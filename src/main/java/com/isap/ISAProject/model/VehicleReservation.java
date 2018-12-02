@@ -8,6 +8,7 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -41,6 +42,8 @@ public class VehicleReservation {
 	@Column(nullable = false)
 	private double price;
 	
+	@ManyToOne
+	private Vehicle vehicle;
 	
 	public Date getBeginDate() {
 		return beginDate;
@@ -59,6 +62,12 @@ public class VehicleReservation {
 	}
 	public void setPrice(double price) {
 		this.price = price;
+	}
+	public Vehicle getVehicle() {
+		return vehicle;
+	}
+	public void setVehicle(Vehicle vehicle) {
+		this.vehicle = vehicle;
 	}
 
 }
