@@ -1,6 +1,7 @@
-package com.isap.ISAProject.model;
+package com.isap.ISAProject.model.Hotel;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,7 +9,7 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -18,13 +19,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-
 @Entity
-@Table(name = "vehicle_reservation")
+@Table(name = "room_reservation")
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(value = {"beginDate", "endDate"}, 
         allowGetters = true)
-public class VehicleReservation {
+public class RoomReservation {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,34 +40,14 @@ public class VehicleReservation {
 	private Date endDate;
 	
 	@Column(nullable = false)
-	private double price;
-	
-	@ManyToOne
-	private Vehicle vehicle;
-	
-	public Date getBeginDate() {
-		return beginDate;
-	}
-	public void setBeginDate(Date beginDate) {
-		this.beginDate = beginDate;
-	}
-	public Date getEndDate() {
-		return endDate;
-	}
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
-	public double getPrice() {
-		return price;
-	}
-	public void setPrice(double price) {
-		this.price = price;
-	}
-	public Vehicle getVehicle() {
-		return vehicle;
-	}
-	public void setVehicle(Vehicle vehicle) {
-		this.vehicle = vehicle;
-	}
+	private int numberOfNights;
 
+	@Column(nullable = false)
+	private int numberOfGuests;
+	
+	@Column(nullable = false)
+	private int numberOfRooms;
+	
+	@ManyToMany(mappedBy="roomReservation")
+	private List<Room> room;
 }

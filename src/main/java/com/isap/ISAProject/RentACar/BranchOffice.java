@@ -1,4 +1,4 @@
-package com.isap.ISAProject.model;
+package com.isap.ISAProject.RentACar;
 
 import java.util.ArrayList;
 import java.util.List;

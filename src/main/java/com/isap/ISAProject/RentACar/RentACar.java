@@ -1,4 +1,4 @@
-package com.isap.ISAProject.model;
+package com.isap.ISAProject.RentACar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,8 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.isap.ISAProject.model.Company;
 
 @Entity
 @Table(name = "rent_a_car")
