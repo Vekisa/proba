@@ -14,7 +14,11 @@ import com.isap.ISAProject.model.Company;
 public class RentACar extends Company {
 	
 	@OneToMany(mappedBy="rentACar")
-	private List<BranchOffice> branchOffices = new ArrayList<>();
+	private List<BranchOffice> branchOffices;
+	
+	public RentACar() {
+		this.branchOffices = new ArrayList<>();
+	}
 
 	public List<BranchOffice> getBranchOffices() {
 		return branchOffices;
