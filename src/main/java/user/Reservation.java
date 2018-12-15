@@ -6,9 +6,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import com.isap.ISAProject.RentACar.VehicleReservation;
-import com.isap.ISAProject.model.Hotel.RoomReservation;
-import com.isap.ISAProject.model.airline.Ticket;
+import model.airline.Ticket;
+import model.hotel.RoomReservation;
+import model.rentacar.VehicleReservation;
 
 public class Reservation {
 	

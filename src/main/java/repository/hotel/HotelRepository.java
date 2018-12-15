@@ -2,7 +2,7 @@ package repository.hotel;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.isap.ISAProject.model.Hotel.Hotel;
+import model.hotel.Hotel;
 
 public interface HotelRepository extends JpaRepository<Hotel, Long> {
 
