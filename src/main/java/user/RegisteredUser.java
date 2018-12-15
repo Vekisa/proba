@@ -11,6 +11,16 @@ public class RegisteredUser extends SystemUser {
 	private List<FriendRequest> sentRequests;
 	
 	private List<FriendRequest> receivedRequests;
+	
+	private List<Friendship> friendships;
+
+	public List<Friendship> getFriendships() {
+		return friendships;
+	}
+
+	public void setFriendships(List<Friendship> friendships) {
+		this.friendships = friendships;
+	}
 
 	public int getBonusPoints() {
 		return bonusPoints;
