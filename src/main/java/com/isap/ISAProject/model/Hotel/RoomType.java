@@ -1,5 +1,6 @@
 package com.isap.ISAProject.model.Hotel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -33,6 +34,10 @@ public class RoomType {
 	
 	@ManyToOne
 	private Catalogue catalogue;
+	
+	public RoomType() {
+		room = new ArrayList<>();
+	}
 
 	public Long getId() {
 		return id;

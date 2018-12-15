@@ -30,6 +30,10 @@ public class ExtraOption {
 	
 	@ManyToOne
 	private RoomReservation roomReservation;
+	
+	public ExtraOption() {
+		
+	}
 
 	public Long getId() {
 		return id;

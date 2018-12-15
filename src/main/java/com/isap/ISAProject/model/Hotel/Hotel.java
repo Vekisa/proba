@@ -1,5 +1,6 @@
 package com.isap.ISAProject.model.Hotel;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,11 @@ public class Hotel extends Company {
 	
 	@OneToOne
 	private Catalogue catalogue;
+	
+	public Hotel() {
+		floor = new ArrayList<>();
+		extraOption = new ArrayList<>();
+	}
 	
 	public Map<Room, Integer> getGraph(Date beginDate, Date endDate) {
 	      // TODO: implement

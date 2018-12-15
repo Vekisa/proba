@@ -1,5 +1,6 @@
 package com.isap.ISAProject.model.Hotel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -7,8 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.isap.ISAProject.model.RatableEntity;
@@ -30,8 +31,12 @@ public class Room extends RatableEntity {
 	@ManyToOne
 	private RoomType roomType;
 	
-	@ManyToMany
+	@OneToMany(mappedBy="room")
 	private List<RoomReservation> roomReservation;
+	
+	public Room() {
+		roomReservation = new ArrayList<>();
+	}
 
 	public Long getId() {
 		return id;

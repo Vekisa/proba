@@ -1,7 +1,6 @@
 package com.isap.ISAProject.model.Hotel;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,7 +8,7 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -32,7 +31,6 @@ public class RoomReservation {
 	
 	@Column(nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
-    @CreatedDate
 	private Date beginDate;
 	
 	@Column(nullable = false)
@@ -48,6 +46,67 @@ public class RoomReservation {
 	@Column(nullable = false)
 	private int numberOfRooms;
 	
-	@ManyToMany(mappedBy="roomReservation")
-	private List<Room> room;
+	@ManyToOne
+	private Room room;
+	
+	public RoomReservation() {
+		
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Date getBeginDate() {
+		return beginDate;
+	}
+
+	public void setBeginDate(Date beginDate) {
+		this.beginDate = beginDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+
+	public int getNumberOfNights() {
+		return numberOfNights;
+	}
+
+	public void setNumberOfNights(int numberOfNights) {
+		this.numberOfNights = numberOfNights;
+	}
+
+	public int getNumberOfGuests() {
+		return numberOfGuests;
+	}
+
+	public void setNumberOfGuests(int numberOfGuests) {
+		this.numberOfGuests = numberOfGuests;
+	}
+
+	public int getNumberOfRooms() {
+		return numberOfRooms;
+	}
+
+	public void setNumberOfRooms(int numberOfRooms) {
+		this.numberOfRooms = numberOfRooms;
+	}
+
+	public Room getRoom() {
+		return room;
+	}
+
+	public void setRoom(Room room) {
+		this.room = room;
+	}
+
 }

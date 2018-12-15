@@ -1,5 +1,6 @@
 package com.isap.ISAProject.model.Hotel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -33,6 +34,10 @@ public class Floor {
 	
 	@OneToMany(mappedBy="floor")
 	private List<Room> room;
+	
+	public Floor() {
+		room = new ArrayList<>();
+	}
 
 	public Long getId() {
 		return id;
@@ -73,8 +78,4 @@ public class Floor {
 	public void setHotel(Hotel hotel) {
 		this.hotel = hotel;
 	}
-	
-	
-	
-
 }
