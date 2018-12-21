@@ -8,19 +8,28 @@ import java.util.Map;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.Company;
 
 @Entity
 @Table(name = "airline")
 public class Airline extends Company {
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "airline")
 	private List<LuggageInfo> luggageInfos;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "airline")
+	@Cascade(CascadeType.ALL)
 	private List<Destination> destinations;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "airline")
 	private List<FlightConfiguration> configurations;
 	
@@ -53,6 +62,27 @@ public class Airline extends Company {
 
 	public List<FlightConfiguration> getConfigurations() {
 		return configurations;
+	}
+
+	public void copyFieldsFrom(@Valid Airline newAirline) {
+		this.setName(newAirline.getName());
+		this.setAddress(newAirline.getAddress());
+		this.setDescription(newAirline.getDescription());
+	}
+
+	public void add(@Valid Destination destination) {
+		this.getDestinations().add(destination);
+		destination.setAirline(this);
+	}
+
+	public void add(@Valid FlightConfiguration flightConfiguration) {
+		this.getConfigurations().add(flightConfiguration);
+		flightConfiguration.setAirline(this);
+	}
+
+	public void add(@Valid LuggageInfo luggageInfo) {
+		this.getLuggageInfos().add(luggageInfo);
+		luggageInfo.setAirline(this);
 	}
 	
 }

@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
 
 @Entity
 @Table(name = "luggage_info")
@@ -56,6 +57,16 @@ public class LuggageInfo {
 
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	public void copyFieldsFrom(@Valid LuggageInfo newLuggageInfo) {
+		this.setMinWeight(newLuggageInfo.getMinWeight());
+		this.setMaxWeight(newLuggageInfo.getMaxWeight());
+		this.setPrice(newLuggageInfo.getPrice());
+	}
+
+	public void setAirline(Airline airline) {
+		this.airline = airline;
 	}
 	
 }
