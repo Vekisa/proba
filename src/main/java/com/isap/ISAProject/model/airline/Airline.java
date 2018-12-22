@@ -22,6 +22,7 @@ public class Airline extends Company {
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "airline")
+	@Cascade(CascadeType.ALL)
 	private List<LuggageInfo> luggageInfos;
 	
 	@JsonIgnore
@@ -31,6 +32,7 @@ public class Airline extends Company {
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "airline")
+	@Cascade(CascadeType.ALL)
 	private List<FlightConfiguration> configurations;
 	
 	public Map<Flight, Integer> getGraphForFlights(Date beginDate, Date endDate) {
