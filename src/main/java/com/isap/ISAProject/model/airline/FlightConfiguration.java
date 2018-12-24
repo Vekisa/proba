@@ -39,5 +39,9 @@ public class FlightConfiguration {
 	public Vector<Vector<FlightSeat>> getSeatsMatrix() {
 		return seatsMatrix;
 	}
+
+	public void setAirline(Airline airline) {
+		this.airline = airline;
+	}
 	
 }

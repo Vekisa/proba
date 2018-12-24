@@ -40,5 +40,9 @@ public abstract class Company extends RatableEntity {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+	public Long getId() {
+		return this.id;
+	}
 
 }
