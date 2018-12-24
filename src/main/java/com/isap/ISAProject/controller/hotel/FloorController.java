@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.isap.ISAProject.model.exception.ResourceNotFoundException;
+import com.isap.ISAProject.exception.ResourceNotFoundException;
 import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.repository.repository.hotel.FloorRepository;
 
@@ -34,13 +34,13 @@ public class FloorController {
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.GET)
 	public Floor getFloorById(@PathVariable(value="id") Long floorId) {
-		return floorRepository.findById(floorId).orElseThrow(() -> new ResourceNotFoundException("Floor", "id", floorId));
+		return floorRepository.findById(floorId).orElseThrow(() -> new ResourceNotFoundException("id: " + floorId));
 	}
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.DELETE)
 	public ResponseEntity<Object> deleteFloor(@PathVariable(value="id") Long floorId){
 		Floor floor = floorRepository.findById(floorId).orElseThrow(() -> 
-			new ResourceNotFoundException("Floor", "id", floorId));
+			new ResourceNotFoundException("id: " + floorId));
 		
 		floorRepository.delete(floor);
 		

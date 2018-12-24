@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.isap.ISAProject.model.exception.ResourceNotFoundException;
+import com.isap.ISAProject.exception.ResourceNotFoundException;
 import com.isap.ISAProject.model.hotel.Catalogue;
 import com.isap.ISAProject.repository.repository.hotel.CatalogueRepository;
 
@@ -34,13 +34,13 @@ public class CatalogueController {
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.GET)
 	public Catalogue getCatalogueById(@PathVariable(value="id") Long catalogueId) {
-		return catalogueRepository.findById(catalogueId).orElseThrow(() -> new ResourceNotFoundException("Catalogue", "id", catalogueId));
+		return catalogueRepository.findById(catalogueId).orElseThrow(() -> new ResourceNotFoundException("id: " + catalogueId));
 	}
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.DELETE)
 	public ResponseEntity<Object> deleteCatalogue(@PathVariable(value="id") Long catalogueId){
 		Catalogue catalogue = catalogueRepository.findById(catalogueId).orElseThrow(() -> 
-			new ResourceNotFoundException("Catalogue", "id", catalogueId));
+			new ResourceNotFoundException("id" + catalogueId));
 		
 		catalogueRepository.delete(catalogue);
 		

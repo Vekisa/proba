@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.isap.ISAProject.model.exception.ResourceNotFoundException;
+import com.isap.ISAProject.exception.ResourceNotFoundException;
 import com.isap.ISAProject.model.hotel.ExtraOption;
 import com.isap.ISAProject.repository.repository.hotel.ExtraOptionRepository;
 
@@ -34,13 +34,13 @@ public class ExtraOptionController {
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.GET)
 	public ExtraOption getExtraOptionById(@PathVariable(value="id") Long extraOptionId) {
-		return extraOptionRepository.findById(extraOptionId).orElseThrow(() -> new ResourceNotFoundException("ExtraOption", "id", extraOptionId));
+		return extraOptionRepository.findById(extraOptionId).orElseThrow(() -> new ResourceNotFoundException("id: " + extraOptionId));
 	}
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.DELETE)
 	public ResponseEntity<Object> deleteExtraOption(@PathVariable(value="id") Long extraOptionId){
 		ExtraOption extraOption = extraOptionRepository.findById(extraOptionId).orElseThrow(() -> 
-			new ResourceNotFoundException("ExtraOption", "id", extraOptionId));
+			new ResourceNotFoundException("id: " + extraOptionId));
 		
 		extraOptionRepository.delete(extraOption);
 		
