@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
 
 import com.isap.ISAProject.model.RatableEntity;
 
@@ -62,5 +63,28 @@ public class Room extends RatableEntity {
 		this.floor = floor;
 	}
 
+	public RoomType getRoomType() {
+		return roomType;
+	}
 
+	public void setRoomType(RoomType roomType) {
+		this.roomType = roomType;
+	}
+
+	public List<RoomReservation> getRoomReservation() {
+		return roomReservation;
+	}
+
+	public void setRoomReservation(List<RoomReservation> roomReservation) {
+		this.roomReservation = roomReservation;
+	}
+
+	public void copyFieldsFrom(@Valid Room newRoom) {
+		this.setNumberOfBeds(newRoom.getNumberOfBeds());
+	}
+	
+	public void add(@Valid RoomReservation roomReservation) {
+		this.getRoomReservation().add(roomReservation);
+		roomReservation.setRoom(this);
+	}
 }

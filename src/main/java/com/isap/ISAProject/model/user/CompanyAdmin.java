@@ -1,5 +1,8 @@
 package com.isap.ISAProject.model.user;
 
-public abstract class CompanyAdmin {
+import javax.persistence.MappedSuperclass;
+
+@MappedSuperclass
+public abstract class CompanyAdmin extends SystemUser {
 
 }

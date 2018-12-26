@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
 
 @Entity
 @Table(name = "floor")
@@ -71,11 +72,30 @@ public class Floor {
 		this.numberOfColumns = numberOfColumns;
 	}
 
+	public List<Room> getRoom() {
+		return room;
+	}
+
+	public void setRoom(List<Room> room) {
+		this.room = room;
+	}
+
 	public Hotel getHotel() {
 		return hotel;
 	}
 
 	public void setHotel(Hotel hotel) {
 		this.hotel = hotel;
+	}
+	
+	public void copyFieldsFrom(@Valid Floor newFloor) {
+		this.setNumber(newFloor.getNumber());
+		this.setNumberOfColumns(newFloor.getNumberOfColumns());
+		this.setNumberOfRows(newFloor.getNumberOfRows());
+	}
+	
+	public void add(@Valid Room room) {
+		this.getRoom().add(room);
+		room.setFloor(this);
 	}
 }

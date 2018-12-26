@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
 
 @Entity
 @Table(name = "room_type")
@@ -77,6 +78,12 @@ public class RoomType {
 
 	public void setCatalogue(Catalogue catalogue) {
 		this.catalogue = catalogue;
+	}
+	
+	public void copyFieldsFrom(@Valid RoomType newRoomType) {
+		this.setName(newRoomType.getName());
+		this.setDescription(newRoomType.getDescription());
+		this.setPricePerNight(newRoomType.getPricePerNight());
 	}
 
 }

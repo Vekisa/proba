@@ -2,27 +2,58 @@ package com.isap.ISAProject.model.user;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
 
+@Entity
+@Table(name = "reservations")
+@EntityListeners(AuditingEntityListener.class)
+@JsonIgnoreProperties(value = {"beginDate", "endDate"}, 
+        allowGetters = true)
 public class Reservation {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 	
+	@OneToOne
 	private Ticket ticket;
+	
+	@OneToOne
 	private VehicleReservation vehicleReservation;
+	
+	@OneToOne
 	private RoomReservation roomReservation;
+	
+	@Column(nullable = false)
 	private double price;
+	
+	@Column(nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date beginDate;
+	
+	@Column(nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date endDate;
 	
+	@ManyToOne
+	private RegisteredUser registeredUser;
 	
 	public Ticket getTicket() {
 		return ticket;
@@ -60,6 +91,10 @@ public class Reservation {
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
-	
-
+	public RegisteredUser getRegisteredUser() {
+		return registeredUser;
+	}
+	public void setRegisteredUser(RegisteredUser registeredUser) {
+		this.registeredUser = registeredUser;	
+	}
 }

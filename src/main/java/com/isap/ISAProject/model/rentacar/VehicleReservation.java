@@ -8,9 +8,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.springframework.data.annotation.CreatedDate;
+
+import com.isap.ISAProject.model.user.Reservation;
 
 
 @Entity
@@ -38,6 +41,9 @@ public class VehicleReservation {
 	
 	@ManyToOne
 	private Vehicle vehicle;
+	
+	@OneToOne
+	private Reservation reservation;
 	
 	public Date getBeginDate() {
 		return beginDate;

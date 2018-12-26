@@ -12,16 +12,15 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.Valid;
 
 import com.isap.ISAProject.model.Company;
+import com.isap.ISAProject.model.airline.Airline;
+import com.isap.ISAProject.model.airline.Destination;
 
 @Entity
 @Table(name = "hotel")
 public class Hotel extends Company {
-	
-	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 	
 	@OneToMany(mappedBy="hotel")
 	private List<Floor> floor;
@@ -57,14 +56,29 @@ public class Hotel extends Company {
 	public void setExtraOption(List<ExtraOption> extraOption) {
 		this.extraOption = extraOption;
 	}
-
-	public Long getId() {
-		return id;
+	
+	public Catalogue getCatalogue() {
+		return catalogue;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setCatalogue(Catalogue catalogue) {
+		this.catalogue = catalogue;
+		catalogue.setHotel(this);
+	}
+
+	public void copyFieldsFrom(@Valid Hotel newHotel) {
+		this.setName(newHotel.getName());
+		this.setAddress(newHotel.getAddress());
+		this.setDescription(newHotel.getDescription());
 	}
 	
-
+	public void add(@Valid Floor floor) {
+		this.getFloor().add(floor);
+		floor.setHotel(this);
+	}
+	
+	public void add(@Valid ExtraOption extraOption) {
+		this.getExtraOption().add(extraOption);
+		extraOption.setHotel(this);
+	}
 }

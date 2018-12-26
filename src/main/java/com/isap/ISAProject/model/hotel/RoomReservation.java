@@ -1,28 +1,23 @@
 package com.isap.ISAProject.model.hotel;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.validation.Valid;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.isap.ISAProject.model.user.Reservation;
 
 @Entity
 @Table(name = "room_reservation")
-@EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(value = {"beginDate", "endDate"}, 
-        allowGetters = true)
 public class RoomReservation {
 	
 	@Id
@@ -30,11 +25,9 @@ public class RoomReservation {
     private Long id;
 	
 	@Column(nullable = false)
-	@Temporal(TemporalType.TIMESTAMP)
 	private Date beginDate;
 	
 	@Column(nullable = false)
-	@Temporal(TemporalType.TIMESTAMP)
 	private Date endDate;
 	
 	@Column(nullable = false)
@@ -48,6 +41,12 @@ public class RoomReservation {
 	
 	@ManyToOne
 	private Room room;
+	
+	@OneToMany(mappedBy = "roomReservation")
+	private List<ExtraOption> extraOptions;
+	
+	@OneToOne
+	private Reservation reservation;
 	
 	public RoomReservation() {
 		
@@ -108,5 +107,25 @@ public class RoomReservation {
 	public void setRoom(Room room) {
 		this.room = room;
 	}
+	
+	public List<ExtraOption> getExtraOptions() {
+		return extraOptions;
+	}
 
+	public void setExtraOptions(List<ExtraOption> extraOptions) {
+		this.extraOptions = extraOptions;
+	}
+
+	public void copyFieldsFrom(@Valid RoomReservation newRoomReservation) {
+		this.setNumberOfGuests(newRoomReservation.getNumberOfGuests());
+		this.setNumberOfNights(newRoomReservation.getNumberOfNights());
+		this.setNumberOfRooms(newRoomReservation.getNumberOfRooms());
+		this.setBeginDate(newRoomReservation.getBeginDate());
+		this.setEndDate(newRoomReservation.getEndDate());
+	}
+
+	public void add(@Valid ExtraOption extraOption) {
+		this.getExtraOptions().add(extraOption);
+		extraOption.setRoomReservation(this);
+	}
 }

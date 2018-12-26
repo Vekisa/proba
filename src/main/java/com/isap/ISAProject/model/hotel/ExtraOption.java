@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.Valid;
 
 @Entity
 @Table(name = "extra_option")
@@ -81,6 +82,12 @@ public class ExtraOption {
 
 	public void setRoomReservation(RoomReservation roomReservation) {
 		this.roomReservation = roomReservation;
+	}
+	
+	public void copyFieldsFrom(@Valid ExtraOption newExtraOption) {
+		this.setPricePerDay(newExtraOption.getPricePerDay());
+		this.setDescription(newExtraOption.getDescription());
+		this.setDiscount(newExtraOption.getDiscount());
 	}
 
 }

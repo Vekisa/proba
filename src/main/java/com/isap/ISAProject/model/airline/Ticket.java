@@ -9,6 +9,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.isap.ISAProject.model.user.Reservation;
+
 @Entity
 @Table(name = "ticket")
 public class Ticket {
@@ -25,6 +27,9 @@ public class Ticket {
 	
 	@OneToOne
 	private FlightSeat seat;
+	
+	@OneToOne
+	private Reservation reservation;
 	
 	public int getDiscount() {
 		return discount;

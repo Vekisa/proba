@@ -163,7 +163,8 @@ public class AirlineController {
 		if(airline.isPresent()) {
 			airline.get().add(luggageInfo);
 			airlineRepository.save(airline.get());
-			return new ResponseEntity<Resource<LuggageInfo>>(HATEOASImplementor.createLuggageInfo(luggageInfo), HttpStatus.CREATED);
+			return new ResponseEntity<Resource<LuggageInfo>>(HATEOASImplementor.createLuggageInfo(luggageInfo),
+					HttpStatus.CREATED);
 		} else {
 			return ResponseEntity.notFound().build();
 		}

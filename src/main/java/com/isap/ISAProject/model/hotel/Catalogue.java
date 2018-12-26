@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.Valid;
 
 @Entity
 @Table(name = "catalogue")
@@ -37,4 +38,28 @@ public class Catalogue {
 		this.id = id;
 	}
 
+	public Hotel getHotel() {
+		return hotel;
+	}
+
+	public void setHotel(Hotel hotel) {
+		this.hotel = hotel;
+	}
+
+	public List<RoomType> getRoomType() {
+		return roomType;
+	}
+
+	public void setRoomType(List<RoomType> roomType) {
+		this.roomType = roomType;
+	}
+
+	public void copyFieldsFrom(@Valid Catalogue catalogue) {
+		//Proveriti sta raditi
+	}
+	
+	public void add(@Valid RoomType roomType) {
+		this.getRoomType().add(roomType);
+		roomType.setCatalogue(this);
+	}
 }
