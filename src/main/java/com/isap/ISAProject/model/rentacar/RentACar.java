@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
 
 import com.isap.ISAProject.model.Company;
 
@@ -25,10 +26,17 @@ public class RentACar extends Company {
 	}
 	
 	public void addBranchOffice(BranchOffice bo) {
-		this.branchOffices.add(bo);
+		if(!this.branchOffices.contains(bo))
+			this.branchOffices.add(bo);
 	}
 	
 	public void removeBranchOffice(BranchOffice bo) {
 		this.branchOffices.remove(bo);
+	}
+	
+	public void copyFieldsFrom(@Valid RentACar newRac) {
+		this.setName(newRac.getName());
+		this.setAddress(newRac.getAddress());
+		this.setDescription(newRac.getDescription());
 	}
 }

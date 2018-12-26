@@ -62,6 +62,7 @@ public class ExtraOptionController {
 		return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(createdExtraOption), HttpStatus.CREATED);
 	}
 	
+
 	//Vraca extra-option sa zadatim ID-em
 	@RequestMapping(value="/{id}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraća extra-option sa zadatim ID-em.", notes = "Povratna vrednost metode je extra-option koji ima zadati ID.",

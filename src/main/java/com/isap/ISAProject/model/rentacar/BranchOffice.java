@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
 
 @Entity
 @Table(name = "branch_office")
@@ -59,5 +60,10 @@ public class BranchOffice {
 	
 	public void removeVehicle(Vehicle vehicle) {
 		this.vehicles.remove(vehicle);
+	}
+	
+	public void copyFieldsFrom(@Valid BranchOffice newBro) {
+		this.setAddress(newBro.getAddress());
+		this.setRentACar(newBro.getRentACar());
 	}
 }

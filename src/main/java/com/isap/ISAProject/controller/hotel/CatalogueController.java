@@ -19,9 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.hotel.Catalogue;
-import com.isap.ISAProject.model.hotel.Floor;
-import com.isap.ISAProject.model.hotel.Room;
-import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.repository.hotel.CatalogueRepository;
 

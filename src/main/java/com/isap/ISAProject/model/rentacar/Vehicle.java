@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
 @Entity
 @Table(name = "vehicle")
 public class Vehicle {
@@ -62,5 +63,11 @@ public class Vehicle {
 	
 	public void removeVehicleReservation(VehicleReservation vr) {
 		this.vehicleReservations.add(vr);
+	}
+	
+	public void copyFieldsFrom(@Valid Vehicle newVeh) {
+		this.setBranchOffice(newVeh.getBranchOffice());
+		this.setDiscount(newVeh.getDiscount());
+		this.setPricePerDay(newVeh.getPricePerDay());
 	}
 }

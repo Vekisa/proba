@@ -63,6 +63,7 @@ public class FloorController {
 		return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(createdFloor), HttpStatus.CREATED);
 	}
 	
+
 	//Vraca sprat sa zadatim ID-em
 	@RequestMapping(value="/{id}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraća sprat sa zadatim ID-em.", notes = "Povratna vrednost metode je sprat koji ima zadati ID.", httpMethod = "GET", produces = "application/json")
