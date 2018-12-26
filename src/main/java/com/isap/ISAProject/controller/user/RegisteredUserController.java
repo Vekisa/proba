@@ -1,4 +1,4 @@
-package user;
+package com.isap.ISAProject.controller.user;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,11 +22,11 @@ import com.isap.ISAProject.model.user.FriendRequest;
 import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
+import com.isap.ISAProject.repository.user.RegisteredUserRepository;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import repository.user.RegisteredUserRepository;
 
 @RestController
 @RequestMapping("/registeredUsers")

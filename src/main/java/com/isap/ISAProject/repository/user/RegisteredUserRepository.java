@@ -1,4 +1,4 @@
-package repository.user;
+package com.isap.ISAProject.repository.user;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 
