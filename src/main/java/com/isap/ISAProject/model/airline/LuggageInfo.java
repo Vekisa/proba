@@ -1,14 +1,11 @@
 package com.isap.ISAProject.model.airline;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.Valid;
 
@@ -31,9 +28,6 @@ public class LuggageInfo {
 	
 	@ManyToOne
 	private Airline airline;
-	
-	@OneToMany(mappedBy = "luggageInfo")
-	private List<FlightSeatCategory> categories;
 	
 	public double getMinWeight() {
 		return minWeight;
@@ -67,6 +61,14 @@ public class LuggageInfo {
 
 	public void setAirline(Airline airline) {
 		this.airline = airline;
+	}
+
+	public Long getId() {
+		return this.id;
+	}
+
+	public Airline getAirline() {
+		return this.airline;
 	}
 	
 }

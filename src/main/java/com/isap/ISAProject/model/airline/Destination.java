@@ -12,6 +12,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.Valid;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "destination")
 public class Destination {
@@ -23,13 +28,17 @@ public class Destination {
 	@Column(nullable = false)
 	private String name;
 	
+	@JsonIgnore
 	@ManyToOne
 	private Airline airline;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "destination")
 	private List<Transfer> transfers;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "destination")
+	@Cascade(CascadeType.ALL)
 	private List<Flight> flights;
 
 	public List<Flight> getFlights() {
@@ -50,6 +59,14 @@ public class Destination {
 
 	public void copyFieldsFrom(@Valid Destination newDestination) {
 		this.setName(newDestination.getName());
+	}
+
+	public Long getId() {
+		return this.id;
+	}
+
+	public Airline getAirline() {
+		return this.airline;
 	}
 	
 }
