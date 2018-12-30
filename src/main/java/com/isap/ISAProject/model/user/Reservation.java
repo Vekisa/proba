@@ -13,6 +13,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.Valid;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -96,5 +97,11 @@ public class Reservation {
 	}
 	public void setRegisteredUser(RegisteredUser registeredUser) {
 		this.registeredUser = registeredUser;	
+	}
+	
+	public void copyFieldsFrom(@Valid Reservation newReservation) {
+		this.setPrice(newReservation.getPrice());
+		this.setBeginDate(newReservation.getBeginDate());
+		this.setEndDate(newReservation.getEndDate());
 	}
 }
