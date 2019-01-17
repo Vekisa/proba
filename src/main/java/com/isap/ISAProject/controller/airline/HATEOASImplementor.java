@@ -6,13 +6,20 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.hateoas.Resource;
 
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.Destination;
+import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
+import com.isap.ISAProject.model.airline.FlightSeat;
+import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.FlightSegment;
 import com.isap.ISAProject.model.airline.LuggageInfo;
+import com.isap.ISAProject.model.airline.Passenger;
+import com.isap.ISAProject.model.airline.Ticket;
 
 class HATEOASImplementor {
 
@@ -31,7 +38,7 @@ class HATEOASImplementor {
 		// TODO : Link za brze rezervacije
 		return resource;
 	}
-	
+
 	/**
 	 * @param airlines - Lista aviona za koje se kreiraju linkovi
 	 * @return Lista resursa aviona sa kreiranim linkovima
@@ -43,7 +50,7 @@ class HATEOASImplementor {
 		}
 		return list;
 	}
-	
+
 	/**
 	 * Linkovi koji će biti kreirani : na sebe, na sve informacije o prtljazima, na avio kompaniju koja ga poseduje
 	 * @param luggageInfo
@@ -53,10 +60,10 @@ class HATEOASImplementor {
 		Resource<LuggageInfo> resource = new Resource<LuggageInfo>(luggageInfo);
 		resource.add(linkTo(methodOn(LuggageInfoController.class).getLuggageInfoWithId(luggageInfo.getId())).withRel("self"));
 		resource.add(linkTo(methodOn(LuggageInfoController.class).getLuggageInfoWithId(null)).slash("?page=0&size=5").withRel("all-luggage-infos"));
-		resource.add(linkTo(methodOn(AirlineController.class).getAirlineById(luggageInfo.getAirline().getId())).withRel("owner-airline"));
+		resource.add(linkTo(methodOn(LuggageInfoController.class).getAirlineForLuggageInfoWithId(luggageInfo.getId())).withRel("owner-airline"));
 		return resource;
 	}
-	
+
 	/**
 	 * @param luggageInfos - Lista informacija o prtljagu za koje se kreiraju linkovi
 	 * @return Lista resursa informacija o prtljagu sa kreiranim linkovima
@@ -77,10 +84,10 @@ class HATEOASImplementor {
 		Resource<Destination> resource = new Resource<Destination>(destination);
 		resource.add(linkTo(methodOn(DestinationController.class).getDestinationById(destination.getId())).withRel("self"));
 		resource.add(linkTo(methodOn(DestinationController.class).getAllDestinations(null)).slash("page=0&size=5").withRel("all-destinations"));
-		resource.add(linkTo(methodOn(AirlineController.class).getAirlineById(destination.getAirline().getId())).withRel("owner-airline"));
+		resource.add(linkTo(methodOn(DestinationController.class).getAirlineForDestinationWithId(destination.getId())).withRel("owner-airline"));
 		return resource;
 	}
-	
+
 	/**
 	 * @param destinations - Lista destinacija za koje se kreiraju linkovi
 	 * @return Lista resursa destinacija sa kreiranim linkovima
@@ -98,15 +105,15 @@ class HATEOASImplementor {
 	 * @return Resurs koji poštuje HATEOAS princip
 	 */
 	public static Resource<FlightConfiguration> createFlightConfiguration(
-	        FlightConfiguration configuration) {
+			FlightConfiguration configuration) {
 		Resource<FlightConfiguration> resource = new Resource<FlightConfiguration>(configuration);
 		resource.add(linkTo(methodOn(FlightConfigurationController.class).getFlightConfigurationWithId(configuration.getId())).withRel("self"));
 		resource.add(linkTo(methodOn(FlightConfigurationController.class).getAllFlightConfigurations(null)).slash("page=0&size=5").withRel("all-configurations"));
-		resource.add(linkTo(methodOn(AirlineController.class).getAirlineById(configuration.getAirline().getId())).withRel("owner-airline"));
+		resource.add(linkTo(methodOn(FlightConfigurationController.class).getAirlineForConfigurationWithId(configuration.getId())).withRel("owner-airline"));
 		resource.add(linkTo(methodOn(FlightConfigurationController.class).getSegmentsForConfigurationWithId(configuration.getId())).withRel("configuration-segments"));
 		return resource;
 	}
-	
+
 	/**
 	 * @param flightConfigurations - Lista konfiguracija za koje se kreiraju linkovi
 	 * @return Lista resursa konfiguracija sa kreiranim linkovima
@@ -118,22 +125,167 @@ class HATEOASImplementor {
 		return list;
 	}
 
+	/**
+	 * Linkovi koji će biti kreirani : na sebe, na sve segmente, na konfiguraciju koja je poseduje, na kategoriju kojoj pripada
+	 * @param segment
+	 * @return Resurs koji poštuje HATEOAS princip
+	 */
 	public static Resource<FlightSegment> createFlightSegment(
-	        FlightSegment fs) {
-		// TODO Auto-generated method stub
-		return null;
+			FlightSegment segment) {
+		Resource<FlightSegment> resource = new Resource<FlightSegment>(segment);
+		resource.add(linkTo(methodOn(FlightSegmentController.class).getFlightSegmentWithId(segment.getId())).withRel("self"));
+		resource.add(linkTo(methodOn(FlightSegmentController.class).getAllFlightSegments(null)).slash("page=0&size=5").withRel("all-segments"));
+		resource.add(linkTo(methodOn(FlightConfigurationController.class).getFlightConfigurationWithId(segment.getConfiguration().getId())).withRel("owner-configuration"));
+		resource.add(linkTo(methodOn(FlightSeatCategoryController.class).getFlightSeatCategoryWithId(segment.getCategory().getId())).withRel("category"));
+		return resource;
 	}
-	
+
 	/**
 	 * @param flightSegments - Lista segmenata za koje se kreiraju linkovi
 	 * @return Lista resursa segemnata sa kreiranim linkovima
 	 */
-	public static List<Resource<FlightSegment>> createSegmentsList(
-	        List<FlightSegment> flightSegments) {
+	public static List<Resource<FlightSegment>> createFlightSegmentsList(
+			List<FlightSegment> flightSegments) {
 		List<Resource<FlightSegment>> list = new ArrayList<Resource<FlightSegment>>();
 		for(FlightSegment fs : flightSegments)
 			list.add(HATEOASImplementor.createFlightSegment(fs));
 		return list;
 	}
+
+	/**
+	 * Linkovi koji će biti kreirani : na sebe, na sve letove, na destinaciju sa koje poleće, na destinaciju na koju sleće, na konfiguraciju leta, na sedišta
+	 * @param flight
+	 * @return Resurs koji poštuje HATEOAS princip
+	 */
+	public static Resource<Flight> createFlight(@Valid Flight flight) {
+		Resource<Flight> resource = new Resource<Flight>(flight);
+		resource.add(linkTo(methodOn(FlightController.class).getFlightById(flight.getId())).withRel("self"));
+		resource.add(linkTo(methodOn(FlightController.class).getAllFlights(null)).slash("page=0%size=5").withRel("all-flights"));
+		resource.add(linkTo(methodOn(FlightController.class).getStartDestinationForFlightWithId(flight.getId())).withRel("start-destination"));
+		resource.add(linkTo(methodOn(FlightController.class).getFinishDestinationForFlightWithId(flight.getId())).withRel("finish-destination"));
+		resource.add(linkTo(methodOn(FlightController.class).getFlightConfigurationForFlightWithId(flight.getId())).withRel("configuration"));
+		resource.add(linkTo(methodOn(FlightController.class).getFlightSeatsForFlightWithId(flight.getId())).withRel("seats"));
+		return resource;
+	}
+
+	/**
+	 * @param flights - Lista letova za koje se kreiraju linkovi
+	 * @return Lista letova sa kreiranim linkovima
+	 */
+	public static List<Resource<Flight>> createFlightsList(List<Flight> flights) {
+		List<Resource<Flight>> list = new ArrayList<Resource<Flight>>();
+		for(Flight f : flights)
+			list.add(HATEOASImplementor.createFlight(f));
+		return list;
+	}
+
+	/**
+	 * Linkovi koji će biti kreirani : na sebe, na sve letove, na destinaciju sa koje poleće, na destinaciju na koju sleće, na konfiguraciju leta, na sedišta
+	 * @param flight
+	 * @return Resurs koji poštuje HATEOAS princip
+	 */
+	public static Resource<FlightSeatCategory> createFlightSeatCategory(
+			FlightSeatCategory flightSeatCategory) {
+		Resource<FlightSeatCategory> resource = new Resource<FlightSeatCategory>(flightSeatCategory);
+		resource.add(linkTo(methodOn(FlightSeatCategoryController.class).getFlightSeatCategoryWithId(flightSeatCategory.getId())).withRel("self"));
+		resource.add(linkTo(methodOn(FlightSeatCategoryController.class).getAllFlightSeatCategories(null)).slash("page=0&size=5").withRel("all-categories"));
+		resource.add(linkTo(methodOn(FlightSeatCategoryController.class).getAirlineForSeatWithId(flightSeatCategory.getId())).withRel("owner-airline"));
+		resource.add(linkTo(methodOn(FlightSeatCategoryController.class).getSeatsInThisCategory(flightSeatCategory.getId())).withRel("seats"));
+		resource.add(linkTo(methodOn(FlightSeatCategoryController.class).getSegmentsOfThisCategory(flightSeatCategory.getId())).withRel("segments"));
+		return resource;
+	}
+
+	/**
+	 * @param flightSeatCategories - Lista kategorija za koje se kreiraju linkovi
+	 * @return Lista kategorija sa kreiranim linkovima
+	 */
+	public static List<Resource<FlightSeatCategory>> createFlightSeatCategoriesList(
+			List<FlightSeatCategory> flightSeatCategories) {
+		List<Resource<FlightSeatCategory>> list = new ArrayList<Resource<FlightSeatCategory>>();
+		for(FlightSeatCategory fsc : flightSeatCategories)
+			list.add(HATEOASImplementor.createFlightSeatCategory(fsc));
+		return list;
+	}
+
+	/**
+	 * Linkovi koji će biti kreirani : na sebe, na sva sedista, na informaciju o prtljagu, na putnika, na kartu, na let
+	 * @param fs
+	 * @return Resurs koji poštuje HATEOAS princip
+	 */
+	public static Resource<FlightSeat> createFlightSeat(FlightSeat fs) {
+		Resource<FlightSeat> resource = new Resource<FlightSeat>(fs);
+		resource.add(linkTo(methodOn(SeatController.class).getSeatWithId(fs.getId())).withRel("self"));
+		resource.add(linkTo(methodOn(SeatController.class).getAllSeats(null)).slash("page=0&size=5").withRel("all-seats"));
+		resource.add(linkTo(methodOn(SeatController.class).getLuggageInfoForSeatWithId(fs.getId())).withRel("luggage-info"));
+		resource.add(linkTo(methodOn(SeatController.class).getPassengerForSeatWithId(fs.getId())).withRel("passenger"));
+		resource.add(linkTo(methodOn(SeatController.class).getTicketForSeatWithId(fs.getId())).withRel("ticket"));
+		resource.add(linkTo(methodOn(SeatController.class).getFlightForSeatWithId(fs.getId())).withRel("flight"));
+		return resource;
+	}
+
+	/**
+	 * @param seats - Lista sedista za koje se kreiraju linkovi
+	 * @return Lista sedista sa kreiranim linkovima
+	 */
+	public static List<Resource<FlightSeat>> createFlightSeatsList(
+			List<FlightSeat> seats) {
+		List<Resource<FlightSeat>> list = new ArrayList<Resource<FlightSeat>>();
+		for(FlightSeat fs : seats)
+			list.add(HATEOASImplementor.createFlightSeat(fs));
+		return list;
+	}
+
+	/**
+	 * Linkovi koji će biti kreirani : na sebe, na sve karte, na let, na sedista
+	 * @param t
+	 * @return Resurs koji poštuje HATEOAS princip
+	 */
+	public static Resource<Ticket> createTicket(Ticket t) {
+		Resource<Ticket> resource = new Resource<Ticket>(t);
+		resource.add(linkTo(methodOn(TicketController.class).getTicketWithId(t.getId())).withRel("self"));
+		resource.add(linkTo(methodOn(TicketController.class).getAllTickets(null)).slash("page=0&size=5").withRel("all-tickets"));
+		resource.add(linkTo(methodOn(TicketController.class).getFlightForTicketWithId(t.getId())).withRel("flight"));
+		resource.add(linkTo(methodOn(TicketController.class).getSeatsForTicketWithId(t.getId())).withRel("seats"));
+		// TODO : link ka rezervaciji
+		return resource;
+	}
 	
+	/**
+	 * @param tickets - Lista karata za koje se kreiraju linkovi
+	 * @return Lista karata sa kreiranim linkovima
+	 */
+	public static List<Resource<Ticket>> createTicketsList(
+			List<Ticket> tickets) {
+		List<Resource<Ticket>> list = new ArrayList<Resource<Ticket>>();
+		for(Ticket t : tickets)
+			list.add(HATEOASImplementor.createTicket(t));
+		return list;
+	}
+
+	/**
+	 * Linkovi koji će biti kreirani : na sebe, na sve putnike, na njegove letove, na njegova sedista, na njegove karte
+	 * @param passenger
+	 * @return Resurs koji poštuje HATEOAS princip
+	 */
+	public static Resource<Passenger> createPassenger(Passenger passenger) {
+		Resource<Passenger> resource = new Resource<Passenger>(passenger);
+		resource.add(linkTo(methodOn(PassengerController.class).getPassengerWithId(passenger.getId())).withRel("self"));
+		resource.add(linkTo(methodOn(PassengerController.class).getAllPassengers(null)).slash("page=0&size=5").withRel("all-passengers"));
+		resource.add(linkTo(methodOn(PassengerController.class).getFlightsForPassengerWithId(passenger.getId())).withRel("flights"));
+		resource.add(linkTo(methodOn(PassengerController.class).getSeatsForPassengerWithId(passenger.getId())).withRel("seats"));
+		resource.add(linkTo(methodOn(PassengerController.class).getTicketsForPassengerWithId(passenger.getId())).withRel("tickets"));
+		return resource;
+	}
+	
+	/**
+	 * @param passengers - Lista putnika za koje se kreiraju linkovi
+	 * @return Lista putnika sa kreiranim linkovima
+	 */
+	public static List<Resource<Passenger>> createPassengersList(List<Passenger> passengers) {
+		List<Resource<Passenger>> list = new ArrayList<Resource<Passenger>>();
+		for(Passenger p : passengers)
+			list.add(HATEOASImplementor.createPassenger(p));
+		return list;
+	}
+
 }

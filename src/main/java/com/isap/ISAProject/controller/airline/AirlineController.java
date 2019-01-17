@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.Destination;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
+import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.LuggageInfo;
 import com.isap.ISAProject.repository.airline.AirlineRepository;
 
@@ -34,7 +35,7 @@ import io.swagger.annotations.ApiResponses;
 public class AirlineController {
 
 	@Autowired
-	AirlineRepository airlineRepository;
+	AirlineRepository repository;
 
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraća avio kompanije.", notes = "Povratna vrednost metode je lista avio kompanija koje pripadaju zahtevanoj strani (na osnovu paginacije).", httpMethod = "GET", produces = "application/json")
@@ -44,7 +45,7 @@ public class AirlineController {
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
 	public ResponseEntity<List<Resource<Airline>>> getAllAirlines(Pageable pageable) {
-		Page<Airline> airlines = airlineRepository.findAll(pageable);
+		Page<Airline> airlines = repository.findAll(pageable);
 		if(airlines.isEmpty())
 			return ResponseEntity.noContent().build();
 		else {
@@ -60,7 +61,7 @@ public class AirlineController {
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa traženim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<Airline>> getAirlineById(@PathVariable(value = "id") Long airlineId) {
-		Optional<Airline> airline = airlineRepository.findById(airlineId);
+		Optional<Airline> airline = repository.findById(airlineId);
 		if(airline.isPresent()) {
 			return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(airline.get()), HttpStatus.OK);
 		} else
@@ -74,7 +75,7 @@ public class AirlineController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđena avio kompanija nije validna.")
 	})
 	public ResponseEntity<Resource<Airline>> createAirline(@Valid @RequestBody Airline airline) {
-		Airline created = airlineRepository.save(airline);
+		Airline created = repository.save(airline);
 		return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(created), HttpStatus.CREATED);
 	}
 
@@ -87,10 +88,10 @@ public class AirlineController {
 	})
 	public ResponseEntity<Resource<Airline>> updateAirlineWithId(@PathVariable(value = "id") Long airlineId,
 			@Valid @RequestBody Airline newAirline) {
-		Optional<Airline> oldAirline = airlineRepository.findById(airlineId);
+		Optional<Airline> oldAirline = repository.findById(airlineId);
 		if(oldAirline.isPresent()) {
 			oldAirline.get().copyFieldsFrom(newAirline);
-			airlineRepository.save(oldAirline.get());
+			repository.save(oldAirline.get());
 			return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(oldAirline.get()), HttpStatus.OK);
 		} else {
 			return ResponseEntity.notFound().build();
@@ -105,12 +106,11 @@ public class AirlineController {
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> deleteAirlineWithId(@PathVariable(value = "id") Long airlineId) {
-		if(!airlineRepository.findById(airlineId).isPresent()) return ResponseEntity.notFound().build();
-		airlineRepository.deleteById(airlineId);
+		if(!repository.findById(airlineId).isPresent()) return ResponseEntity.notFound().build();
+		repository.deleteById(airlineId);
 		return ResponseEntity.ok().build();
 	}
 
-	// TODO : Dodati u model ogranicenje da korisnik sme jednog da glasa za svaki entitet
 	@RequestMapping(value = "/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Dodaje rejting za datu avio kompaniju.", notes = "Povratna vrednost metode je avion sa izmenjenim rejtingom.", httpMethod = "POST", produces = "application/json")
 	@ApiResponses(value = {
@@ -119,7 +119,7 @@ public class AirlineController {
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<Airline>> addRatingToAirlineWithId(@PathVariable(value = "id") Long airlineId, @RequestParam("rating") int rating) {
-		Optional<Airline> airline = airlineRepository.findById(airlineId);
+		Optional<Airline> airline = repository.findById(airlineId);
 		if(airline.isPresent()) {
 			airline.get().addRating(rating);
 			return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(airline.get()), HttpStatus.OK);
@@ -137,7 +137,7 @@ public class AirlineController {
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<LuggageInfo>>> getLuggageInfosForAirlineWithId(@PathVariable(value = "id") Long airlineId) {
-		Optional<Airline> airline = airlineRepository.findById(airlineId);
+		Optional<Airline> airline = repository.findById(airlineId);
 		if(airline.isPresent()) {
 			List<LuggageInfo> list = airline.get().getLuggageInfos();
 			if(list.isEmpty()) {
@@ -159,10 +159,10 @@ public class AirlineController {
 	})
 	public ResponseEntity<Resource<LuggageInfo>> createLuggageInfoForAirlineWithId(@PathVariable(value = "id") Long airlineId,
 			@Valid @RequestBody LuggageInfo luggageInfo) {
-		Optional<Airline> airline = airlineRepository.findById(airlineId);
+		Optional<Airline> airline = repository.findById(airlineId);
 		if(airline.isPresent()) {
 			airline.get().add(luggageInfo);
-			airlineRepository.save(airline.get());
+			repository.save(airline.get());
 			return new ResponseEntity<Resource<LuggageInfo>>(HATEOASImplementor.createLuggageInfo(luggageInfo),
 					HttpStatus.CREATED);
 		} else {
@@ -179,7 +179,7 @@ public class AirlineController {
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<Destination>>> getDestinationsForAirlineWithId(@PathVariable(value = "id") Long airlineId) {
-		Optional<Airline> airline = airlineRepository.findById(airlineId);
+		Optional<Airline> airline = repository.findById(airlineId);
 		if(airline.isPresent()) {
 			List<Destination> list = airline.get().getDestinations();
 			if(list.isEmpty()) {
@@ -201,10 +201,10 @@ public class AirlineController {
 	})
 	public ResponseEntity<Resource<Destination>> createDestinationForAirlineWithId(@PathVariable(value = "id") Long airlineId,
 			@Valid @RequestBody Destination destination) {
-		Optional<Airline> airline = airlineRepository.findById(airlineId);
+		Optional<Airline> airline = repository.findById(airlineId);
 		if(airline.isPresent()) {
 			airline.get().add(destination);
-			airlineRepository.save(airline.get());
+			repository.save(airline.get());
 			return new ResponseEntity<Resource<Destination>>(HATEOASImplementor.createDestination(destination), HttpStatus.CREATED);
 		} else {
 			return ResponseEntity.notFound().build();
@@ -220,7 +220,7 @@ public class AirlineController {
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<FlightConfiguration>>> getFlightConfigurationsForAirlineWithId(@PathVariable(value = "id") Long airlineId) {
-		Optional<Airline> airline = airlineRepository.findById(airlineId);
+		Optional<Airline> airline = repository.findById(airlineId);
 		if(airline.isPresent()) {
 			List<FlightConfiguration> list = airline.get().getConfigurations();
 			if(list.isEmpty()) {
@@ -233,20 +233,60 @@ public class AirlineController {
 		}
 	}
 
-	@RequestMapping(value = "/{id}/configurations", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Kreira konfiguraciju leta za datu avio kompaniju.", notes = "Povratna vrednost metode je kreirana konfiguracija leta.", httpMethod = "POST", produces = "application/json", consumes = "application/json")
+	@RequestMapping(value = "/{id}/configurations", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Kreira konfiguraciju leta za datu avio kompaniju.", notes = "Povratna vrednost metode je kreirana konfiguracija leta.", httpMethod = "POST", produces = "application/json")
 	@ApiResponses(value = {
 			@ApiResponse(code = 201, message = "Created", response = FlightConfiguration.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili konfiguracija leta nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
-	public ResponseEntity<Resource<FlightConfiguration>> createFlightConfigurationForAirlineWithId(@PathVariable(value = "id") Long airlineId,
-			@Valid @RequestBody FlightConfiguration flightConfiguration) {
-		Optional<Airline> airline = airlineRepository.findById(airlineId);
+	public ResponseEntity<Resource<FlightConfiguration>> createFlightConfigurationForAirlineWithId(@PathVariable(value = "id") Long airlineId) {
+		Optional<Airline> airline = repository.findById(airlineId);
 		if(airline.isPresent()) {
-			airline.get().add(flightConfiguration);
-			airlineRepository.save(airline.get());
-			return new ResponseEntity<Resource<FlightConfiguration>>(HATEOASImplementor.createFlightConfiguration(flightConfiguration), HttpStatus.CREATED);
+			FlightConfiguration configuration = new FlightConfiguration();
+			airline.get().add(configuration);
+			repository.save(airline.get());
+			return new ResponseEntity<Resource<FlightConfiguration>>(HATEOASImplementor.createFlightConfiguration(configuration), HttpStatus.CREATED);
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	@RequestMapping(value = "/{id}/categories", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća kategorije sedišta za datu avio kompaniju.", notes = "Povratna vrednost servisa je lista resursa kategorija sedišta.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content. Ne postoje kategorije sedišta za datu avio kompaniju."),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
+	})
+	public ResponseEntity<List<Resource<FlightSeatCategory>>> getFlightSeatCategoriesForAirlineWithId(@PathVariable(value = "id") Long airlineId) {
+		Optional<Airline> airline = repository.findById(airlineId);
+		if(airline.isPresent()) {
+			List<FlightSeatCategory> list = airline.get().getCategories();
+			if(list.isEmpty()) {
+				return ResponseEntity.noContent().build();
+			} else {
+				return new ResponseEntity<List<Resource<FlightSeatCategory>>>(HATEOASImplementor.createFlightSeatCategoriesList(list), HttpStatus.OK);
+			}
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	@RequestMapping(value = "/{id}/categories", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Kreira kategorija sedišta za datu avio kompaniju.", notes = "Povratna vrednost servisa je kreirana kategorija sedišta.", httpMethod = "GET", produces = "application/json", consumes = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 201, message = "Created", response = FlightSeatCategory.class),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili kategorija sedišta nisu validni."),
+			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
+	})
+	public ResponseEntity<Resource<FlightSeatCategory>> createFlightSeatCategoryForAirlineWithId(@PathVariable(value = "id") Long airlineId, @Valid @RequestBody FlightSeatCategory category) {
+		Optional<Airline> airline = repository.findById(airlineId);
+		if(airline.isPresent()) {
+			airline.get().add(category);
+			repository.save(airline.get());
+			return new ResponseEntity<Resource<FlightSeatCategory>>(HATEOASImplementor.createFlightSeatCategory(category), HttpStatus.CREATED);
 		} else {
 			return ResponseEntity.notFound().build();
 		}

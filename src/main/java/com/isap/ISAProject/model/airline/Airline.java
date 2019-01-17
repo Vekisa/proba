@@ -35,10 +35,15 @@ public class Airline extends Company {
 	@Cascade(CascadeType.ALL)
 	private List<FlightConfiguration> configurations;
 	
-	public Map<Flight, Integer> getGraphForFlights(Date beginDate, Date endDate) {
+	@JsonIgnore
+	@OneToMany(mappedBy = "airline")
+	@Cascade(CascadeType.ALL)
+	private List<FlightSeatCategory> categories;
+	
+	public Map<Flight, Integer> getGraphForFlights(Date beginDate, Date endDate) {	// TODO : Letovi koji slecu u destinaciju ili polecu iz nje?
 		Map<Flight, Integer> result = new HashMap<Flight, Integer>();
 		for(Destination d : this.destinations)
-			for(Flight f : d.getFlights())
+			for(Flight f : d.getFlightsFromHere())
 				if((f.getDepartureTime().after(beginDate)) && (f.getArrivalTime().before(endDate)))
 					if(result.containsKey(f))
 						result.put(f, result.get(f) + 1);
@@ -85,6 +90,15 @@ public class Airline extends Company {
 	public void add(@Valid LuggageInfo luggageInfo) {
 		this.getLuggageInfos().add(luggageInfo);
 		luggageInfo.setAirline(this);
+	}
+
+	public List<FlightSeatCategory> getCategories() {
+		return this.categories;
+	}
+
+	public void add(@Valid FlightSeatCategory category) {
+		this.getCategories().add(category);
+		category.setAirline(this);
 	}
 	
 }

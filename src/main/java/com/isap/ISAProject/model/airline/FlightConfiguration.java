@@ -14,37 +14,44 @@ import javax.validation.Valid;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "flight_configuration")
 public class FlightConfiguration {
 
+	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "configuration")
 	@Cascade(CascadeType.ALL)
 	private List<FlightSegment> segments;
 	
+	@JsonIgnore
 	@ManyToOne
 	private Airline airline;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "configuration")
+	private List<Flight> flights;
+	
 	public void setAirline(Airline airline) {
 		this.airline = airline;
-	}
-
-	public void copyFieldsFrom(@Valid FlightConfiguration newConfiguration) {
-		// TODO ?
 	}
 
 	public List<FlightSegment> getSegments() {
 		return this.segments;
 	}
 
-	public void add(@Valid FlightSegment flightSegment) {
-		// TODO : Izvesti u biznis sloj, kako bi se vršila provera da se segmenti ne poklapaju i da idu jedan za drugim
+	public boolean add(@Valid FlightSegment flightSegment) {
+		for(FlightSegment fs : this.getSegments())
+			if(flightSegment.overlapsWith(fs)) return false;
 		this.segments.add(flightSegment);
 		flightSegment.setConfiguration(this);
+		return true;
 	}
 
 	public Long getId() {
