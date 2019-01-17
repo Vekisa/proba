@@ -1,11 +1,6 @@
 package com.isap.ISAProject.controller.user;
 
-import static java.util.stream.Collectors.toList;
-import static org.springframework.http.ResponseEntity.ok;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -17,20 +12,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,62 +23,17 @@ import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.repository.user.RegisteredUserRepository;
-import com.isap.ISAProject.security.jwt.JwtTokenProvider;
-import com.isap.ISAProject.web.AuthenticationRequest;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @RestController
-@RequestMapping("/registered-users")
+@RequestMapping("/registeredUsers")
 public class RegisteredUserController {
 	
 	@Autowired
 	RegisteredUserRepository registeredUserRepository;
-	
-	@Autowired
-	AuthenticationManager authenticationManager;
-
-	@Autowired
-	JwtTokenProvider jwtTokenProvider;
-
-	@Autowired
-	RegisteredUserRepository userRepo;
-	
-	// TODO: uraditi kako treba!
-	@GetMapping("/me")
-	@PreAuthorize("hasAuthority('SYSTEM_ADMIN')")
-    public ResponseEntity currentUser(@AuthenticationPrincipal UserDetails userDetails){
-        Map<Object, Object> model = new HashMap<>();
-        model.put("username", userDetails.getUsername());
-        model.put("roles", userDetails.getAuthorities()
-            .stream()
-            .map(a -> ((GrantedAuthority) a).getAuthority())
-            .collect(toList())
-        );
-        return ok(model);
-    }
-	
-	// TODO: uraditi kako treba i ovo!
-	@PostMapping("/signin")
-    public ResponseEntity signin(@RequestBody AuthenticationRequest data) {
-    	try {
-    		Authentication authenticationRequest =
-                new UsernamePasswordAuthenticationToken(data.getUsername(), data.getPassword());
-    		Authentication authenticationResult = authenticationManager.authenticate(authenticationRequest);
-    		
-    		SecurityContextHolder.getContext().setAuthentication(authenticationResult);
-    		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-    		String token = jwtTokenProvider.createToken(username, this.userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Korisničko ime " + username + "nije pronađeno")).getRoles());
-    		Map<Object, Object> model = new HashMap<>();
-    		model.put("username", username);
-    		model.put("token", token);
-    		return ok(model);
-    	}catch (AuthenticationException e) {
-            throw new BadCredentialsException("Pogrešno uneto korisničko ime ili lozinka");
-        }
-    }
 	
 	//Lista svih registrovanih usera
 	@RequestMapping(method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -185,7 +122,7 @@ public class RegisteredUserController {
 		}
 	}
 	
-	/*//Vraca rezervacije datog usera
+	//Vraca rezervacije datog usera
 	@RequestMapping(value = "/{id}/reservations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraća rezervacije prosledjenog usera.", notes = "Povratna vrednost servisa je lista rezervacija.",
 			httpMethod = "GET", produces = "application/json")
@@ -355,5 +292,5 @@ public class RegisteredUserController {
 		}else {
 			return ResponseEntity.notFound().build();
 		}
-	}*/
+	}
 }
