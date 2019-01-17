@@ -6,17 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.Valid;
 
 import com.isap.ISAProject.model.Company;
-import com.isap.ISAProject.model.airline.Airline;
-import com.isap.ISAProject.model.airline.Destination;
 
 @Entity
 @Table(name = "hotel")
@@ -30,6 +26,9 @@ public class Hotel extends Company {
 	
 	@OneToOne
 	private Catalogue catalogue;
+	
+	@Version
+	private Long version;
 	
 	public Hotel() {
 		floor = new ArrayList<>();

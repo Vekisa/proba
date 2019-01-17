@@ -20,17 +20,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Room;
-import com.isap.ISAProject.repository.hotel.FloorRepository;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import service.hotel.FloorService;
 
 @RestController
 @RequestMapping("/floors")
 public class FloorController {
 	@Autowired
-	FloorRepository floorRepository;
+	FloorService floorService;
 	
 	//Vraca sve spratove
 	@RequestMapping(method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -42,7 +42,7 @@ public class FloorController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<Floor>>> getAllFloors(Pageable pageable){
-		Page<Floor> floors = floorRepository.findAll(pageable); 
+		Page<Floor> floors = floorService.findAll(pageable); 
 		if(floors.isEmpty())
 			return ResponseEntity.noContent().build();
 		else
@@ -59,7 +59,7 @@ public class FloorController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<Floor>> createFloor(@Valid @RequestBody Floor floor) {
-		Floor createdFloor =  floorRepository.save(floor);
+		Floor createdFloor =  floorService.save(floor);
 		return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(createdFloor), HttpStatus.CREATED);
 	}
 	
@@ -73,7 +73,7 @@ public class FloorController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<Floor>> getFloorById(@PathVariable(value="id") Long floorId) {
-		Optional<Floor> floor = floorRepository.findById(floorId);
+		Optional<Floor> floor = floorService.findById(floorId);
 		if(floor.isPresent())
 			return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(floor.get()), HttpStatus.OK);
 		else
@@ -89,10 +89,10 @@ public class FloorController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<?> deleteFloorWithId(@PathVariable(value="id") Long floorId){
-		if(!floorRepository.findById(floorId).isPresent())
+		if(!floorService.findById(floorId).isPresent())
 			return ResponseEntity.notFound().build();
 			
-		floorRepository.deleteById(floorId);
+		floorService.deleteById(floorId);
 		return ResponseEntity.ok().build();
 	}
 	
@@ -107,10 +107,10 @@ public class FloorController {
 	})
 	public ResponseEntity<Resource<Floor>> updateFloorWithId(@PathVariable(value = "id") Long floorId,
 			@Valid @RequestBody Floor newFloor) {
-		Optional<Floor> oldFloor = floorRepository.findById(floorId);
+		Optional<Floor> oldFloor = floorService.findById(floorId);
 		if(oldFloor.isPresent()) {
 			oldFloor.get().copyFieldsFrom(newFloor);
-			floorRepository.save(oldFloor.get());
+			floorService.save(oldFloor.get());
 			return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(oldFloor.get()), HttpStatus.OK);
 		} else {
 			return ResponseEntity.notFound().build();
@@ -127,7 +127,7 @@ public class FloorController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<Room>>> getRoomsForFloorWithId(@PathVariable(value = "id") Long floorId) {
-		Optional<Floor> floor = floorRepository.findById(floorId);
+		Optional<Floor> floor = floorService.findById(floorId);
 		if(floor.isPresent()) {
 			List<Room> roomList = floor.get().getRoom();
 			if(roomList.isEmpty())
@@ -150,10 +150,10 @@ public class FloorController {
 	})
 	public ResponseEntity<Resource<Room>> createRoomForFloorWithId(@PathVariable(value = "id") Long floorId,
 			@Valid @RequestBody Room room) {
-		Optional<Floor> floor = floorRepository.findById(floorId);
+		Optional<Floor> floor = floorService.findById(floorId);
 		if(floor.isPresent()) {
 			floor.get().add(room);
-			floorRepository.save(floor.get());
+			floorService.save(floor.get());
 			return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(room), HttpStatus.CREATED);
 		}else {
 			return ResponseEntity.notFound().build();
