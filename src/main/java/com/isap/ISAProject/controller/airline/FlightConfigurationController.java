@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSegment;
 import com.isap.ISAProject.repository.airline.FlightConfigurationRepository;
@@ -31,7 +32,7 @@ import io.swagger.annotations.ApiResponses;
 public class FlightConfigurationController {
 
 	@Autowired
-	FlightConfigurationRepository flightConfigurationRepository;
+	FlightConfigurationRepository repository;
 	
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraća konfiguracije letova.", notes = "Povratna vrednost servisa je lista resursa konfiguracije letova koji pripadaju zahtevanoj strani (na osnovu paginacije).", httpMethod = "GET", produces = "application/json")
@@ -41,7 +42,7 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
 	public ResponseEntity<List<Resource<FlightConfiguration>>> getAllFlightConfigurations(Pageable pageable) {
-		Page<FlightConfiguration> configurations = flightConfigurationRepository.findAll(pageable);
+		Page<FlightConfiguration> configurations = repository.findAll(pageable);
 		if(configurations.isEmpty())
 			return ResponseEntity.noContent().build();
 		else
@@ -56,7 +57,7 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija (leta) sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FlightConfiguration>> getFlightConfigurationWithId(@PathVariable("id") Long configurationId) {
-		Optional<FlightConfiguration> configuration = flightConfigurationRepository.findById(configurationId);
+		Optional<FlightConfiguration> configuration = repository.findById(configurationId);
 		if(configuration.isPresent()) {
 			return new ResponseEntity<Resource<FlightConfiguration>>(HATEOASImplementor.createFlightConfiguration(configuration.get()), HttpStatus.OK);
 		} else {
@@ -72,23 +73,10 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> deleteFlightConfigurationWithId(@PathVariable("id") Long configurationId) {
-		if(!flightConfigurationRepository.findById(configurationId).isPresent()) return ResponseEntity.notFound().build();
-		flightConfigurationRepository.deleteById(configurationId);
+		if(!repository.findById(configurationId).isPresent()) return ResponseEntity.notFound().build();
+		repository.deleteById(configurationId);
 		return ResponseEntity.ok().build();
 	}
-	
-	/* TODO : Da li je ovo uopste neophodno?
-	@RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Resource<FlightConfiguration>> updateFlightConfigurationWithId(@PathVariable("id") Long configurationId,
-			@Valid @RequestBody FlightConfiguration newConfiguration) {
-		Optional<FlightConfiguration> oldConfiguration = flightConfigurationRepository.findById(configurationId);
-		if(oldConfiguration.isPresent()) {
-			oldConfiguration.get().copyFieldsFrom(newConfiguration);
-			return new ResponseEntity<Resource<FlightConfiguration>>(HATEOASImplementor.createFlightConfiguration(oldConfiguration.get()), HttpStatus.OK);
-		} else {
-			return ResponseEntity.notFound().build();
-		}
-	}*/
 	
 	@RequestMapping(value = "/{id}/segments", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraća segmente leta za datu konfiguraciju.", notes = "Povratna vrednost servisa je lista resursa segmenata leta.", httpMethod = "GET", produces = "application/json")
@@ -99,13 +87,13 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija leta sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<FlightSegment>>> getSegmentsForConfigurationWithId(@PathVariable("id") Long configurationId) {
-		Optional<FlightConfiguration> configuration = flightConfigurationRepository.findById(configurationId);
+		Optional<FlightConfiguration> configuration = repository.findById(configurationId);
 		if(configuration.isPresent()) {
 			List<FlightSegment> list = configuration.get().getSegments();
 			if(list.isEmpty()) {
 				return ResponseEntity.noContent().build();
 			} else {
-				return new ResponseEntity<List<Resource<FlightSegment>>>(HATEOASImplementor.createSegmentsList(list), HttpStatus.OK);
+				return new ResponseEntity<List<Resource<FlightSegment>>>(HATEOASImplementor.createFlightSegmentsList(list), HttpStatus.OK);
 			}
 		} else {
 			return ResponseEntity.notFound().build();
@@ -113,17 +101,35 @@ public class FlightConfigurationController {
 	}
 	
 	@RequestMapping(value = "/{id}/segments", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Kreira segment za datu konfiguraciju.", notes = "Povratna vrednost servisa je kreirani segment leta.", httpMethod = "POST", produces = "application/json", consumes = "application/json")
+	@ApiOperation(value = "Kreira segment za datu konfiguraciju.", notes = "Povratna vrednost servisa je kreirani segment leta. Vrši se provera poklapanja segmenata.", httpMethod = "POST", produces = "application/json", consumes = "application/json")
 	@ApiResponses(value = {
 			@ApiResponse(code = 201, message = "Created", response = FlightSegment.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili segment nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija leta sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FlightSegment>> createSegmentForConfigurationWithId(@PathVariable("id") Long configurationId, @Valid @RequestBody FlightSegment flightSegment) {
-		Optional<FlightConfiguration> configuration = flightConfigurationRepository.findById(configurationId);
+		Optional<FlightConfiguration> configuration = repository.findById(configurationId);
 		if(configuration.isPresent()) {
-			configuration.get().add(flightSegment);
-			return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementor.createFlightSegment(flightSegment), HttpStatus.CREATED);
+			if(configuration.get().add(flightSegment)) {
+				repository.save(configuration.get());
+				return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementor.createFlightSegment(flightSegment), HttpStatus.CREATED);
+			} else
+				return ResponseEntity.badRequest().build();
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+
+	@RequestMapping(value = "/{id}/airline", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<Airline>> getAirlineForConfigurationWithId(Long id) {
+		Optional<FlightConfiguration> configuration = repository.findById(id);
+		if(configuration.isPresent()) {
+			Airline airline = configuration.get().getAirline();
+			if(airline == null) {
+				return ResponseEntity.noContent().build();
+			} else {
+				return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(airline), HttpStatus.OK);
+			}
 		} else {
 			return ResponseEntity.notFound().build();
 		}

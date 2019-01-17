@@ -10,41 +10,76 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "flight_seat_category")
 public class FlightSeatCategory {
 
+	@JsonIgnore
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-	
-	@ManyToOne
-	private Flight flight;
-	
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
 	@Column(nullable = false)
 	private double price;
-	
-	@ManyToOne
-	private LuggageInfo luggageInfo;
-	
+
+	@Column(nullable = false)
+	private String name;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "category")
+	private List<FlightSegment> segments;
+
+	@JsonIgnore
 	@OneToMany(mappedBy = "category")
 	private List<FlightSeat> seats;
-	
+
+	@JsonIgnore
+	@ManyToOne
+	private Airline airline;
+
 	public double getPrice() {
 		return price;
 	}
-	
+
 	public void setPrice(double price) {
 		this.price = price;
 	}
-	
-	public LuggageInfo getLuggageInfo() {
-		return luggageInfo;
+
+	public Airline getAirline() {
+		return this.airline;
 	}
-	
-	public void setLuggageInfo(LuggageInfo luggageInfo) {
-		this.luggageInfo = luggageInfo;
+
+	public Long getId() {
+		return this.id;
 	}
-	
+
+	public void copyFieldsFrom(@Valid FlightSeatCategory category) {
+		this.setPrice(category.getPrice());
+		this.setName(category.getName());
+	}
+
+	private void setName(String name) {
+		this.name = name;
+	}
+
+	private String getName() {
+		return this.name;
+	}
+
+	public void setAirline(Airline airline) {
+		this.airline = airline;
+	}
+
+	public List<FlightSeat> getSeats() {
+		return this.seats;
+	}
+
+	public List<FlightSegment> getSegments() {
+		return this.segments;
+	}
+
 }

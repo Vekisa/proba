@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "destination")
 public class Destination {
 
+	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,16 +34,20 @@ public class Destination {
 	private Airline airline;
 	
 	@JsonIgnore
-	@OneToMany(mappedBy = "destination")
-	private List<Transfer> transfers;
+	@OneToMany(mappedBy = "startDestination", orphanRemoval = true)
+	@Cascade(CascadeType.ALL)
+	private List<Flight> flightsFromHere;
 	
 	@JsonIgnore
-	@OneToMany(mappedBy = "destination")
-	@Cascade(CascadeType.ALL)
-	private List<Flight> flights;
+	@OneToMany(mappedBy = "finishDestination")
+	private List<Flight> flightsToHere;
 
-	public List<Flight> getFlights() {
-		return flights;
+	public List<Flight> getFlightsFromHere() {
+		return this.flightsFromHere;
+	}
+	
+	public List<Flight> getFlightsToHere() {
+		return this.flightsToHere;
 	}
 	
 	public String getName() {
@@ -67,6 +72,11 @@ public class Destination {
 
 	public Airline getAirline() {
 		return this.airline;
+	}
+
+	public void add(@Valid Flight flight) {
+		this.getFlightsFromHere().add(flight);
+		flight.setStartDestination(this);
 	}
 	
 }
