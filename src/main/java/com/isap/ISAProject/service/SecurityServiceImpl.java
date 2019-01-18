@@ -1,4 +1,4 @@
-package com.isap.ISAProject.service.impl;
+package com.isap.ISAProject.service;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;

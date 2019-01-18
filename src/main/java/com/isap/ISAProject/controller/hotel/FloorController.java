@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Room;
+import com.isap.ISAProject.service.hotel.FloorService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import service.hotel.FloorService;
 
 @RestController
 @RequestMapping("/floors")
