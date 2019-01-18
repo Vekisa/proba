@@ -6,7 +6,11 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,74 +28,62 @@ import com.isap.ISAProject.repository.airline.LuggageInfoRepository;
 public class LuggageInfoController {
 
 	@Autowired
-	LuggageInfoRepository luggageInfoRepository;
-	
+	LuggageInfoRepository repository;
+
 	@Autowired
 	AirlineRepository airlineRepository;
-	
+
 	@RequestMapping(method = RequestMethod.GET)
-	public ResponseEntity<List<LuggageInfo>> getAllLuggageInfos() {
-		List<LuggageInfo> luggageInfos = luggageInfoRepository.findAll();
+	public ResponseEntity<List<Resource<LuggageInfo>>> getAllLuggageInfos(Pageable pageable) {
+		Page<LuggageInfo> luggageInfos = repository.findAll(pageable);
 		if(luggageInfos.isEmpty())
 			return ResponseEntity.notFound().build();
 		else
-			return new ResponseEntity<List<LuggageInfo>>(luggageInfos, HttpStatus.OK);
+			return new ResponseEntity<List<Resource<LuggageInfo>>>(HATEOASImplementor.createLuggageInfosList(luggageInfos.getContent()), HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public ResponseEntity<LuggageInfo> getLuggageInfoWithId(@PathVariable(value = "id") Long luggageInfoId) {
-		try {
-			Optional<LuggageInfo> luggageInfo = luggageInfoRepository.findById(luggageInfoId);
-			if(luggageInfo.isPresent())
-				return new ResponseEntity<LuggageInfo>(luggageInfo.get(), HttpStatus.OK);
-			else
-				return ResponseEntity.notFound().build();
-		} catch(Exception e) {
-			return ResponseEntity.badRequest().build();
-		}
+		Optional<LuggageInfo> luggageInfo = repository.findById(luggageInfoId);
+		if(luggageInfo.isPresent())
+			return new ResponseEntity<LuggageInfo>(luggageInfo.get(), HttpStatus.OK);
+		else
+			return ResponseEntity.notFound().build();
 	}
-	
+
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<LuggageInfo> updateLuggageInfoWithId(@PathVariable(value = "id") Long luggageInfoId,
-															   @Valid @RequestBody LuggageInfo newLuggageInfo) {
-		try {
-			Optional<LuggageInfo> oldLuggageInfo = luggageInfoRepository.findById(luggageInfoId);
-			if(oldLuggageInfo.isPresent()) {
-				oldLuggageInfo.get().copyFieldsFrom(newLuggageInfo);
-				return new ResponseEntity<LuggageInfo>(oldLuggageInfo.get(), HttpStatus.OK);
-			} else {
-				return ResponseEntity.notFound().build();
-			}
-		} catch(Exception e) {
-			return ResponseEntity.badRequest().build();
+			@Valid @RequestBody LuggageInfo newLuggageInfo) {
+		Optional<LuggageInfo> oldLuggageInfo = repository.findById(luggageInfoId);
+		if(oldLuggageInfo.isPresent()) {
+			oldLuggageInfo.get().copyFieldsFrom(newLuggageInfo);
+			repository.save(oldLuggageInfo.get());
+			return new ResponseEntity<LuggageInfo>(oldLuggageInfo.get(), HttpStatus.OK);
+		} else {
+			return ResponseEntity.notFound().build();
 		}
 	}
-	
+
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<?> deleteLuggageInfoWithId(@PathVariable(value = "id") Long luggageInfoId) {
-		try {
-			luggageInfoRepository.deleteById(luggageInfoId);
-			return ResponseEntity.ok().build();
-		} catch(Exception e) {
-			return ResponseEntity.badRequest().build();
-		}
+		if(!repository.findById(luggageInfoId).isPresent()) return ResponseEntity.notFound().build();
+		repository.deleteById(luggageInfoId);
+		return ResponseEntity.ok().build();
 	}
 	
-	@RequestMapping(value = "/airlines/{id}/luggageInfos", method = RequestMethod.GET)
-	public ResponseEntity<List<LuggageInfo>> getLuggageInfosForAirlineWithId(@PathVariable(value = "id") Long airlineId) {
-		try {
-			Optional<Airline> airline = airlineRepository.findById(airlineId);
-			if(airline.isPresent()) {
-				if(airline.get().getLuggageInfos().isEmpty())
-					return ResponseEntity.notFound().build();
-				else
-					return new ResponseEntity<List<LuggageInfo>>(airline.get().getLuggageInfos(), HttpStatus.OK);
+	@RequestMapping(value = "/{id}/airline", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<Airline>> getAirlineForLuggageInfoWithId(@PathVariable(value = "id") Long id) {
+		Optional<LuggageInfo> luggageInfo = repository.findById(id);
+		if(luggageInfo.isPresent()) {
+			Airline airline = luggageInfo.get().getAirline();
+			if(airline == null) {
+				return ResponseEntity.noContent().build();
 			} else {
-				return ResponseEntity.notFound().build();
+				return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(airline), HttpStatus.OK);
 			}
-		} catch(Exception e) {
-			return ResponseEntity.badRequest().build();
+		} else {
+			return ResponseEntity.notFound().build();
 		}
 	}
-	
+
 }

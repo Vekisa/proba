@@ -1,55 +1,55 @@
 package com.isap.ISAProject.model.airline;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.user.Reservation;
 
 @Entity
 @Table(name = "ticket")
 public class Ticket {
 
+	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 	
-	@ManyToOne
-	private Flight flight;
+	@Column
+	private double price;
 	
-	@Column(nullable = false)
-	private int discount;
+	@JsonIgnore
+	@OneToMany(mappedBy = "ticket")
+	private List<FlightSeat> seats;
 	
-	@OneToOne
-	private FlightSeat seat;
-	
+	@JsonIgnore
 	@OneToOne
 	private Reservation reservation;
-	
-	public int getDiscount() {
-		return discount;
-	}
-
-	public void setDiscount(int discount) {
-		this.discount = discount;
-	}
-
-	public FlightSeat getSeat() {
-		return seat;
-	}
-
-	public void setSeat(FlightSeat seat) {
-		this.seat = seat;
-	}
 
 	public double getPrice() {
 		// TODO : implement
 		return 0;
+	}
+
+	public void add(FlightSeat seat) {
+		this.getSeats().add(seat);
+		seat.setTicket(this);
+	}
+	
+	public List<FlightSeat> getSeats() {
+		return this.seats;
+	}
+
+	public Long getId() {
+		return this.id;
 	}
 	
 }

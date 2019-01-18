@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.Valid;
 
 import com.isap.ISAProject.model.Company;
@@ -25,6 +26,9 @@ public class Hotel extends Company {
 	
 	@OneToOne
 	private Catalogue catalogue;
+	
+	@Version
+	private Long version;
 	
 	public Hotel() {
 		floor = new ArrayList<>();
