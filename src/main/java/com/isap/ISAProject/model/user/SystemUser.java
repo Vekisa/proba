@@ -6,15 +6,22 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import com.isap.ISAProject.model.user.base.UserBase;
+
 @MappedSuperclass
-public abstract class SystemUser {
+public class SystemUser extends UserBase{
 	
+	private static final long serialVersionUID = 1L;
+
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 	@Column(nullable = false)
 	private String email;
+	
+	@Column(nullable = false)
+	private String username;
 	
 	@Column(nullable = false)
 	private String password;
@@ -31,7 +38,32 @@ public abstract class SystemUser {
 	@Column(nullable = false)
 	private String phoneNumber;
 	
+	@Column(nullable = false)
+	private String authorities;
 	
+	
+	
+	
+	public SystemUser() {
+		super();
+	}
+	
+	public SystemUser(String email, String username, String password, String firstName, String lastName, String city,
+			String phoneNumber, String authorities) {
+		super();
+		this.email = email;
+		this.username = username;
+		this.password = password;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.city = city;
+		this.phoneNumber = phoneNumber;
+		this.authorities = authorities;
+	}
+
+
+
+
 	public Long getId() {
 		return id;
 	}
@@ -73,6 +105,18 @@ public abstract class SystemUser {
 	}
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getAuthorities() {
+		return authorities;
+	}
+	public void setAuthorities(String authorities) {
+		this.authorities = authorities;
 	}
 	
 }
