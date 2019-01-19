@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.isap.ISAProject.security.AuthenticationTokenFilter;
 import com.isap.ISAProject.security.EntryPointUnauthorizedHandler;
-import com.isap.ISAProject.service.SecurityService;
+import com.isap.ISAProject.service.user.security.SecurityService;
 
 @Configuration
 @EnableWebSecurity

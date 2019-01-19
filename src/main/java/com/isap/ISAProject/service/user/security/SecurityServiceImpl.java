@@ -1,10 +1,8 @@
-package com.isap.ISAProject.service;
+package com.isap.ISAProject.service.user.security;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import com.isap.ISAProject.service.SecurityService;
 
 @Service
 public class SecurityServiceImpl implements SecurityService {
