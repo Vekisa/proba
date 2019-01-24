@@ -11,44 +11,45 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.isap.ISAProject.model.hotel.Floor;
-import com.isap.ISAProject.repository.hotel.FloorRepository;
+import com.isap.ISAProject.model.hotel.Catalogue;
+import com.isap.ISAProject.model.hotel.Hotel;
+import com.isap.ISAProject.repository.hotel.CatalogueRepository;
 
 @Service
 @Transactional(readOnly = true)
-public class FloorService {
+public class CatalogueService {
 	
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
+private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
-	private FloorRepository floorRepository;
+	private CatalogueRepository catalogueRepository;
 	
-	public Optional<Floor> findById(long id) {	
+	public Optional<Catalogue> findById(long id) {
 		logger.info("> findById id:{}", id);
-		Optional<Floor> floor = floorRepository.findById(id);
+		Optional<Catalogue> catalogue = catalogueRepository.findById(id);
 		logger.info("< findById id:{}", id);
-		return floor;
+		return catalogue;
 	}
 	
-	public Page<Floor> findAll(Pageable pageable) {
+	public Page<Catalogue> findAll(Pageable pageable) {
 		logger.info("> findAll");
-		Page<Floor> floors = floorRepository.findAll(pageable);
+		Page<Catalogue> catalogues = catalogueRepository.findAll(pageable);
 		logger.info("< findAll");
-		return floors;
+		return catalogues;
 	}
 	
 	@Transactional(readOnly = false)
-	public Floor save(Floor floor) {
+	public Catalogue save(Catalogue catalogue) {
 		logger.info("> create");
-		Floor savedFloor = floorRepository.save(floor);
+		Catalogue savedCatalogue = catalogueRepository.save(catalogue);
 		logger.info("< create");
-		return savedFloor;
+		return savedCatalogue;
 	}
 	
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void deleteById(long id) {
 		logger.info("> delete");
-		floorRepository.deleteById(id);
+		catalogueRepository.deleteById(id);
 		logger.info("< delete");
 	}
 

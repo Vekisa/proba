@@ -19,17 +19,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.hotel.ExtraOption;
-import com.isap.ISAProject.repository.hotel.ExtraOptionRepository;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import service.hotel.ExtraOptionService;
 
 @RestController
 @RequestMapping("/extra_options")
 public class ExtraOptionController {
+	
 	@Autowired
-	ExtraOptionRepository extraOptionRepository;
+	ExtraOptionService extraOptionService;
 	
 	//Lista svih extra-optiona
 	@RequestMapping(method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -41,7 +42,7 @@ public class ExtraOptionController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<ExtraOption>>> getAllExtraOptions(Pageable pageable){
-		Page<ExtraOption> extraOptions = extraOptionRepository.findAll(pageable); 
+		Page<ExtraOption> extraOptions = extraOptionService.findAll(pageable); 
 		if(extraOptions.isEmpty())
 			return ResponseEntity.noContent().build();
 		else
@@ -58,7 +59,7 @@ public class ExtraOptionController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<ExtraOption>> createExtraOption(@Valid @RequestBody ExtraOption extraOption) {
-		ExtraOption createdExtraOption =  extraOptionRepository.save(extraOption);
+		ExtraOption createdExtraOption =  extraOptionService.save(extraOption);
 		return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(createdExtraOption), HttpStatus.CREATED);
 	}
 	
@@ -73,7 +74,7 @@ public class ExtraOptionController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<ExtraOption>> getExtraOptionById(@PathVariable(value="id") Long extraOptionId) {
-		Optional<ExtraOption> extraOption = extraOptionRepository.findById(extraOptionId);
+		Optional<ExtraOption> extraOption = extraOptionService.findById(extraOptionId);
 		if(extraOption.isPresent())
 			return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(extraOption.get()), HttpStatus.OK);
 		else
@@ -89,10 +90,10 @@ public class ExtraOptionController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<?> deleteExtraOptionWithId(@PathVariable(value="id") Long extraOptionId){
-		if(!extraOptionRepository.findById(extraOptionId).isPresent())
+		if(!extraOptionService.findById(extraOptionId).isPresent())
 			return ResponseEntity.notFound().build();
 		
-		extraOptionRepository.deleteById(extraOptionId);
+		extraOptionService.deleteById(extraOptionId);
 		return ResponseEntity.ok().build();
 	}
 	
@@ -107,10 +108,10 @@ public class ExtraOptionController {
 	})
 	public ResponseEntity<Resource<ExtraOption>> updateExtraOptionWithId(@PathVariable(value = "id") Long extraOptionId,
 			@Valid @RequestBody ExtraOption newExtraOption) {
-		Optional<ExtraOption> oldExtraOption = extraOptionRepository.findById(extraOptionId);
+		Optional<ExtraOption> oldExtraOption = extraOptionService.findById(extraOptionId);
 		if(oldExtraOption.isPresent()) {
 			oldExtraOption.get().copyFieldsFrom(newExtraOption);
-			extraOptionRepository.save(oldExtraOption.get());
+			extraOptionService.save(oldExtraOption.get());
 			return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(oldExtraOption.get()), HttpStatus.OK);
 		} else {
 			return ResponseEntity.notFound().build();

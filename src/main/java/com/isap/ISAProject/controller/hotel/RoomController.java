@@ -21,17 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
-import com.isap.ISAProject.repository.hotel.RoomRepository;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import service.hotel.RoomService;
 
 @RestController
 @RequestMapping("/rooms")
 public class RoomController {
+	
 	@Autowired
-	RoomRepository roomRepository;
+	RoomService roomService;
 	
 	//Vraca sve sobe
 	@RequestMapping(method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,7 +44,7 @@ public class RoomController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<Room>>> getAllRooms(Pageable pageable){
-		Page<Room> rooms = roomRepository.findAll(pageable); 
+		Page<Room> rooms = roomService.findAll(pageable); 
 		if(rooms.isEmpty())
 			return ResponseEntity.noContent().build();
 		else
@@ -60,7 +61,7 @@ public class RoomController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<Room>> createRoom(@Valid @RequestBody Room room) {
-		Room createdRoom =  roomRepository.save(room);
+		Room createdRoom =  roomService.save(room);
 		return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(createdRoom), HttpStatus.CREATED);
 	}
 	
@@ -73,7 +74,7 @@ public class RoomController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<Room>> getRoomById(@PathVariable(value="id") Long roomId) {
-		Optional<Room> room = roomRepository.findById(roomId);
+		Optional<Room> room = roomService.findById(roomId);
 		if(room.isPresent())
 			return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(room.get()), HttpStatus.OK);
 		else
@@ -89,10 +90,10 @@ public class RoomController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<?> deleteRoomWithId(@PathVariable(value="id") Long roomId){
-		if(!roomRepository.findById(roomId).isPresent())
+		if(!roomService.findById(roomId).isPresent())
 			return ResponseEntity.notFound().build();
 			
-		roomRepository.deleteById(roomId);
+		roomService.deleteById(roomId);
 		return ResponseEntity.ok().build();
 	}
 	
@@ -107,10 +108,10 @@ public class RoomController {
 	})
 	public ResponseEntity<Resource<Room>> updateRoomWithId(@PathVariable(value = "id") Long roomId,
 			@Valid @RequestBody Room newRoom) {
-		Optional<Room> oldRoom = roomRepository.findById(roomId);
+		Optional<Room> oldRoom = roomService.findById(roomId);
 		if(oldRoom.isPresent()) {
 			oldRoom.get().copyFieldsFrom(newRoom);
-			roomRepository.save(oldRoom.get());
+			roomService.save(oldRoom.get());
 			return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(oldRoom.get()), HttpStatus.OK);
 		} else {
 			return ResponseEntity.notFound().build();
@@ -127,7 +128,7 @@ public class RoomController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<RoomReservation>>> getRoomReservationsForRoomWithId(@PathVariable(value = "id") Long roomId) {
-		Optional<Room> room = roomRepository.findById(roomId);
+		Optional<Room> room = roomService.findById(roomId);
 		if(room.isPresent()) {
 			List<RoomReservation> roomReservationList = room.get().getRoomReservation();
 			if(roomReservationList.isEmpty())
@@ -150,10 +151,10 @@ public class RoomController {
 	})
 	public ResponseEntity<Resource<RoomReservation>> createRoomReservationForRoomWithId(@PathVariable(value = "id") Long roomId,
 			@Valid @RequestBody RoomReservation roomReservation) {
-		Optional<Room> room = roomRepository.findById(roomId);
+		Optional<Room> room = roomService.findById(roomId);
 		if(room.isPresent()) {
 			room.get().add(roomReservation);
-			roomRepository.save(room.get());
+			roomService.save(room.get());
 			return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservation), HttpStatus.CREATED);
 		}else {
 			return ResponseEntity.notFound().build();

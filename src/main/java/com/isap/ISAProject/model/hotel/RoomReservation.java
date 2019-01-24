@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.Valid;
 
 import com.isap.ISAProject.model.user.Reservation;
@@ -47,6 +48,9 @@ public class RoomReservation {
 	
 	@OneToOne
 	private Reservation reservation;
+	
+	@Version
+	private Long version;
 	
 	public RoomReservation() {
 		
@@ -114,6 +118,22 @@ public class RoomReservation {
 
 	public void setExtraOptions(List<ExtraOption> extraOptions) {
 		this.extraOptions = extraOptions;
+	}
+
+	public Reservation getReservation() {
+		return reservation;
+	}
+
+	public void setReservation(Reservation reservation) {
+		this.reservation = reservation;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
 	public void copyFieldsFrom(@Valid RoomReservation newRoomReservation) {

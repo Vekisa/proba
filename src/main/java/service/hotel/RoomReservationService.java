@@ -11,45 +11,44 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.isap.ISAProject.model.hotel.Floor;
-import com.isap.ISAProject.repository.hotel.FloorRepository;
+import com.isap.ISAProject.model.hotel.RoomReservation;
+import com.isap.ISAProject.repository.hotel.RoomReservationRepository;
 
 @Service
 @Transactional(readOnly = true)
-public class FloorService {
+public class RoomReservationService {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
-	private FloorRepository floorRepository;
+	private RoomReservationRepository roomReservationRepository;
 	
-	public Optional<Floor> findById(long id) {	
+	public Optional<RoomReservation> findById(long id) {	
 		logger.info("> findById id:{}", id);
-		Optional<Floor> floor = floorRepository.findById(id);
+		Optional<RoomReservation> roomReservation = roomReservationRepository.findById(id);
 		logger.info("< findById id:{}", id);
-		return floor;
+		return roomReservation;
 	}
 	
-	public Page<Floor> findAll(Pageable pageable) {
+	public Page<RoomReservation> findAll(Pageable pageable) {
 		logger.info("> findAll");
-		Page<Floor> floors = floorRepository.findAll(pageable);
+		Page<RoomReservation> roomReservations = roomReservationRepository.findAll(pageable);
 		logger.info("< findAll");
-		return floors;
+		return roomReservations;
 	}
 	
 	@Transactional(readOnly = false)
-	public Floor save(Floor floor) {
+	public RoomReservation save(RoomReservation roomReservation) {
 		logger.info("> create");
-		Floor savedFloor = floorRepository.save(floor);
+		RoomReservation savedRoomReservation = roomReservationRepository.save(roomReservation);
 		logger.info("< create");
-		return savedFloor;
+		return savedRoomReservation;
 	}
 	
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void deleteById(long id) {
 		logger.info("> delete");
-		floorRepository.deleteById(id);
+		roomReservationRepository.deleteById(id);
 		logger.info("< delete");
 	}
-
 }

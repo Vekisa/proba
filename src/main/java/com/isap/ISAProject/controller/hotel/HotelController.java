@@ -92,11 +92,10 @@ public class HotelController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<?> deleteHotelWithId(@PathVariable(value="id") Long hotelId){
-		if(!hotelService.findById(hotelId).isPresent())
-			return ResponseEntity.notFound().build();
-		
-		hotelService.deleteById(hotelId);
-		return ResponseEntity.ok().build();
+		if(hotelService.deleteById(hotelId))
+			return ResponseEntity.ok().build();
+
+		return ResponseEntity.notFound().build();
 	}	
 	
 	//Update hotela sa zadatim id-em
@@ -110,15 +109,13 @@ public class HotelController {
 	})
 	public ResponseEntity<Resource<Hotel>> updateHotelWithId(@PathVariable(value = "id") Long hotelId,
 			@Valid @RequestBody Hotel newHotel) {
-		Optional<Hotel> oldHotel = hotelService.findById(hotelId);
-		if(oldHotel.isPresent()) {
-			oldHotel.get().copyFieldsFrom(newHotel);
-			hotelService.save(oldHotel.get());
-			return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(oldHotel.get()), HttpStatus.OK);
-		} else {
+			Optional<Hotel> oldHotel = hotelService.updateHotelById(hotelId, newHotel);
+		
+			if(oldHotel.isPresent())
+				return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(oldHotel.get()), HttpStatus.OK);
+
 			return ResponseEntity.notFound().build();
 		}
-	}
 	
 	//Ocenjivanje hotela sa zadatim id-em
 	@RequestMapping(value = "/{id}/add-rating", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -145,8 +142,8 @@ public class HotelController {
 	public ResponseEntity<List<Resource<Floor>>> getFloorsForHotelWithId(@PathVariable(value = "id") Long hotelId) {
 		Optional<Hotel> hotel = hotelService.findById(hotelId);
 		if(hotel.isPresent()) {
-			List<Floor> floorList = hotel.get().getFloor();
-			if(floorList.isEmpty())
+			List<Floor> floorList = hotelService.getFloors(hotel);
+			if(floorList == null)
 				return ResponseEntity.noContent().build();
 			else
 				return new ResponseEntity<List<Resource<Floor>>>(HATEOASImplementorHotel.createFloorList(floorList), HttpStatus.OK);
@@ -166,10 +163,8 @@ public class HotelController {
 	})
 	public ResponseEntity<Resource<Floor>> createFloorForHotelWithId(@PathVariable(value = "id") Long hotelId,
 			@Valid @RequestBody Floor floor) {
-		Optional<Hotel> hotel = hotelService.findById(hotelId);
-		if(hotel.isPresent()) {
-			hotel.get().add(floor);
-			hotelService.save(hotel.get());
+
+		if(hotelService.createFloor(hotelId, floor)) {
 			return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(floor), HttpStatus.CREATED);
 		}else {
 			return ResponseEntity.notFound().build();

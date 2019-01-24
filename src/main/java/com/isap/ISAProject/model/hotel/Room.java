@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.Valid;
 
 import com.isap.ISAProject.model.RatableEntity;
@@ -34,6 +35,9 @@ public class Room extends RatableEntity {
 	
 	@OneToMany(mappedBy="room")
 	private List<RoomReservation> roomReservation;
+	
+	@Version
+	private Long version;
 	
 	public Room() {
 		roomReservation = new ArrayList<>();
@@ -77,6 +81,14 @@ public class Room extends RatableEntity {
 
 	public void setRoomReservation(List<RoomReservation> roomReservation) {
 		this.roomReservation = roomReservation;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
 	public void copyFieldsFrom(@Valid Room newRoom) {

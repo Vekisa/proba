@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.Valid;
 
 @Entity
@@ -31,6 +32,9 @@ public class ExtraOption {
 	
 	@ManyToOne
 	private RoomReservation roomReservation;
+	
+	@Version
+	private Long version;
 	
 	public ExtraOption() {
 		
@@ -74,6 +78,14 @@ public class ExtraOption {
 
 	public void setHotel(Hotel hotel) {
 		this.hotel = hotel;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
 	public RoomReservation getRoomReservation() {

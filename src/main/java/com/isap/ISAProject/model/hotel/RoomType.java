@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.Valid;
 
 @Entity
@@ -35,6 +36,9 @@ public class RoomType {
 	
 	@ManyToOne
 	private Catalogue catalogue;
+	
+	@Version
+	private Long version;
 	
 	public RoomType() {
 		room = new ArrayList<>();
@@ -80,6 +84,22 @@ public class RoomType {
 		this.catalogue = catalogue;
 	}
 	
+	public List<Room> getRoom() {
+		return room;
+	}
+
+	public void setRoom(List<Room> room) {
+		this.room = room;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
+	}
+
 	public void copyFieldsFrom(@Valid RoomType newRoomType) {
 		this.setName(newRoomType.getName());
 		this.setDescription(newRoomType.getDescription());
