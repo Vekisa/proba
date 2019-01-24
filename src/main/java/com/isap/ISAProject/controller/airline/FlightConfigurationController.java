@@ -1,12 +1,10 @@
 package com.isap.ISAProject.controller.airline;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -21,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSegment;
-import com.isap.ISAProject.repository.airline.FlightConfigurationRepository;
+import com.isap.ISAProject.service.airline.FlightConfigurationService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -32,8 +30,8 @@ import io.swagger.annotations.ApiResponses;
 public class FlightConfigurationController {
 
 	@Autowired
-	FlightConfigurationRepository repository;
-	
+	private FlightConfigurationService service;
+
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraća konfiguracije letova.", notes = "Povratna vrednost servisa je lista resursa konfiguracije letova koji pripadaju zahtevanoj strani (na osnovu paginacije).", httpMethod = "GET", produces = "application/json")
 	@ApiResponses(value = {
@@ -42,13 +40,9 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
 	public ResponseEntity<List<Resource<FlightConfiguration>>> getAllFlightConfigurations(Pageable pageable) {
-		Page<FlightConfiguration> configurations = repository.findAll(pageable);
-		if(configurations.isEmpty())
-			return ResponseEntity.noContent().build();
-		else
-			return new ResponseEntity<List<Resource<FlightConfiguration>>>(HATEOASImplementor.createFlightConfigurationsList(configurations.getContent()), HttpStatus.OK);
+		return new ResponseEntity<List<Resource<FlightConfiguration>>>(HATEOASImplementor.createFlightConfigurationsList(service.findAll(pageable)), HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraća konfiguraciju (leta) sa ID.", notes = "Povratna vrednost servisa je konfiguracija (leta) sa prosleđenim ID.", httpMethod = "GET", produces = "application/json")
 	@ApiResponses(value = {
@@ -57,14 +51,9 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija (leta) sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FlightConfiguration>> getFlightConfigurationWithId(@PathVariable("id") Long configurationId) {
-		Optional<FlightConfiguration> configuration = repository.findById(configurationId);
-		if(configuration.isPresent()) {
-			return new ResponseEntity<Resource<FlightConfiguration>>(HATEOASImplementor.createFlightConfiguration(configuration.get()), HttpStatus.OK);
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return new ResponseEntity<Resource<FlightConfiguration>>(HATEOASImplementor.createFlightConfiguration(service.findById(configurationId)), HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	@ApiOperation(value = "Briše konfiguraciju.", notes = "Briše konfiguraciju leta sa prosleđenim ID.", httpMethod = "DELETE")
 	@ApiResponses(value = {
@@ -73,11 +62,10 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> deleteFlightConfigurationWithId(@PathVariable("id") Long configurationId) {
-		if(!repository.findById(configurationId).isPresent()) return ResponseEntity.notFound().build();
-		repository.deleteById(configurationId);
+		service.deleteConfiguration(service.findById(configurationId));
 		return ResponseEntity.ok().build();
 	}
-	
+
 	@RequestMapping(value = "/{id}/segments", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraća segmente leta za datu konfiguraciju.", notes = "Povratna vrednost servisa je lista resursa segmenata leta.", httpMethod = "GET", produces = "application/json")
 	@ApiResponses(value = {
@@ -87,19 +75,9 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija leta sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<FlightSegment>>> getSegmentsForConfigurationWithId(@PathVariable("id") Long configurationId) {
-		Optional<FlightConfiguration> configuration = repository.findById(configurationId);
-		if(configuration.isPresent()) {
-			List<FlightSegment> list = configuration.get().getSegments();
-			if(list.isEmpty()) {
-				return ResponseEntity.noContent().build();
-			} else {
-				return new ResponseEntity<List<Resource<FlightSegment>>>(HATEOASImplementor.createFlightSegmentsList(list), HttpStatus.OK);
-			}
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return new ResponseEntity<List<Resource<FlightSegment>>>(HATEOASImplementor.createFlightSegmentsList(service.getSegmentsForConfiguration(service.findById(configurationId))), HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/{id}/segments", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Kreira segment za datu konfiguraciju.", notes = "Povratna vrednost servisa je kreirani segment leta. Vrši se provera poklapanja segmenata.", httpMethod = "POST", produces = "application/json", consumes = "application/json")
 	@ApiResponses(value = {
@@ -108,31 +86,20 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija leta sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FlightSegment>> createSegmentForConfigurationWithId(@PathVariable("id") Long configurationId, @Valid @RequestBody FlightSegment flightSegment) {
-		Optional<FlightConfiguration> configuration = repository.findById(configurationId);
-		if(configuration.isPresent()) {
-			if(configuration.get().add(flightSegment)) {
-				repository.save(configuration.get());
-				return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementor.createFlightSegment(flightSegment), HttpStatus.CREATED);
-			} else
-				return ResponseEntity.badRequest().build();
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementor.createFlightSegment(service.createSegmentForConfiguration(flightSegment, service.findById(configurationId))), HttpStatus.CREATED);
 	}
 
+
 	@RequestMapping(value = "/{id}/airline", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća avio kompaniju kofiguracije leta.", notes = "Povratna vrednost servisa je resurs avio kompanije u koju je registrovana konfiguracija leta.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Airline.class),
+			@ApiResponse(code = 204, message = "No Content. Avio kompanija nije pridružena konfiguraciji leta."),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Konfiguracija leta sa prosleđenim ID ne postoji.")
+	})
 	public ResponseEntity<Resource<Airline>> getAirlineForConfigurationWithId(Long id) {
-		Optional<FlightConfiguration> configuration = repository.findById(id);
-		if(configuration.isPresent()) {
-			Airline airline = configuration.get().getAirline();
-			if(airline == null) {
-				return ResponseEntity.noContent().build();
-			} else {
-				return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(airline), HttpStatus.OK);
-			}
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(service.getAirlineForConfiguration(service.findById(id))), HttpStatus.OK);
 	}
-	
+
 }

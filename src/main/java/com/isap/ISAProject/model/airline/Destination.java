@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.Valid;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -62,21 +61,12 @@ public class Destination {
 		this.airline = airline;
 	}
 
-	public void copyFieldsFrom(@Valid Destination newDestination) {
-		this.setName(newDestination.getName());
-	}
-
 	public Long getId() {
 		return this.id;
 	}
 
 	public Airline getAirline() {
 		return this.airline;
-	}
-
-	public void add(@Valid Flight flight) {
-		this.getFlightsFromHere().add(flight);
-		flight.setStartDestination(this);
 	}
 	
 }

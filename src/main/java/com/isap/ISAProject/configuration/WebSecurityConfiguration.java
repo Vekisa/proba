@@ -76,13 +76,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
       .authorizeRequests()
-        .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-        .antMatchers("/registeredUsers/auth/**").permitAll()
+      	.antMatchers("/**").permitAll()
+      	.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
         .anyRequest().authenticated();
-
-    // Custom JWT based authentication
     httpSecurity
-      .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+    	.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
   }
 
 }
