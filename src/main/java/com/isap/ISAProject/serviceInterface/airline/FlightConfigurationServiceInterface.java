@@ -8,7 +8,7 @@ import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSegment;
 
-public interface FlightConfigurationInterface {
+public interface FlightConfigurationServiceInterface {
 
 	List<FlightConfiguration> findAll(Pageable pageable);
 	

@@ -9,7 +9,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -47,16 +46,8 @@ public class Passenger {
 
 	public void setPassportNumber(Long passportNumber) { this.passportNumber = passportNumber; }
 
-	public void copyFieldsFrom(@Valid Passenger newPassenger) {
-		this.setFirstName(newPassenger.getFirstName());
-		this.setLastName(newPassenger.getLastName());
-		this.setPassportNumber(newPassenger.getPassportNumber());
-	}
-
 	public List<FlightSeat> getFlightSeats() { return this.seats; }
 
-	public Long getId() {
-		return this.id;
-	}
+	public Long getId() { return this.id; }
 
 }

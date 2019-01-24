@@ -62,76 +62,40 @@ public class FlightSeat {
 		this.state = SeatState.FREE;
 	}
 
-	public SeatState getState() {
-		return state;
-	}
+	public SeatState getState() { return state; }
 
-	public void setState(SeatState state) {
-		this.state = state;
-	}
+	public void setState(SeatState state) { this.state = state; }
 
-	public Flight getFlight() {
-		return flight;
-	}
+	public Flight getFlight() { return flight; }
 
-	public void setFlight(Flight flight) {
-		this.flight = flight;
-	}
+	public void setFlight(Flight flight) { this.flight = flight; }
 
-	public double getPrice() {
-		return this.price;
-	}
+	public double getPrice() { return this.price; }
 
-	public void setPrice(double price) {
-		this.price = price;
-	}
+	public void setPrice(double price) { this.price = price; }
 
-	public LuggageInfo getLuggageInfo() {
-		return luggageInfo;
-	}
+	public LuggageInfo getLuggageInfo() { return luggageInfo; }
 
-	public void setLuggageInfo(LuggageInfo luggageInfo) {
-		if(this.getLuggageInfo() != null) this.price -= this.getLuggageInfo().getPrice();
-		this.luggageInfo = luggageInfo;
-		this.luggageInfo.addSeat(this);
-		this.price += this.getLuggageInfo().getPrice();
-	}
+	public int getRow() { return this.rNumber; }
 
-	public int getRow() {
-		return this.rNumber;
-	}
+	public int getColumn() { return this.cNumber; }
 
-	public int getColumn() {
-		return this.cNumber;
-	}
+	public void setTicket(Ticket ticket) { this.ticket = ticket; }
 
-	public void setTicket(Ticket ticket) {
-		this.ticket = ticket;
-		this.setState(SeatState.TAKEN);
-	}
+	public Passenger getPassenger() { return this.passenger; }
 
-	public Passenger getPassenger() {
-		return this.passenger;
-	}
+	public void setPassenger(Passenger passenger) { this.passenger = passenger; }
 
-	public void setPassenger(Passenger passenger) {
-		this.passenger = passenger;
-	}
+	public FlightSeatCategory getCategory() { return this.category; }
 
-	public FlightSeatCategory getCategory() {
-		return this.category;
-	}
+	public Long getId() { return this.id; }
 
-	public Long getId() {
-		return this.id;
-	}
+	public Ticket getTicket() { return this.ticket; }
 
-	public Ticket getTicket() {
-		return this.ticket;
-	}
+	public void setCategory(FlightSeatCategory category) { this.category = category; }
 
-	public void setCategory(FlightSeatCategory category) {
-		this.category = category;
-	}
+	public void setLuggageInfo(LuggageInfo luggageInfo) { this.luggageInfo = luggageInfo; }
 
+	public boolean isTaken() { return this.getState().equals(SeatState.TAKEN); }
+	
 }

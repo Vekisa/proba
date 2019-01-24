@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -41,45 +40,22 @@ public class FlightSeatCategory {
 	@ManyToOne
 	private Airline airline;
 
-	public double getPrice() {
-		return price;
-	}
+	public double getPrice() { return price; }
 
-	public void setPrice(double price) {
-		this.price = price;
-	}
+	public void setPrice(double price) { this.price = price; }
 
-	public Airline getAirline() {
-		return this.airline;
-	}
+	public Airline getAirline() { return this.airline; }
 
-	public Long getId() {
-		return this.id;
-	}
+	public Long getId() { return this.id; }
 
-	public void copyFieldsFrom(@Valid FlightSeatCategory category) {
-		this.setPrice(category.getPrice());
-		this.setName(category.getName());
-	}
+	public void setName(String name) { this.name = name; }
 
-	private void setName(String name) {
-		this.name = name;
-	}
+	public String getName() { return this.name; }
 
-	private String getName() {
-		return this.name;
-	}
+	public void setAirline(Airline airline) { this.airline = airline; }
 
-	public void setAirline(Airline airline) {
-		this.airline = airline;
-	}
+	public List<FlightSeat> getSeats() { return this.seats; }
 
-	public List<FlightSeat> getSeats() {
-		return this.seats;
-	}
-
-	public List<FlightSegment> getSegments() {
-		return this.segments;
-	}
+	public List<FlightSegment> getSegments() { return this.segments; }
 
 }

@@ -1,11 +1,14 @@
 package com.isap.ISAProject.serviceInterface.airline;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Pageable;
 
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.Destination;
+import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.LuggageInfo;
@@ -37,5 +40,9 @@ public interface AirlineServiceInterface {
 	List<FlightSeatCategory> getFlightSeatCategoriesForAirline(Airline airline);
 	
 	FlightSeatCategory addFlightSeatCategoryToAirline(Airline airline, FlightSeatCategory flightSeatCategory);
+	
+	Map<Destination, Integer> getGraphForDestinations(Date beginDate, Date endDate);
+	
+	Map<Flight, Integer> getGraphForFlights(Date beginDate, Date endDate);
 	
 }

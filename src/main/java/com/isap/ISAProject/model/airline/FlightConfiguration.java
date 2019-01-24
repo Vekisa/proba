@@ -37,20 +37,12 @@ public class FlightConfiguration {
 	@OneToMany(mappedBy = "configuration")
 	private List<Flight> flights;
 	
-	public void setAirline(Airline airline) {
-		this.airline = airline;
-	}
+	public void setAirline(Airline airline) { this.airline = airline; }
 
-	public List<FlightSegment> getSegments() {
-		return this.segments;
-	}
+	public List<FlightSegment> getSegments() { return this.segments; }
 
-	public Long getId() {
-		return this.id;
-	}
+	public Long getId() { return this.id; }
 
-	public Airline getAirline() {
-		return this.airline;
-	}
+	public Airline getAirline() { return this.airline; }
 	
 }

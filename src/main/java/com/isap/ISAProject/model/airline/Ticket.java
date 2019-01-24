@@ -34,22 +34,12 @@ public class Ticket {
 	@OneToOne
 	private Reservation reservation;
 
-	public double getPrice() {
-		// TODO : implement
-		return 0;
-	}
-
-	public void add(FlightSeat seat) {
-		this.getSeats().add(seat);
-		seat.setTicket(this);
-	}
+	public double getPrice() { return this.price; }
 	
-	public List<FlightSeat> getSeats() {
-		return this.seats;
-	}
+	public List<FlightSeat> getSeats() { return this.seats; }
 
-	public Long getId() {
-		return this.id;
-	}
+	public Long getId() { return this.id; }
+
+	public void setPrice(double price) { this.price = price; }
 	
 }

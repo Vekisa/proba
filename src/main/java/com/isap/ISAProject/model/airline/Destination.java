@@ -41,32 +41,18 @@ public class Destination {
 	@OneToMany(mappedBy = "finishDestination")
 	private List<Flight> flightsToHere;
 
-	public List<Flight> getFlightsFromHere() {
-		return this.flightsFromHere;
-	}
+	public List<Flight> getFlightsFromHere() { return this.flightsFromHere; }
 	
-	public List<Flight> getFlightsToHere() {
-		return this.flightsToHere;
-	}
+	public List<Flight> getFlightsToHere() { return this.flightsToHere; }
 	
-	public String getName() {
-		return this.name;
-	}
+	public String getName() { return this.name; }
 	
-	public void setName(String name) {
-		this.name = name;
-	}
+	public void setName(String name) { this.name = name; }
 	
-	public void setAirline(Airline airline) {
-		this.airline = airline;
-	}
+	public void setAirline(Airline airline) { this.airline = airline; }
 
-	public Long getId() {
-		return this.id;
-	}
+	public Long getId() { return this.id; }
 
-	public Airline getAirline() {
-		return this.airline;
-	}
+	public Airline getAirline() { return this.airline; }
 	
 }

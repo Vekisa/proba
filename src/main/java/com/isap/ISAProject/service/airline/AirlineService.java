@@ -1,6 +1,8 @@
 package com.isap.ISAProject.service.airline;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -14,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.Destination;
+import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.LuggageInfo;
@@ -24,10 +27,10 @@ import com.isap.ISAProject.serviceInterface.airline.AirlineServiceInterface;
 public class AirlineService implements AirlineServiceInterface {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
 	@Autowired
-	AirlineRepository repository;
-	
+	private AirlineRepository repository;
+
 	@Override
 	public List<Airline> findAll(Pageable pageable) {
 		logger.info("> fetch airlines at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
@@ -41,10 +44,8 @@ public class AirlineService implements AirlineServiceInterface {
 		logger.info("> fetch airline with id {}", id);
 		Optional<Airline> airline = repository.findById(id);
 		logger.info("< airline fetched");
-		if(airline.isPresent()) 
-			return airline.get();
-		else
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Request airline doesn't exist.");
+		if(airline.isPresent()) return airline.get();
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested airline doesn't exist.");
 	}
 
 	@Override
@@ -78,10 +79,8 @@ public class AirlineService implements AirlineServiceInterface {
 		logger.info("> fetching luggage infos for airline with id {}", airline.getId());
 		List<LuggageInfo> list = airline.getLuggageInfos();
 		logger.info("< luggage infos fetched");
-		if(!list.isEmpty())
-			return list;
-		else
-			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested luggage infos do not exist.");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested luggage infos do not exist.");
 	}
 
 	@Override
@@ -99,10 +98,8 @@ public class AirlineService implements AirlineServiceInterface {
 		logger.info("> fetching destinations for airline with id {}", airline.getId());
 		List<Destination> list = airline.getDestinations();
 		logger.info("< destinations fetched");
-		if(!list.isEmpty())
-			return list;
-		else
-			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested destinations do not exist.");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested destinations do not exist.");
 	}
 
 	@Override
@@ -120,10 +117,8 @@ public class AirlineService implements AirlineServiceInterface {
 		logger.info("> fetching flight configurations for airline with id {}", airline.getId());
 		List<FlightConfiguration> list = airline.getConfigurations();
 		logger.info("< flight configurations fetched");
-		if(!list.isEmpty())
-			return list;
-		else
-			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested flight configurations do not exist.");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested flight configurations do not exist.");
 	}
 
 	@Override
@@ -141,10 +136,8 @@ public class AirlineService implements AirlineServiceInterface {
 		logger.info("> fetching flight seat categories for airline with id {}", airline.getId());
 		List<FlightSeatCategory> list = airline.getCategories();
 		logger.info("< flight seat categories fetched");
-		if(!list.isEmpty())
-			return list;
-		else
-			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested flight seat categories do not exist.");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested flight seat categories do not exist.");
 	}
 
 	@Override
@@ -155,6 +148,18 @@ public class AirlineService implements AirlineServiceInterface {
 		repository.save(airline);
 		logger.info("< flight seat categories added");
 		return flightSeatCategory;
+	}
+
+	@Override
+	public Map<Destination, Integer> getGraphForDestinations(Date beginDate, Date endDate) {
+		// TODO : implement
+		return null;
+	}
+
+	@Override
+	public Map<Flight, Integer> getGraphForFlights(Date beginDate, Date endDate) {
+		// TODO : implement
+		return null;
 	}
 
 }
