@@ -23,11 +23,11 @@ import com.isap.ISAProject.model.hotel.Catalogue;
 import com.isap.ISAProject.model.hotel.ExtraOption;
 import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Hotel;
+import com.isap.ISAProject.service.hotel.HotelService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import service.hotel.HotelService;
 
 @RestController
 @RequestMapping("/hotels")

@@ -1,4 +1,4 @@
-package service.hotel;
+package com.isap.ISAProject.service.hotel;
 
 import java.util.List;
 import java.util.Optional;

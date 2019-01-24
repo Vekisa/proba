@@ -68,6 +68,7 @@ public class TicketController {
 		Optional<Ticket> ticket = repository.findById(ticketId);
 		if(ticket.isPresent()) {
 			FlightSeat seat = repository.findSeatById(seatId);
+			if(seat == null) return ResponseEntity.noContent().build();
 			if(seat.getState().equals(SeatState.TAKEN)) return ResponseEntity.badRequest().build();
 			ticket.get().add(seat);
 			repository.save(ticket.get());

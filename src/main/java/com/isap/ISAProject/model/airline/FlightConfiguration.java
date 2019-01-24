@@ -9,7 +9,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.Valid;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -44,14 +43,6 @@ public class FlightConfiguration {
 
 	public List<FlightSegment> getSegments() {
 		return this.segments;
-	}
-
-	public boolean add(@Valid FlightSegment flightSegment) {
-		for(FlightSegment fs : this.getSegments())
-			if(flightSegment.overlapsWith(fs)) return false;
-		this.segments.add(flightSegment);
-		flightSegment.setConfiguration(this);
-		return true;
 	}
 
 	public Long getId() {

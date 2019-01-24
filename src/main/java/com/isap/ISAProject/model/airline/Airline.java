@@ -71,34 +71,13 @@ public class Airline extends Company {
 		return configurations;
 	}
 
-	public void copyFieldsFrom(@Valid Airline newAirline) {
-		this.setName(newAirline.getName());
-		this.setAddress(newAirline.getAddress());
-		this.setDescription(newAirline.getDescription());
-	}
-
-	public void add(@Valid Destination destination) {
-		this.getDestinations().add(destination);
-		destination.setAirline(this);
-	}
-
 	public void add(@Valid FlightConfiguration flightConfiguration) {
 		this.getConfigurations().add(flightConfiguration);
 		flightConfiguration.setAirline(this);
 	}
 
-	public void add(@Valid LuggageInfo luggageInfo) {
-		this.getLuggageInfos().add(luggageInfo);
-		luggageInfo.setAirline(this);
-	}
-
 	public List<FlightSeatCategory> getCategories() {
 		return this.categories;
-	}
-
-	public void add(@Valid FlightSeatCategory category) {
-		this.getCategories().add(category);
-		category.setAirline(this);
 	}
 	
 }
