@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.airline.Flight;
@@ -18,6 +19,7 @@ import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.repository.airline.TicketRepository;
 import com.isap.ISAProject.serviceInterface.airline.TicketServiceInterface;
 
+@Service
 public class TicketService implements TicketServiceInterface {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
