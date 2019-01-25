@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.hotel.ExtraOption;
 import com.isap.ISAProject.model.hotel.RoomReservation;
+import com.isap.ISAProject.service.hotel.RoomReservationService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import service.hotel.RoomReservationService;
 
 @RestController
 @RequestMapping("/room_reservations")
@@ -42,11 +42,7 @@ public class RoomReservationController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<RoomReservation>>> getAllRoomReservations(Pageable pageable){
-		Page<RoomReservation> roomReservations = roomReservationService.findAll(pageable); 
-		if(roomReservations.isEmpty())
-			return ResponseEntity.noContent().build();
-		else
-			return new ResponseEntity<List<Resource<RoomReservation>>>(HATEOASImplementorHotel.createRoomReservationList(roomReservations.getContent()), HttpStatus.OK);
+			return new ResponseEntity<List<Resource<RoomReservation>>>(HATEOASImplementorHotel.createRoomReservationList(roomReservationService.findAll(pageable)), HttpStatus.OK);
 	}
 	
 	//Kreiranje rezeracije
@@ -59,8 +55,7 @@ public class RoomReservationController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<RoomReservation>> createRoomReservation(@Valid @RequestBody RoomReservation roomReservation) {
-		RoomReservation createdRoomReservation =  roomReservationService.save(roomReservation);
-		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(createdRoomReservation), HttpStatus.CREATED);
+		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.save(roomReservation)), HttpStatus.CREATED);
 	}
 	
 	//Vraca rezervaciju sobe sa zadatim ID-em
@@ -72,11 +67,7 @@ public class RoomReservationController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<RoomReservation>> getRoomReservationById(@PathVariable(value="id") Long roomReservationId) {
-		Optional<RoomReservation> roomReservation = roomReservationService.findById(roomReservationId);
-		if(roomReservation.isPresent())
-			return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservation.get()), HttpStatus.OK);
-		else
-			return ResponseEntity.noContent().build();
+			return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.findById(roomReservationId)), HttpStatus.OK);
 	}
 	
 	//Brisanje rezervacij sobe sa zadatim id-em
@@ -87,10 +78,7 @@ public class RoomReservationController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
-	public ResponseEntity<?> deleteRoomReservationWithId(@PathVariable(value="id") Long roomReservationId){
-		if(!roomReservationService.findById(roomReservationId).isPresent())
-			return ResponseEntity.notFound().build();
-			
+	public ResponseEntity<?> deleteRoomReservationWithId(@PathVariable(value="id") Long roomReservationId){			
 		roomReservationService.deleteById(roomReservationId);
 		return ResponseEntity.ok().build();
 	}
@@ -106,14 +94,7 @@ public class RoomReservationController {
 	})
 	public ResponseEntity<Resource<RoomReservation>> updateRoomResrvationWithId(@PathVariable(value = "id") Long roomReservationId,
 			@Valid @RequestBody RoomReservation newRoomReservation) {
-		Optional<RoomReservation> oldRoomReservation = roomReservationService.findById(roomReservationId);
-		if(oldRoomReservation.isPresent()) {
-			oldRoomReservation.get().copyFieldsFrom(newRoomReservation);
-			roomReservationService.save(oldRoomReservation.get());
-			return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(oldRoomReservation.get()), HttpStatus.OK);
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+			return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.updateRoomReservationById(roomReservationId, newRoomReservation)), HttpStatus.OK);
 	}
 	
 	//Vraca extra option-e za datu rezervaciju sobe
@@ -126,16 +107,7 @@ public class RoomReservationController {
 				@ApiResponse(code = 400, message = "Bad Request")
 		})
 		public ResponseEntity<List<Resource<ExtraOption>>> getExtraOptionsForRoomReservationWithId(@PathVariable(value = "id") Long roomReservationId) {
-			Optional<RoomReservation> roomReservation = roomReservationService.findById(roomReservationId);
-			if(roomReservation.isPresent()) {
-				List<ExtraOption> extraOptionsList = roomReservation.get().getExtraOptions();
-				if(extraOptionsList.isEmpty())
-					return ResponseEntity.noContent().build();
-				else
-					return new ResponseEntity<List<Resource<ExtraOption>>>(HATEOASImplementorHotel.createExtraOptionList(extraOptionsList), HttpStatus.OK);
-			}else {
-				return ResponseEntity.notFound().build();
-			}
+					return new ResponseEntity<List<Resource<ExtraOption>>>(HATEOASImplementorHotel.createExtraOptionList(roomReservationService.getExtraOptions(roomReservationId)), HttpStatus.OK);
 		}
 		
 		@RequestMapping(value = "/{id}/extra-options", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -148,13 +120,6 @@ public class RoomReservationController {
 		})
 		public ResponseEntity<Resource<ExtraOption>> createExtraOptionForRoomReservationWithId(@PathVariable(value = "id") Long roomReservationId,
 				@Valid @RequestBody ExtraOption extraOption) {
-			Optional<RoomReservation> roomReservation = roomReservationService.findById(roomReservationId);
-			if(roomReservation.isPresent()) {
-				roomReservation.get().add(extraOption);
-				roomReservationService.save(roomReservation.get());
-				return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(extraOption), HttpStatus.CREATED);
-			} else {
-				return ResponseEntity.notFound().build();
-			}
+				return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(roomReservationService.createExtraOption(roomReservationId, extraOption)), HttpStatus.CREATED);
 		}
 }

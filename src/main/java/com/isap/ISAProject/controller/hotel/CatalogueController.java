@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.hotel.Catalogue;
 import com.isap.ISAProject.model.hotel.RoomType;
+import com.isap.ISAProject.service.hotel.CatalogueService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import service.hotel.CatalogueService;
 
 @RestController
 @RequestMapping("/catalogues")
@@ -43,11 +43,7 @@ public class CatalogueController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<Catalogue>>> getAllCatalogues(Pageable pageable){
-		Page<Catalogue> catalogues = catalogueService.findAll(pageable); 
-		if(catalogues.isEmpty())
-			return ResponseEntity.noContent().build();
-		else
-			return new ResponseEntity<List<Resource<Catalogue>>>(HATEOASImplementorHotel.createCatalogueList(catalogues.getContent()), HttpStatus.OK);
+			return new ResponseEntity<List<Resource<Catalogue>>>(HATEOASImplementorHotel.createCatalogueList(catalogueService.findAll(pageable)), HttpStatus.OK);
 	}
 	
 	//Kreiranje cenovnika
@@ -60,8 +56,7 @@ public class CatalogueController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<Catalogue>> createCatalogue(@Valid @RequestBody Catalogue catalogue) {
-		Catalogue createdCatalogue =  catalogueService.save(catalogue);
-		return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(createdCatalogue), HttpStatus.CREATED);
+		return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(catalogueService.save(catalogue)), HttpStatus.CREATED);
 	}
 	
 	//Vraca cenovnik sa zadatim ID-em
@@ -74,11 +69,7 @@ public class CatalogueController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<Catalogue>> getCatalogueById(@PathVariable(value="id") Long catalogueId) {
-		Optional<Catalogue> catalogue = catalogueService.findById(catalogueId);
-		if(catalogue.isPresent())
-			return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(catalogue.get()), HttpStatus.OK);
-		else
-			return ResponseEntity.noContent().build();
+			return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(catalogueService.findById(catalogueId)), HttpStatus.OK);
 	}
 	
 	//Brisanje cenovnik sa zadatim id-em
@@ -89,10 +80,7 @@ public class CatalogueController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
-	public ResponseEntity<?> deleteCatalogueWithId(@PathVariable(value="id") Long catalogueId){
-		if(!catalogueService.findById(catalogueId).isPresent())
-			return ResponseEntity.notFound().build();
-		
+	public ResponseEntity<?> deleteCatalogueWithId(@PathVariable(value="id") Long catalogueId){		
 		catalogueService.deleteById(catalogueId);
 		return ResponseEntity.ok().build();
 	}
@@ -108,14 +96,7 @@ public class CatalogueController {
 	})
 	public ResponseEntity<Resource<Catalogue>> updateCatalogueWithId(@PathVariable(value = "id") Long catalogueId,
 			@Valid @RequestBody Catalogue newCatalogue) {
-		Optional<Catalogue> oldCatalogue = catalogueService.findById(catalogueId);
-		if(oldCatalogue.isPresent()) {
-			oldCatalogue.get().copyFieldsFrom(newCatalogue);
-			catalogueService.save(oldCatalogue.get());
-			return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(oldCatalogue.get()), HttpStatus.OK);
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+			return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(catalogueService.updateCatalogueById(catalogueId, newCatalogue)), HttpStatus.OK);
 	}
 	
 	//Vraca tipove soba za dati cenovnik
@@ -128,16 +109,7 @@ public class CatalogueController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<RoomType>>> getRoomTypesForCatalogueWithId(@PathVariable(value = "id") Long catalogueId) {
-		Optional<Catalogue> catalogue = catalogueService.findById(catalogueId);
-		if(catalogue.isPresent()) {
-			List<RoomType> roomTypeList = catalogue.get().getRoomType();
-			if(roomTypeList.isEmpty())
-				return ResponseEntity.noContent().build();
-			else
-				return new ResponseEntity<List<Resource<RoomType>>>(HATEOASImplementorHotel.createRoomTypeList(roomTypeList), HttpStatus.OK);
-		}else {
-			return ResponseEntity.notFound().build();
-		}
+				return new ResponseEntity<List<Resource<RoomType>>>(HATEOASImplementorHotel.createRoomTypeList(catalogueService.getRoomTypes(catalogueId)), HttpStatus.OK);
 	}
 	
 	//Kreira tip sobe za dati cenovnik
@@ -151,13 +123,6 @@ public class CatalogueController {
 	})
 	public ResponseEntity<Resource<RoomType>> createRoomTypeForCatalogueWithId(@PathVariable(value = "id") Long catalogueId,
 			@Valid @RequestBody RoomType roomType) {
-		Optional<Catalogue> catalogue = catalogueService.findById(catalogueId);
-		if(catalogue.isPresent()) {
-			catalogue.get().add(roomType);
-			catalogueService.save(catalogue.get());
-			return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(roomType), HttpStatus.CREATED);
-		}else {
-			return ResponseEntity.notFound().build();
-		}
+			return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(catalogueService.createRoomType(catalogueId, roomType)), HttpStatus.CREATED);
 	}
 }

@@ -1,12 +1,10 @@
 package com.isap.ISAProject.controller.hotel;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -19,11 +17,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.hotel.RoomType;
+import com.isap.ISAProject.service.hotel.RoomTypeService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import service.hotel.RoomTypeService;
 
 @RestController
 @RequestMapping("/room_types")
@@ -42,11 +40,7 @@ public class RoomTypeController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<RoomType>>> getAllRoomTypes(Pageable pageable){
-		Page<RoomType> roomTypes = roomTypeService.findAll(pageable); 
-		if(roomTypes.isEmpty())
-			return ResponseEntity.noContent().build();
-		else
-			return new ResponseEntity<List<Resource<RoomType>>>(HATEOASImplementorHotel.createRoomTypeList(roomTypes.getContent()), HttpStatus.OK);
+			return new ResponseEntity<List<Resource<RoomType>>>(HATEOASImplementorHotel.createRoomTypeList(roomTypeService.findAll(pageable)), HttpStatus.OK);
 	}
 	
 	//Kreiranje tipa sobe
@@ -59,8 +53,7 @@ public class RoomTypeController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<RoomType>> createRoomType(@Valid @RequestBody RoomType roomType) {
-		RoomType createdRoomType =  roomTypeService.save(roomType);
-		return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(createdRoomType), HttpStatus.CREATED);
+		return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(roomTypeService.save(roomType)), HttpStatus.CREATED);
 	}
 	
 	//Vraca tip sobe sa zadatim ID-em
@@ -73,11 +66,7 @@ public class RoomTypeController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<RoomType>> getRoomTypeById(@PathVariable(value="id") Long roomTypeId) {
-		Optional<RoomType> roomType = roomTypeService.findById(roomTypeId);
-		if(roomType.isPresent())
-			return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(roomType.get()), HttpStatus.OK);
-		else
-			return ResponseEntity.noContent().build();
+			return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(roomTypeService.findById(roomTypeId)), HttpStatus.OK);
 	}
 	
 	//Brisanje tipa sobe sa zadatim id-em
@@ -89,9 +78,6 @@ public class RoomTypeController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<?> deleteRoomTypeWithId(@PathVariable(value="id") Long roomTypeId){
-		if(!roomTypeService.findById(roomTypeId).isPresent())
-			return ResponseEntity.notFound().build();
-		
 		roomTypeService.deleteById(roomTypeId);
 		return ResponseEntity.ok().build();
 	}
@@ -107,13 +93,7 @@ public class RoomTypeController {
 		})
 		public ResponseEntity<Resource<RoomType>> updateRoomTypenWithId(@PathVariable(value = "id") Long roomTypeId,
 				@Valid @RequestBody RoomType newRoomType) {
-			Optional<RoomType> oldRoomType = roomTypeService.findById(roomTypeId);
-			if(oldRoomType.isPresent()) {
-				oldRoomType.get().copyFieldsFrom(newRoomType);
-				roomTypeService.save(oldRoomType.get());
-				return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(oldRoomType.get()), HttpStatus.OK);
-			} else {
-				return ResponseEntity.notFound().build();
-			}
+
+				return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(roomTypeService.updateRoomTypeById(roomTypeId, newRoomType)), HttpStatus.OK);	
 		}
 }

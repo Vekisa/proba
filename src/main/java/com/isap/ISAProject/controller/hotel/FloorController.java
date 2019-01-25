@@ -1,12 +1,10 @@
 package com.isap.ISAProject.controller.hotel;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -42,11 +40,7 @@ public class FloorController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<Floor>>> getAllFloors(Pageable pageable){
-		Page<Floor> floors = floorService.findAll(pageable); 
-		if(floors.isEmpty())
-			return ResponseEntity.noContent().build();
-		else
-			return new ResponseEntity<List<Resource<Floor>>>(HATEOASImplementorHotel.createFloorList(floors.getContent()), HttpStatus.OK);
+			return new ResponseEntity<List<Resource<Floor>>>(HATEOASImplementorHotel.createFloorList(floorService.findAll(pageable)), HttpStatus.OK);
 	}
 	
 	//Kreiranje sprata
@@ -59,8 +53,7 @@ public class FloorController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<Floor>> createFloor(@Valid @RequestBody Floor floor) {
-		Floor createdFloor =  floorService.save(floor);
-		return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(createdFloor), HttpStatus.CREATED);
+		return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(floorService.save(floor)), HttpStatus.CREATED);
 	}
 	
 
@@ -73,11 +66,7 @@ public class FloorController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<Floor>> getFloorById(@PathVariable(value="id") Long floorId) {
-		Optional<Floor> floor = floorService.findById(floorId);
-		if(floor.isPresent())
-			return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(floor.get()), HttpStatus.OK);
-		else
-			return ResponseEntity.noContent().build();
+			return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(floorService.findById(floorId)), HttpStatus.OK);
 	}
 	
 	//Brisanje sprata sa zadatim id-em
@@ -89,9 +78,6 @@ public class FloorController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<?> deleteFloorWithId(@PathVariable(value="id") Long floorId){
-		if(!floorService.findById(floorId).isPresent())
-			return ResponseEntity.notFound().build();
-			
 		floorService.deleteById(floorId);
 		return ResponseEntity.ok().build();
 	}
@@ -107,14 +93,7 @@ public class FloorController {
 	})
 	public ResponseEntity<Resource<Floor>> updateFloorWithId(@PathVariable(value = "id") Long floorId,
 			@Valid @RequestBody Floor newFloor) {
-		Optional<Floor> oldFloor = floorService.findById(floorId);
-		if(oldFloor.isPresent()) {
-			oldFloor.get().copyFieldsFrom(newFloor);
-			floorService.save(oldFloor.get());
-			return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(oldFloor.get()), HttpStatus.OK);
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+			return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(floorService.updateFloorById(floorId, newFloor)), HttpStatus.OK);
 	}
 	
 	//Vraca sobe za dati sprat
@@ -127,16 +106,7 @@ public class FloorController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<Room>>> getRoomsForFloorWithId(@PathVariable(value = "id") Long floorId) {
-		Optional<Floor> floor = floorService.findById(floorId);
-		if(floor.isPresent()) {
-			List<Room> roomList = floor.get().getRoom();
-			if(roomList.isEmpty())
-				return ResponseEntity.noContent().build();
-			else
-				return new ResponseEntity<List<Resource<Room>>>(HATEOASImplementorHotel.createRoomList(roomList), HttpStatus.OK);
-		}else {
-			return ResponseEntity.notFound().build();
-		}
+				return new ResponseEntity<List<Resource<Room>>>(HATEOASImplementorHotel.createRoomList(floorService.getRooms(floorId)), HttpStatus.OK);	
 	}
 	
 	//Kreira sobu na spratu
@@ -150,13 +120,6 @@ public class FloorController {
 	})
 	public ResponseEntity<Resource<Room>> createRoomForFloorWithId(@PathVariable(value = "id") Long floorId,
 			@Valid @RequestBody Room room) {
-		Optional<Floor> floor = floorService.findById(floorId);
-		if(floor.isPresent()) {
-			floor.get().add(room);
-			floorService.save(floor.get());
-			return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(room), HttpStatus.CREATED);
-		}else {
-			return ResponseEntity.notFound().build();
-		}
+			return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(floorService.createRoom(floorId, room)), HttpStatus.CREATED);	
 	}
 }
