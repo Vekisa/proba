@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.isap.ISAProject.model.hotel.Catalogue;
 import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.service.hotel.RoomTypeService;
 
@@ -83,17 +84,29 @@ public class RoomTypeController {
 	}
 	
 	//Update tip sobe sa zadatim id-em
-		@RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-		@ApiOperation(value = "Update tipa sobe.", notes = "Ažurira tip sobe sa zadatim ID-em na osnovu prosleđenog tipa sobe."
-				+ " Kolekcije originalnog tipa sobe ostaju netaknute.", httpMethod = "PUT", consumes = "application/json", produces = "application/json")
-		@ApiResponses(value = {
-				@ApiResponse(code = 200, message = "OK", response = RoomType.class),
-				@ApiResponse(code = 204, message = "No Content"),
-				@ApiResponse(code = 400, message = "Bad Request")
-		})
-		public ResponseEntity<Resource<RoomType>> updateRoomTypenWithId(@PathVariable(value = "id") Long roomTypeId,
-				@Valid @RequestBody RoomType newRoomType) {
-
-				return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(roomTypeService.updateRoomTypeById(roomTypeId, newRoomType)), HttpStatus.OK);	
-		}
+	@RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Update tipa sobe.", notes = "Ažurira tip sobe sa zadatim ID-em na osnovu prosleđenog tipa sobe."
+			+ " Kolekcije originalnog tipa sobe ostaju netaknute.", httpMethod = "PUT", consumes = "application/json", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = RoomType.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request")
+	})
+	public ResponseEntity<Resource<RoomType>> updateRoomTypenWithId(@PathVariable(value = "id") Long roomTypeId,
+			@Valid @RequestBody RoomType newRoomType) {
+			return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(roomTypeService.updateRoomTypeById(roomTypeId, newRoomType)), HttpStatus.OK);	
+	}
+	
+	//Vraca cenovnik kome pripada tip sobe
+	@RequestMapping(value = "/{id}/catalogue", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraca cenovnik.", notes = "Povratna vrednost je cenovnik kome pripada tip sobe"
+			+ " Kolekcije originalnog tipa sobe ostaju netaknute.", httpMethod = "PUT", consumes = "application/json", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = RoomType.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request")
+	})
+	public ResponseEntity<Resource<Catalogue>> getCatalogueForRoomType(@PathVariable(value = "id") Long roomTypeId) {
+			return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(roomTypeService.getCatalogue(roomTypeId)), HttpStatus.OK);	
+	}
 }

@@ -10,12 +10,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.hotel.ExtraOption;
-import com.isap.ISAProject.model.hotel.Hotel;
+import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.repository.hotel.ExtraOptionRepository;
 
 @Service
@@ -68,6 +67,17 @@ public class ExtraOptionService {
 		extraOptionRepository.save(oldExtraOption);
 		logger.info("< Extra-option update");
 		return oldExtraOption;
+	}
+	
+	public RoomReservation getRoomReservation(Long extraOptionId) {
+		logger.info("> room-reservation from extra-option", extraOptionId);
+		ExtraOption extraOption = this.findById(extraOptionId);
+		RoomReservation roomReservation = extraOption.getRoomReservation();
+		logger.info("< room-type from room");
+		if(roomReservation != null)
+			return roomReservation;
+		else
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Extra option za datu rezervaciju nije postavljen");
 	}
 
 }

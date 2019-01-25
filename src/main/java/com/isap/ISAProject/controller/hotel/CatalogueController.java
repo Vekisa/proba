@@ -1,12 +1,10 @@
 package com.isap.ISAProject.controller.hotel;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.hotel.Catalogue;
+import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.service.hotel.CatalogueService;
 
@@ -124,5 +123,18 @@ public class CatalogueController {
 	public ResponseEntity<Resource<RoomType>> createRoomTypeForCatalogueWithId(@PathVariable(value = "id") Long catalogueId,
 			@Valid @RequestBody RoomType roomType) {
 			return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(catalogueService.createRoomType(catalogueId, roomType)), HttpStatus.CREATED);
+	}
+	
+	//vraca hotel od prosledjenog cenovnika
+	@RequestMapping(value = "/{id}/hotel", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraca hotel.", notes = "Povratna vrednost servisa je hotel kome cenovnik", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Hotel.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request"),
+			@ApiResponse(code = 404, message = "Not Found")
+	})
+	public ResponseEntity<Resource<Hotel>> getHotelForCatalogueWithId(@PathVariable("id") Long catalogueId) {
+				return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(catalogueService.getHotel(catalogueId)), HttpStatus.OK);
 	}
 }

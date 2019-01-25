@@ -12,6 +12,9 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.Valid;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
 import com.isap.ISAProject.model.Company;
 
 @Entity
@@ -19,6 +22,7 @@ import com.isap.ISAProject.model.Company;
 public class Hotel extends Company {
 	
 	@OneToMany(mappedBy="hotel")
+	@Cascade(CascadeType.ALL)
 	private List<Floor> floor;
 	
 	@OneToMany(mappedBy="hotel")

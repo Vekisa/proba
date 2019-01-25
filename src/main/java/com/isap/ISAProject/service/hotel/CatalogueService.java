@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.hotel.Catalogue;
-import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.repository.hotel.CatalogueRepository;
@@ -90,6 +89,17 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 		this.save(catalogue);
 		logger.info("< create room-type for catalogue");
 		return roomType;
+	}
+	
+	public Hotel getHotel(Long catalogueId) {
+		logger.info("> hotel from catalogue", catalogueId);
+		Catalogue catalogue = this.findById(catalogueId);
+		Hotel hotel = catalogue.getHotel();
+		logger.info("< hotel from catalogue");
+		if(hotel != null)
+			return hotel;
+		else
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Hotel za dati cenovnik nije postavljen");
 	}
 
 }

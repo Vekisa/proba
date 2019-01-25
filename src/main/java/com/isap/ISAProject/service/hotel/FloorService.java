@@ -10,11 +10,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.hotel.Floor;
+import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.repository.hotel.FloorRepository;
 
@@ -89,6 +89,17 @@ public class FloorService {
 		this.save(floor);
 		logger.info("< create room for floor");
 		return room;
+	}
+	
+	public Hotel getHotel(Long floorId) {
+		logger.info("> hotel from floor", floorId);
+		Floor floor = this.findById(floorId);
+		Hotel hotel = floor.getHotel();
+		logger.info("< hotel from floor");
+		if(hotel != null)
+			return hotel;
+		else
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Hotel za dati sprat nije postavljen");
 	}
 
 }

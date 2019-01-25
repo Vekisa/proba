@@ -1,12 +1,10 @@
 package com.isap.ISAProject.controller.hotel;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.hotel.ExtraOption;
+import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.service.hotel.RoomReservationService;
 
@@ -98,28 +97,41 @@ public class RoomReservationController {
 	}
 	
 	//Vraca extra option-e za datu rezervaciju sobe
-		@RequestMapping(value = "/{id}/extra-options", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-		@ApiOperation(value = "Vraća extra optione za datu rezervaciju.", notes = "Povratna vrednost servisa je lista extra option-a.",
-				httpMethod = "GET", produces = "application/json")
-		@ApiResponses(value = {
-				@ApiResponse(code = 200, message = "OK", response = List.class),
-				@ApiResponse(code = 204, message = "No Content"),
-				@ApiResponse(code = 400, message = "Bad Request")
-		})
-		public ResponseEntity<List<Resource<ExtraOption>>> getExtraOptionsForRoomReservationWithId(@PathVariable(value = "id") Long roomReservationId) {
-					return new ResponseEntity<List<Resource<ExtraOption>>>(HATEOASImplementorHotel.createExtraOptionList(roomReservationService.getExtraOptions(roomReservationId)), HttpStatus.OK);
-		}
-		
-		@RequestMapping(value = "/{id}/extra-options", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-		@ApiOperation(value = "Kreira extra option za zadatu rezervaciju.", notes = "Povratna vrednost metode je kreirana extraoption.",
-				httpMethod = "POST", produces = "application/json", consumes = "application/json")
-		@ApiResponses(value = {
-				@ApiResponse(code = 200, message = "OK", response = ExtraOption.class),
-				@ApiResponse(code = 204, message = "No Content"),
-				@ApiResponse(code = 400, message = "Bad Request")
-		})
-		public ResponseEntity<Resource<ExtraOption>> createExtraOptionForRoomReservationWithId(@PathVariable(value = "id") Long roomReservationId,
-				@Valid @RequestBody ExtraOption extraOption) {
-				return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(roomReservationService.createExtraOption(roomReservationId, extraOption)), HttpStatus.CREATED);
-		}
+	@RequestMapping(value = "/{id}/extra-options", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća extra optione za datu rezervaciju.", notes = "Povratna vrednost servisa je lista extra option-a.",
+			httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request")
+	})
+	public ResponseEntity<List<Resource<ExtraOption>>> getExtraOptionsForRoomReservationWithId(@PathVariable(value = "id") Long roomReservationId) {
+				return new ResponseEntity<List<Resource<ExtraOption>>>(HATEOASImplementorHotel.createExtraOptionList(roomReservationService.getExtraOptions(roomReservationId)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/extra-options", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Kreira extra option za zadatu rezervaciju.", notes = "Povratna vrednost metode je kreirana extraoption.",
+			httpMethod = "POST", produces = "application/json", consumes = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = ExtraOption.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request")
+	})
+	public ResponseEntity<Resource<ExtraOption>> createExtraOptionForRoomReservationWithId(@PathVariable(value = "id") Long roomReservationId,
+			@Valid @RequestBody ExtraOption extraOption) {
+			return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(roomReservationService.createExtraOption(roomReservationId, extraOption)), HttpStatus.CREATED);
+	}
+	
+	//vraca sobu od prosledjene rezervacije
+	@RequestMapping(value = "/{id}/room", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraca sobu.", notes = "Povratna vrednost soba od prosledjene rezervacije", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Room.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request"),
+			@ApiResponse(code = 404, message = "Not Found")
+	})
+	public ResponseEntity<Resource<Room>> getRoomForRoomReservationWithId(@PathVariable("id") Long roomReservationId) {
+				return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(roomReservationService.getRoom(roomReservationId)), HttpStatus.OK);
+	}
 }

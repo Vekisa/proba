@@ -1,5 +1,6 @@
 package com.isap.ISAProject.service.hotel;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,12 +11,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.model.hotel.Floor;
+import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
+import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.repository.hotel.RoomRepository;
 
 @Service
@@ -84,11 +87,65 @@ public class RoomService {
 	public RoomReservation createRoomReservation(Long roomId, RoomReservation roomReservation){
 		logger.info("> create room reservation for room");
 		Room room = this.findById(roomId);
+		if(roomReservation.getBeginDate().after(roomReservation.getEndDate()))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datum rezervacije je lose unesen");
+		if(!checkIfRoomIsFree(roomReservation.getBeginDate(), roomReservation.getEndDate(), room))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba nije slobodna u tom periodu");
 		room.getRoomReservation().add(roomReservation);
 		roomReservation.setRoom(room);
 		this.save(room);
 		logger.info("< create room reservation for room");
 		return roomReservation;
+	}
+	
+	public Hotel getHotel(Long roomId) {
+		logger.info("> hotel from room", roomId);
+		Room room = this.findById(roomId);
+		Floor floor = room.getFloor();
+		if(floor == null) {
+			logger.info("< hotel from floor");
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Sprat za prosledjenu sobu nije postavljen");
+		}
+		Hotel hotel = floor.getHotel();
+		logger.info("< hotel from room");
+		if(hotel != null)
+			return hotel;
+		else
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Hotel za datu sobu nije postavljen");
+	}
+	
+	public Floor getFloor(Long roomId) {
+		logger.info("> floor from room", roomId);
+		Room room = this.findById(roomId);
+		Floor floor = room.getFloor();
+		logger.info("< floor from room");
+		if(floor != null)
+			return floor;
+		else
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Sprat za datu sobu nije postavljen");
+	}
+	
+	public RoomType getRoomType(Long roomId) {
+		logger.info("> room-type from room", roomId);
+		Room room = this.findById(roomId);
+		RoomType roomType = room.getRoomType();
+		logger.info("< room-type from room");
+		if(roomType != null)
+			return roomType;
+		else
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Tip sobe za datu sobu nije postavljen");
+	}
+	
+	public boolean checkIfRoomIsFree(Date start, Date end, Room room) {
+		Date reservedStart = null;
+		Date reservedEnd = null;
+		for(RoomReservation roomReservation :room.getRoomReservation()) {
+			reservedStart = roomReservation.getBeginDate();
+			reservedEnd = roomReservation.getEndDate();
+			if((start.after(reservedStart) && start.before(reservedEnd)) || (end.after(reservedStart) && end.before(reservedEnd)))
+				return false;
+		}
+		return true;
 	}
 
 }

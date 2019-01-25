@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.hotel.Floor;
+import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.service.hotel.FloorService;
 
@@ -121,5 +122,18 @@ public class FloorController {
 	public ResponseEntity<Resource<Room>> createRoomForFloorWithId(@PathVariable(value = "id") Long floorId,
 			@Valid @RequestBody Room room) {
 			return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(floorService.createRoom(floorId, room)), HttpStatus.CREATED);	
+	}
+	
+	//vraca hotel od prosledjenog sprata
+	@RequestMapping(value = "/{id}/hotel", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraca hotel.", notes = "Povratna vrednost servisa je hotel kome sprat pripada", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Hotel.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request"),
+			@ApiResponse(code = 404, message = "Not Found")
+	})
+	public ResponseEntity<Resource<Hotel>> getHotelForFloorWithId(@PathVariable("id") Long floorId) {
+				return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(floorService.getHotel(floorId)), HttpStatus.OK);
 	}
 }

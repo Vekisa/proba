@@ -14,6 +14,9 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.Valid;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
 import com.isap.ISAProject.model.RatableEntity;
 
 @Entity
@@ -34,6 +37,7 @@ public class Room extends RatableEntity {
 	private RoomType roomType;
 	
 	@OneToMany(mappedBy="room")
+	@Cascade(CascadeType.ALL)
 	private List<RoomReservation> roomReservation;
 	
 	@Version

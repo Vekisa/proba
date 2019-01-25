@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.model.hotel.Catalogue;
 import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.repository.hotel.RoomTypeRepository;
 
@@ -67,4 +68,16 @@ public class RoomTypeService {
 		logger.info("< Room-type update");
 		return oldRoomType;
 	}
+	
+	public Catalogue getCatalogue(Long roomTypeId) {
+		logger.info("> catalogue from room-type", roomTypeId);
+		RoomType roomType = this.findById(roomTypeId);
+		Catalogue catalogue = roomType.getCatalogue();
+		logger.info("< catalogue from room-type");
+		if(catalogue != null)
+			return catalogue;
+		else
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Cenovnik za tip sobe nije postavljena");
+	}
+
 }

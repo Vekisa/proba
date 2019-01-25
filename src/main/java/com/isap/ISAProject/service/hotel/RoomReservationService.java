@@ -1,5 +1,6 @@
 package com.isap.ISAProject.service.hotel;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,13 +11,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.hotel.ExtraOption;
-import com.isap.ISAProject.model.hotel.Floor;
-import com.isap.ISAProject.model.hotel.Hotel;
+import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.repository.hotel.RoomReservationRepository;
 
@@ -66,6 +65,11 @@ public class RoomReservationService {
 	public RoomReservation updateRoomReservationById(Long roomReservationId, RoomReservation newRoomReservation) {
 		logger.info("> Rezervacija sobe update");
 		RoomReservation oldRoomReservation = this.findById(roomReservationId);
+		Room room = this.getRoom(roomReservationId);
+		if(newRoomReservation.getBeginDate().after(newRoomReservation.getEndDate()))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datum rezervacije je lose unesen");
+		if(room!= null && !checkIfRoomIsFree(newRoomReservation.getBeginDate(), oldRoomReservation.getEndDate(), room))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba nije slobodna u tom periodu");	
 		oldRoomReservation.copyFieldsFrom(newRoomReservation);
 		roomReservationRepository.save(oldRoomReservation);
 		logger.info("< Rezervacija sobe update");
@@ -91,5 +95,28 @@ public class RoomReservationService {
 		this.save(roomReservation);
 		logger.info("< create extra-option for room-resevration");
 		return extraOption;
+	}
+	
+	public Room getRoom(Long roomReservationId) {
+		logger.info("> room from room-reservation", roomReservationId);
+		RoomReservation roomReservation = this.findById(roomReservationId);
+		Room room = roomReservation.getRoom();
+		logger.info("< room from room-reservation");
+		if(room != null)
+			return room;
+		else
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Soba za rezervaciju nije postavljena");
+	}
+	
+	public boolean checkIfRoomIsFree(Date start, Date end, Room room) {
+		Date reservedStart = null;
+		Date reservedEnd = null;
+		for(RoomReservation roomReservation :room.getRoomReservation()) {
+			reservedStart = roomReservation.getBeginDate();
+			reservedEnd = roomReservation.getEndDate();
+			if((start.after(reservedStart) && start.before(reservedEnd)) || (end.after(reservedStart) && end.before(reservedEnd)))
+				return false;
+		}
+		return true;
 	}
 }
