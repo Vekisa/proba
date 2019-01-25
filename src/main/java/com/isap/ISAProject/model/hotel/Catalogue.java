@@ -14,7 +14,7 @@ import javax.persistence.Version;
 import javax.validation.Valid;
 
 @Entity
-@Table(name = "catalogue")
+//@Table(name = "catalogue")
 public class Catalogue {
 	
 	@Id

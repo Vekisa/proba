@@ -11,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.Valid;
+import javax.persistence.Version;
 @Entity
 @Table(name = "vehicle")
 public class Vehicle {
@@ -31,6 +31,9 @@ public class Vehicle {
 	
 	@OneToMany(mappedBy="vehicle")
 	private List<VehicleReservation> vehicleReservations = new ArrayList<>();
+	
+	@Version
+	private Long version;
 	
 	public double getPricePerDay() {
 		return pricePerDay;
@@ -65,9 +68,11 @@ public class Vehicle {
 		this.vehicleReservations.add(vr);
 	}
 	
-	public void copyFieldsFrom(@Valid Vehicle newVeh) {
-		this.setBranchOffice(newVeh.getBranchOffice());
-		this.setDiscount(newVeh.getDiscount());
-		this.setPricePerDay(newVeh.getPricePerDay());
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 }

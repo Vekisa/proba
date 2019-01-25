@@ -2,12 +2,10 @@ package com.isap.ISAProject.controller.rentacar;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -20,10 +18,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.isap.ISAProject.exception.ResourceNotFoundException;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
-import com.isap.ISAProject.repository.rentacar.VehicleReservationRepository;
+import com.isap.ISAProject.service.rentacar.VehicleReservationService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -34,7 +31,7 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping("/vehicle-reservations")
 public class VehicleReservationController {
 	@Autowired
-	VehicleReservationRepository vehicleReservationRepository;
+	VehicleReservationService service;
 	
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Pruža uvid u svе registracije svih vozila.", responseContainer = "List", notes = "Vraća onoliko VehicleReservation objekata koliko se zahteva paginacijom.", httpMethod = "GET", produces = "application/json")
@@ -44,11 +41,7 @@ public class VehicleReservationController {
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
 	public ResponseEntity<List<Resource<VehicleReservation>>> getAllVehicleReservations(Pageable pageable){
-		Page<VehicleReservation> vehicleRes =  vehicleReservationRepository.findAll(pageable);
-		if(vehicleRes.isEmpty()) {
-			return ResponseEntity.noContent().build();
-		}
-		return new ResponseEntity<List<Resource<VehicleReservation>>>(HATEOASImplementorRentacar.vehicleReservationLinksList(vehicleRes.getContent()), HttpStatus.OK);
+		return new ResponseEntity<List<Resource<VehicleReservation>>>(HATEOASImplementorRentacar.vehicleReservationLinksList(service.getAllVehicleReservation(pageable)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -59,11 +52,7 @@ public class VehicleReservationController {
 			@ApiResponse(code = 404, message = "Not Found. Rezervacija sa traženim ID-em ne postoji.")
 	})
 	public ResponseEntity<Resource<VehicleReservation>> getVehicleReservationById(@PathVariable(value="id") Long vehId) {
-		VehicleReservation vehicleRes = vehicleReservationRepository.findById(vehId).get();
-		if(vehicleRes == null) {
-			throw new ResourceNotFoundException("id: " + vehId);
-		}
-		return new ResponseEntity<Resource<VehicleReservation>>(HATEOASImplementorRentacar.vehicleReservationLinks(vehicleRes), HttpStatus.OK);
+		return new ResponseEntity<Resource<VehicleReservation>>(HATEOASImplementorRentacar.vehicleReservationLinks(service.getVehicleReservationById(vehId)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -72,9 +61,8 @@ public class VehicleReservationController {
 			@ApiResponse(code = 201, message = "Created", response = VehicleReservation.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđena rezervacija nije validna.")
 	})
-	public ResponseEntity<Object> createVehicleReservation(@Valid @RequestBody VehicleReservation vehRes) {
-		VehicleReservation savedVeh = vehicleReservationRepository.save(vehRes);
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedVeh.getId()).toUri();
+	public ResponseEntity<Object> saveVehicleReservation(@Valid @RequestBody VehicleReservation vehRes) {
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(service.saveVehicleReservation(vehRes).getId()).toUri();
 		return ResponseEntity.created(location).build();
 	}
 	
@@ -86,14 +74,7 @@ public class VehicleReservationController {
 			@ApiResponse(code = 404, message = "Not Found. Vozilo sa prosleđenim ID-em ne postoji.")
 	})
 	public ResponseEntity<Resource<VehicleReservation>> updateVehicleReservation(@PathVariable(value="id") Long vehId, @Valid @RequestBody VehicleReservation vehDetails) {
-		Optional<VehicleReservation> stariVeh = vehicleReservationRepository.findById(vehId);
-		if(stariVeh.get() == null) {
-			throw new ResourceNotFoundException("id: " + vehId);
-		}
-		else if(stariVeh.isPresent()) {
-			stariVeh.get().copyFieldsFrom(vehDetails);
-		}
-		return new ResponseEntity<Resource<VehicleReservation>>(HATEOASImplementorRentacar.vehicleReservationLinks(stariVeh.get()), HttpStatus.OK);
+		return new ResponseEntity<Resource<VehicleReservation>>(HATEOASImplementorRentacar.vehicleReservationLinks(service.updateVehicleReservation(vehId, vehDetails)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -104,11 +85,7 @@ public class VehicleReservationController {
 			@ApiResponse(code = 404, message = "Not Found. Rezervacija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> deleteVehicleReservationWithID(@PathVariable(value = "id") Long id){
-		VehicleReservation deletedVeh = vehicleReservationRepository.findById(id).get();
-		if(deletedVeh == null) {
-			throw new ResourceNotFoundException("id: " + id);
-		}
-		vehicleReservationRepository.deleteById(id);
+		service.deleteVehicleReservation(id);
 		return ResponseEntity.ok().build();
 	}
 }
