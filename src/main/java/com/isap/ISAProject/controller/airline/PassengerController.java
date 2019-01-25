@@ -1,12 +1,10 @@
 package com.isap.ISAProject.controller.airline;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -22,95 +20,98 @@ import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightSeat;
 import com.isap.ISAProject.model.airline.Passenger;
 import com.isap.ISAProject.model.airline.Ticket;
-import com.isap.ISAProject.repository.airline.PassengerRepository;
+import com.isap.ISAProject.service.airline.PassengerService;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping("/passengers")
 public class PassengerController {
 
 	@Autowired
-	PassengerRepository repository;
-	
+	private PassengerService service;
+
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća putnike.", notes = "Povratna vrednost servisa je lista putnika koji pripadaju zahtevanoj strani (na osnovu paginacije).", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = { 
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content. Lista je prazna."),
+			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
+	})
 	public ResponseEntity<List<Resource<Passenger>>> getAllPassengers(Pageable pageable) {
-		Page<Passenger> passengers = repository.findAll(pageable);
-		if(passengers.hasContent()) {
-			return new ResponseEntity<List<Resource<Passenger>>>(HATEOASImplementor.createPassengersList(passengers.getContent()), HttpStatus.OK);
-		} else {
-			return ResponseEntity.noContent().build();
-		}
+		return new ResponseEntity<List<Resource<Passenger>>>(HATEOASImplementor.createPassengersList(service.findAll(pageable)), HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća putnika sa ID.", notes = "Povratna vrednost servisa je resurs putnika koji ima traženi ID.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Passenger.class),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Putnik sa traženim ID ne postoji.")
+	})
 	public ResponseEntity<Resource<Passenger>> getPassengerWithId(@PathVariable("id") Long id) {
-		Optional<Passenger> passenger = repository.findById(id);
-		if(passenger.isPresent()) {
-			return new ResponseEntity<Resource<Passenger>>(HATEOASImplementor.createPassenger(passenger.get()), HttpStatus.OK);
-		} else {
-			return ResponseEntity.notFound().build();
-		}
-	}
-	
+		return new ResponseEntity<Resource<Passenger>>(HATEOASImplementor.createPassenger(service.findById(id)), HttpStatus.OK);
+	}	
+
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	@ApiOperation(value = "Briše putnika.", notes = "Briše putnika sa prosleđenim ID", httpMethod = "DELETE")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Putnik sa prosleđenim ID ne postoji.")
+	})
 	public ResponseEntity<?> deletePassengerWithId(@PathVariable("id") Long id) {
-		if(!repository.findById(id).isPresent()) return ResponseEntity.notFound().build();
-		repository.deleteById(id);
+		service.deletePassenger(service.findById(id));
 		return ResponseEntity.ok().build();
 	}
-	
+
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Ažurira putnika.", notes = "Ažurira putnika sa prosleđenim ID na osnovu prosleđenog putnika. Kolekcije originalnog putnika ostaju netaknute.", httpMethod = "PUT", consumes = "application/json", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Passenger.class),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili avio kompaniju nisu validni."),
+			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
+	})
 	public ResponseEntity<Resource<Passenger>> updatePassengerWithId(@PathVariable("id") Long id, @RequestBody @Valid Passenger newPassenger) {
-		Optional<Passenger> oldPassenger = repository.findById(id);
-		if(oldPassenger.isPresent()) {
-			oldPassenger.get().copyFieldsFrom(newPassenger);
-			repository.save(oldPassenger.get());
-			return new ResponseEntity<Resource<Passenger>>(HATEOASImplementor.createPassenger(oldPassenger.get()), HttpStatus.OK);
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return new ResponseEntity<Resource<Passenger>>(HATEOASImplementor.createPassenger(service.updatePassenger(service.findById(id), newPassenger)), HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/{id}/seats", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća sedišta koja je zauzeo putnik.", notes = "Povratna vrednost servisa je lista resursa sedišta.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content. Ne postoje sedišta za datog putnika."),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Putnik sa prosleđenim ID ne postoji.")
+	})
 	public ResponseEntity<List<Resource<FlightSeat>>> getSeatsForPassengerWithId(@PathVariable("id") Long id) {
-		Optional<Passenger> passenger = repository.findById(id);
-		if(passenger.isPresent()) {
-			List<FlightSeat> seats = passenger.get().getFlightSeats();
-			if(seats.isEmpty()) {
-				return ResponseEntity.noContent().build();
-			} else {
-				return new ResponseEntity<List<Resource<FlightSeat>>>(HATEOASImplementor.createFlightSeatsList(seats), HttpStatus.OK);
-			}
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return new ResponseEntity<List<Resource<FlightSeat>>>(HATEOASImplementor.createFlightSeatsList(service.getSeatsWithPassenger(service.findById(id))), HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/{id}/flights", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća letove na kojima je putnik.", notes = "Povratna vrednost servisa je lista resursa letova na kojima je učestvovao putnik sa prosleđenim ID.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content. Ne postoji nijedan let za putnika."),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Putnik sa prosleđenim ID ne postoji.")
+	})
 	public ResponseEntity<List<Resource<Flight>>> getFlightsForPassengerWithId(@PathVariable("id") Long id) {
-		if(repository.findById(id).isPresent()) {
-			List<Flight> flights = repository.getFlightsForPassenger(id);
-			if(flights.isEmpty()) {
-				return ResponseEntity.noContent().build();
-			} else {
-				return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementor.createFlightsList(flights), HttpStatus.OK);
-			}
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementor.createFlightsList(service.getFlightsWithPassenger(service.findById(id))), HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/{id}/tickets", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća karte na kojima je putnik.", notes = "Povratna vrednost servisa je lista resursa karata na kojima je učestvovao putnik sa prosleđenim ID.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content. Ne postoji nijedna karta za putnika."),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Putnik sa prosleđenim ID ne postoji.")
+	})
 	public ResponseEntity<List<Resource<Ticket>>> getTicketsForPassengerWithId(@PathVariable("id") Long id) {
-		if(repository.findById(id).isPresent()) {
-			List<Ticket> tickets = repository.getTicketsForPassenger(id);
-			if(tickets.isEmpty()) {
-				return ResponseEntity.noContent().build();
-			} else {
-				return new ResponseEntity<List<Resource<Ticket>>>(HATEOASImplementor.createTicketsList(tickets), HttpStatus.OK);
-			}
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return new ResponseEntity<List<Resource<Ticket>>>(HATEOASImplementor.createTicketsList(service.getTicketsOfPassenger(service.findById(id))), HttpStatus.OK);
 	}
-	
+
 }

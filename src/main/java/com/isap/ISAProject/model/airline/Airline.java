@@ -1,14 +1,10 @@
 package com.isap.ISAProject.model.airline;
 
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.Valid;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -40,44 +36,12 @@ public class Airline extends Company {
 	@Cascade(CascadeType.ALL)
 	private List<FlightSeatCategory> categories;
 	
-	public Map<Flight, Integer> getGraphForFlights(Date beginDate, Date endDate) {	// TODO : Letovi koji slecu u destinaciju ili polecu iz nje?
-		Map<Flight, Integer> result = new HashMap<Flight, Integer>();
-		for(Destination d : this.destinations)
-			for(Flight f : d.getFlightsFromHere())
-				if((f.getDepartureTime().after(beginDate)) && (f.getArrivalTime().before(endDate)))
-					if(result.containsKey(f))
-						result.put(f, result.get(f) + 1);
-					else
-						result.put(f, 1);
-		return result;
-	}
-	
-	public Map<Destination, Integer> getGraphForDestinations(Date beginDate, Date endDate) {
-		Map<Destination, Integer> result = new HashMap<Destination, Integer>();
-		/*for(Destination d : this.destinations) // TODO : Da li je ovo stvarno potrebno?
-			if()*/
-		return result;
-	}
-	
-	public List<LuggageInfo> getLuggageInfos() {
-		return luggageInfos;
-	}
+	public List<LuggageInfo> getLuggageInfos() { return luggageInfos; }
 
-	public List<Destination> getDestinations() {
-		return destinations;
-	}
+	public List<Destination> getDestinations() { return this.destinations; }
 
-	public List<FlightConfiguration> getConfigurations() {
-		return configurations;
-	}
+	public List<FlightConfiguration> getConfigurations() { return this.configurations; }
 
-	public void add(@Valid FlightConfiguration flightConfiguration) {
-		this.getConfigurations().add(flightConfiguration);
-		flightConfiguration.setAirline(this);
-	}
-
-	public List<FlightSeatCategory> getCategories() {
-		return this.categories;
-	}
+	public List<FlightSeatCategory> getCategories() { return this.categories; }
 	
 }

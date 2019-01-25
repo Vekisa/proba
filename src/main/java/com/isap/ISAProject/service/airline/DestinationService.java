@@ -23,10 +23,10 @@ import com.isap.ISAProject.serviceInterface.airline.DestinationServiceInterface;
 public class DestinationService implements DestinationServiceInterface {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
 	@Autowired
-	DestinationRepository repository;
-	
+	private DestinationRepository repository;
+
 	@Override
 	public List<Destination> findAll(Pageable pageable) {
 		logger.info("> fetch destinations at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
@@ -40,10 +40,8 @@ public class DestinationService implements DestinationServiceInterface {
 		logger.info("> fetch destination with id {}", id);
 		Optional<Destination> destination = repository.findById(id);
 		logger.info("< destination fetched");
-		if(destination.isPresent()) 
-			return destination.get();
-		else
-			throw new ResourceNotFoundException("Destination with ID : " + id + " doesn't exist");
+		if(destination.isPresent()) return destination.get();
+		throw new ResourceNotFoundException("Destination with ID : " + id + " doesn't exist");
 	}
 
 	@Override
@@ -62,7 +60,7 @@ public class DestinationService implements DestinationServiceInterface {
 		logger.info("< destination updated");
 		return oldDestination;
 	}
-	
+
 	@Override
 	public void deleteDestination(Destination destination) {
 		logger.info("> deleting destination with id {}", destination.getId());
@@ -85,10 +83,8 @@ public class DestinationService implements DestinationServiceInterface {
 		logger.info("> fetching flights from destination with id {}", destination.getId());
 		List<Flight> list = destination.getFlightsFromHere();
 		logger.info("< flights from destination fetched");
-		if(!list.isEmpty())
-			return list;
-		else
-			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested flights do not exist.");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested flights do not exist.");
 	}
 
 	@Override
@@ -96,10 +92,8 @@ public class DestinationService implements DestinationServiceInterface {
 		logger.info("> fetching flights to destination with id {}", destination.getId());
 		List<Flight> list = destination.getFlightsToHere();
 		logger.info("< flights to destination fetched");
-		if(!list.isEmpty())
-			return list;
-		else
-			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested flights do not exist.");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested flights do not exist.");
 	}
 
 	@Override
@@ -107,10 +101,8 @@ public class DestinationService implements DestinationServiceInterface {
 		logger.info("> fetching airline for destination with id {}", destination.getId());
 		Airline airline = destination.getAirline();
 		logger.info("< airline fetched");
-		if(airline != null)
-			return airline;
-		else
-			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested airline does not exist.");
+		if(airline != null) return airline;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested airline does not exist.");
 	}
 
 }
