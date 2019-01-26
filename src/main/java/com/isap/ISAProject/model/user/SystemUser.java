@@ -14,7 +14,7 @@ public class SystemUser extends UserBase{
 	private static final long serialVersionUID = 689204864806648978L;
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
 	@Column(nullable = false)
@@ -40,10 +40,7 @@ public class SystemUser extends UserBase{
 	
 	@Column(nullable = false)
 	private String authorities;
-	
-	
-	
-	
+
 	public SystemUser() {
 		super();
 	}

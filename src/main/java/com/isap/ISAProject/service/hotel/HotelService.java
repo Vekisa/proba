@@ -30,9 +30,8 @@ public class HotelService {
 	@Autowired
 	private HotelRepository hotelRepository;
 	
-	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Hotel findById(long id) {
-		try {
 			logger.info("> Hotel findById id:{}", id);
 			Optional<Hotel> hotel = hotelRepository.findById(id);
 			logger.info("< Hotel findById id:{}", id);
@@ -40,12 +39,9 @@ public class HotelService {
 				return hotel.get();
 			else 
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hotel sa zadatim id-em ne postoji");
-		}catch(Exception e) {
-			//Neki response za los
-			return null;
-		}
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<Hotel> findAll(Pageable pageable) {
 		logger.info("> Hotel findAll");
 		Page<Hotel> hotels = hotelRepository.findAll(pageable);
@@ -56,7 +52,7 @@ public class HotelService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hoteli ne postoje");
 	}
 	
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public Hotel save(Hotel hotel) {
 		logger.info("> Hotel create");
 		Hotel savedHotel = hotelRepository.save(hotel);
@@ -64,7 +60,7 @@ public class HotelService {
 		return savedHotel;
 	}
 	
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteById(long id) {
 		logger.info("> Hotel delete");
 		this.findById(id);
@@ -72,16 +68,17 @@ public class HotelService {
 		logger.info("< Hotel delete");
 	}
 	
-	@Transactional(readOnly = false, isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public Hotel updateHotelById(Long hotelId, Hotel newHotel) {
 		logger.info("> Hotel update");
 		Hotel oldHotel = this.findById(hotelId);
 		oldHotel.copyFieldsFrom(newHotel);
-		hotelRepository.save(oldHotel);
+		this.save(oldHotel);
 		logger.info("< Hotel update");
 		return oldHotel;
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<Floor> getFloors(Long id){
 		logger.info("> get floors for hotel");
 		Hotel hotel = this.findById(id);
@@ -93,7 +90,7 @@ public class HotelService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Spratovi za dati hotel ne postoje");
 	}
 	
-	@Transactional(readOnly = false, isolation = Isolation.REPEATABLE_READ)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public Floor createFloor(Long hotelId, Floor floor){
 		logger.info("> create floor for hotel");
 		Hotel hotel = this.findById(hotelId);
@@ -104,6 +101,7 @@ public class HotelService {
 		return floor;
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<ExtraOption> getExtraOptions(Long id){
 		logger.info("> get extra-options for hotel");
 		Hotel hotel = this.findById(id);
@@ -115,7 +113,7 @@ public class HotelService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Extra-optioni za dati hotel ne postoje");
 	}
 	
-	@Transactional(readOnly = false, isolation = Isolation.REPEATABLE_READ)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public ExtraOption createExtraOption(Long hotelId, ExtraOption extraOption){
 		logger.info("> create extra-option for hotel");
 		Hotel hotel = this.findById(hotelId);
@@ -126,6 +124,7 @@ public class HotelService {
 		return extraOption;
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public Catalogue getCatalogue(Long id){
 		logger.info("> get catalogue for hotel");
 		Hotel hotel = this.findById(id);
@@ -137,7 +136,7 @@ public class HotelService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cenovnik za dati hotel ne postoji");
 	}
 	
-	@Transactional(readOnly = false, isolation = Isolation.REPEATABLE_READ)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public Catalogue createCatalogue(Long hotelId, Catalogue catalogue){
 		logger.info("> create catalogue for hotel");
 		Hotel hotel = this.findById(hotelId);

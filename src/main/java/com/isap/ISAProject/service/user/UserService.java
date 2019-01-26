@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,6 +20,7 @@ import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.repository.user.RegisteredUserRepository;
+import com.isap.ISAProject.service.EmailSenderService;
 import com.isap.ISAProject.serviceInterface.user.UserServiceInterface;
 
 @Service
@@ -28,6 +30,9 @@ public class UserService implements UserServiceInterface {
 
 	@Autowired
 	private RegisteredUserRepository repository;
+	
+	@Autowired
+    private EmailSenderService emailSenderService;
 	
 	@Override
 	public List<RegisteredUser> findAll(Pageable pageable) {
@@ -42,6 +47,14 @@ public class UserService implements UserServiceInterface {
 		logger.info("> fetch user with id {}", id);
 		Optional<RegisteredUser> user = repository.findById(id);
 		logger.info("< user fetched");
+		
+		/*SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo("vmosorinski@gmail.com");
+        mailMessage.setSubject("Complete Registration!");
+        mailMessage.setFrom("bice10izise@gmail.com");
+        mailMessage.setText("CAO");
+        emailSenderService.sendEmail(mailMessage);*/
+		
 		if(user.isPresent()) return user.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested user doesn't exist.");
 	}
@@ -52,6 +65,7 @@ public class UserService implements UserServiceInterface {
 		// TODO : Biznis logika memorisanja korisnika + slanje mejla u slucaju uspesnosti + timeout zahteva
 		repository.save(user);
 		logger.info("< user saved");
+		
 		return user;
 	}
 
