@@ -266,4 +266,15 @@ public class RegisteredUserController {
 		return ResponseEntity.ok().build();
 	}
 	
+	@RequestMapping(value = "/{token}/confirm-account", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraca potvrdjenog korisnika.", notes = "Potvrdjuje korisnika.", httpMethod = "PUT", consumes = "application/json", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = RegisteredUser.class),
+			@ApiResponse(code = 400, message = "Bad Request"),
+			@ApiResponse(code = 404, message = "Not Found")
+	})
+	public ResponseEntity<Resource<RegisteredUser>> confirmAccountWithToken(@PathVariable("token") String userToken) {
+			return new ResponseEntity<Resource<RegisteredUser>>(HATEOASImplementor.createRegisteredUser(service.confirmAccount(userToken)), HttpStatus.OK);
+	}
+	
 }
