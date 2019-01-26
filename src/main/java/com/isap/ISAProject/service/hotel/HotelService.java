@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,14 +30,20 @@ public class HotelService {
 	@Autowired
 	private HotelRepository hotelRepository;
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public Hotel findById(long id) {
-		logger.info("> Hotel findById id:{}", id);
-		Optional<Hotel> hotel = hotelRepository.findById(id);
-		logger.info("< Hotel findById id:{}", id);
-		if(hotel.isPresent())
-			return hotel.get();
-		else 
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hotel sa zadatim id-em ne postoji");
+		try {
+			logger.info("> Hotel findById id:{}", id);
+			Optional<Hotel> hotel = hotelRepository.findById(id);
+			logger.info("< Hotel findById id:{}", id);
+			if(hotel.isPresent())
+				return hotel.get();
+			else 
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hotel sa zadatim id-em ne postoji");
+		}catch(Exception e) {
+			//Neki response za los
+			return null;
+		}
 	}
 	
 	public List<Hotel> findAll(Pageable pageable) {
@@ -65,6 +72,7 @@ public class HotelService {
 		logger.info("< Hotel delete");
 	}
 	
+	@Transactional(readOnly = false, isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRES_NEW)
 	public Hotel updateHotelById(Long hotelId, Hotel newHotel) {
 		logger.info("> Hotel update");
 		Hotel oldHotel = this.findById(hotelId);
@@ -85,6 +93,7 @@ public class HotelService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Spratovi za dati hotel ne postoje");
 	}
 	
+	@Transactional(readOnly = false, isolation = Isolation.REPEATABLE_READ)
 	public Floor createFloor(Long hotelId, Floor floor){
 		logger.info("> create floor for hotel");
 		Hotel hotel = this.findById(hotelId);
@@ -106,6 +115,7 @@ public class HotelService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Extra-optioni za dati hotel ne postoje");
 	}
 	
+	@Transactional(readOnly = false, isolation = Isolation.REPEATABLE_READ)
 	public ExtraOption createExtraOption(Long hotelId, ExtraOption extraOption){
 		logger.info("> create extra-option for hotel");
 		Hotel hotel = this.findById(hotelId);
@@ -127,6 +137,7 @@ public class HotelService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cenovnik za dati hotel ne postoji");
 	}
 	
+	@Transactional(readOnly = false, isolation = Isolation.REPEATABLE_READ)
 	public Catalogue createCatalogue(Long hotelId, Catalogue catalogue){
 		logger.info("> create catalogue for hotel");
 		Hotel hotel = this.findById(hotelId);
