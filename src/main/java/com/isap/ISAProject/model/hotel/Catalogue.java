@@ -10,10 +10,11 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.Valid;
 
 @Entity
-@Table(name = "catalogue")
+//@Table(name = "catalogue")
 public class Catalogue {
 	
 	@Id
@@ -25,6 +26,9 @@ public class Catalogue {
 	
 	@OneToMany(mappedBy="catalogue")
 	private List<RoomType> roomType;
+	
+	@Version
+	private Long version;
 	
 	public Catalogue() {
 		roomType = new ArrayList<>();
@@ -52,6 +56,14 @@ public class Catalogue {
 
 	public void setRoomType(List<RoomType> roomType) {
 		this.roomType = roomType;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
 	public void copyFieldsFrom(@Valid Catalogue catalogue) {

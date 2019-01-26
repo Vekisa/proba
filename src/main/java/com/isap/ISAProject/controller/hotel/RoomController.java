@@ -1,12 +1,10 @@
 package com.isap.ISAProject.controller.hotel;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -19,9 +17,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.hotel.Floor;
+import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
-import com.isap.ISAProject.repository.hotel.RoomRepository;
+import com.isap.ISAProject.model.hotel.RoomType;
+import com.isap.ISAProject.service.hotel.RoomService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -30,8 +30,9 @@ import io.swagger.annotations.ApiResponses;
 @RestController
 @RequestMapping("/rooms")
 public class RoomController {
+	
 	@Autowired
-	RoomRepository roomRepository;
+	RoomService roomService;
 	
 	//Vraca sve sobe
 	@RequestMapping(method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,11 +44,7 @@ public class RoomController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<Room>>> getAllRooms(Pageable pageable){
-		Page<Room> rooms = roomRepository.findAll(pageable); 
-		if(rooms.isEmpty())
-			return ResponseEntity.noContent().build();
-		else
-			return new ResponseEntity<List<Resource<Room>>>(HATEOASImplementorHotel.createRoomList(rooms.getContent()), HttpStatus.OK);
+			return new ResponseEntity<List<Resource<Room>>>(HATEOASImplementorHotel.createRoomList(roomService.findAll(pageable)), HttpStatus.OK);
 	}
 	
 	//Kreiranje sobe
@@ -60,8 +57,7 @@ public class RoomController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<Room>> createRoom(@Valid @RequestBody Room room) {
-		Room createdRoom =  roomRepository.save(room);
-		return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(createdRoom), HttpStatus.CREATED);
+		return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(roomService.save(room)), HttpStatus.CREATED);
 	}
 	
 	//Vraca sobu sa zadatim ID-em
@@ -73,11 +69,7 @@ public class RoomController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<Room>> getRoomById(@PathVariable(value="id") Long roomId) {
-		Optional<Room> room = roomRepository.findById(roomId);
-		if(room.isPresent())
-			return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(room.get()), HttpStatus.OK);
-		else
-			return ResponseEntity.noContent().build();
+			return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(roomService.findById(roomId)), HttpStatus.OK);
 	}
 	
 	//Brisanje sobe sa zadatim id-em
@@ -89,10 +81,7 @@ public class RoomController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<?> deleteRoomWithId(@PathVariable(value="id") Long roomId){
-		if(!roomRepository.findById(roomId).isPresent())
-			return ResponseEntity.notFound().build();
-			
-		roomRepository.deleteById(roomId);
+		roomService.deleteById(roomId);
 		return ResponseEntity.ok().build();
 	}
 	
@@ -107,14 +96,7 @@ public class RoomController {
 	})
 	public ResponseEntity<Resource<Room>> updateRoomWithId(@PathVariable(value = "id") Long roomId,
 			@Valid @RequestBody Room newRoom) {
-		Optional<Room> oldRoom = roomRepository.findById(roomId);
-		if(oldRoom.isPresent()) {
-			oldRoom.get().copyFieldsFrom(newRoom);
-			roomRepository.save(oldRoom.get());
-			return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(oldRoom.get()), HttpStatus.OK);
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+			return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(roomService.updateRoomById(roomId, newRoom)), HttpStatus.OK);
 	}
 	
 	//Vraca rezervacije za datu sobu
@@ -127,16 +109,7 @@ public class RoomController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<RoomReservation>>> getRoomReservationsForRoomWithId(@PathVariable(value = "id") Long roomId) {
-		Optional<Room> room = roomRepository.findById(roomId);
-		if(room.isPresent()) {
-			List<RoomReservation> roomReservationList = room.get().getRoomReservation();
-			if(roomReservationList.isEmpty())
-				return ResponseEntity.noContent().build();
-			else
-				return new ResponseEntity<List<Resource<RoomReservation>>>(HATEOASImplementorHotel.createRoomReservationList(roomReservationList), HttpStatus.OK);
-		}else {
-			return ResponseEntity.notFound().build();
-		}
+				return new ResponseEntity<List<Resource<RoomReservation>>>(HATEOASImplementorHotel.createRoomReservationList(roomService.getRoomReservations(roomId)), HttpStatus.OK);	
 	}
 	
 	//Kreira rezervaciju za sobu
@@ -150,13 +123,46 @@ public class RoomController {
 	})
 	public ResponseEntity<Resource<RoomReservation>> createRoomReservationForRoomWithId(@PathVariable(value = "id") Long roomId,
 			@Valid @RequestBody RoomReservation roomReservation) {
-		Optional<Room> room = roomRepository.findById(roomId);
-		if(room.isPresent()) {
-			room.get().add(roomReservation);
-			roomRepository.save(room.get());
-			return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservation), HttpStatus.CREATED);
-		}else {
-			return ResponseEntity.notFound().build();
-		}
+			return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomService.createRoomReservation(roomId, roomReservation)), HttpStatus.CREATED);
 	}
+	
+	//vraca hotel od prosledjene sobe
+	@RequestMapping(value = "/{id}/hotel", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraca hotel.", notes = "Povratna vrednost servisa je hotel kome soba pripada", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Hotel.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request"),
+			@ApiResponse(code = 404, message = "Not Found")
+	})
+	public ResponseEntity<Resource<Hotel>> getHotelForRoomWithId(@PathVariable("id") Long roomId) {
+				return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(roomService.getHotel(roomId)), HttpStatus.OK);
+	}
+	
+	//vraca sprat od prosledjene sobe
+	@RequestMapping(value = "/{id}/floor", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraca sprat.", notes = "Povratna vrednost servisa je sprat kome soba pripada", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Floor.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request"),
+			@ApiResponse(code = 404, message = "Not Found")
+	})
+	public ResponseEntity<Resource<Floor>> getFloorForRoomWithId(@PathVariable("id") Long roomId) {
+				return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(roomService.getFloor(roomId)), HttpStatus.OK);
+	}
+	
+	//vraca tip sobe od prosledjene sobe
+	@RequestMapping(value = "/{id}/room-type", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraca tip sobe.", notes = "Povratna vrednost servisa je tip sobe od prosledjene sobe", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = RoomType.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request"),
+			@ApiResponse(code = 404, message = "Not Found")
+	})
+	public ResponseEntity<Resource<RoomType>> getRoomTypeForRoomWithId(@PathVariable("id") Long roomId) {
+				return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(roomService.getRoomType(roomId)), HttpStatus.OK);
+	}
+	
 }

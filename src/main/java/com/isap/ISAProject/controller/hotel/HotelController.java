@@ -1,12 +1,10 @@
 package com.isap.ISAProject.controller.hotel;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -46,11 +44,7 @@ public class HotelController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<Hotel>>> getAllHotels(Pageable pageable){
-		Page<Hotel> hotels = hotelService.findAll(pageable); 
-		if(hotels.isEmpty())
-			return ResponseEntity.noContent().build();
-		else
-			return new ResponseEntity<List<Resource<Hotel>>>(HATEOASImplementorHotel.createHotelsList(hotels.getContent()), HttpStatus.OK);
+			return new ResponseEntity<List<Resource<Hotel>>>(HATEOASImplementorHotel.createHotelsList(hotelService.findAll(pageable)), HttpStatus.OK);
 	}
 	
 	//Kreiranje hotela
@@ -63,8 +57,7 @@ public class HotelController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<Hotel>> createHotel(@Valid @RequestBody Hotel hotel) {
-		Hotel createdHotel =  hotelService.save(hotel);
-		return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(createdHotel), HttpStatus.CREATED);
+		return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(hotelService.save(hotel)), HttpStatus.CREATED);
 	}
 	
 	//Vraca hotel sa zadatim ID-em
@@ -76,11 +69,7 @@ public class HotelController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<Hotel>> getHotelById(@PathVariable(value="id") Long hotelId) {
-		Optional<Hotel> hotel = hotelService.findById(hotelId);
-		if(hotel.isPresent())
-			return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(hotel.get()), HttpStatus.OK);
-		else
-			return ResponseEntity.noContent().build();
+			return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(hotelService.findById(hotelId)), HttpStatus.OK);
 	}
 	
 	//Brisanje hotela sa zadatim id-em
@@ -92,9 +81,6 @@ public class HotelController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<?> deleteHotelWithId(@PathVariable(value="id") Long hotelId){
-		if(!hotelService.findById(hotelId).isPresent())
-			return ResponseEntity.notFound().build();
-		
 		hotelService.deleteById(hotelId);
 		return ResponseEntity.ok().build();
 	}	
@@ -110,15 +96,8 @@ public class HotelController {
 	})
 	public ResponseEntity<Resource<Hotel>> updateHotelWithId(@PathVariable(value = "id") Long hotelId,
 			@Valid @RequestBody Hotel newHotel) {
-		Optional<Hotel> oldHotel = hotelService.findById(hotelId);
-		if(oldHotel.isPresent()) {
-			oldHotel.get().copyFieldsFrom(newHotel);
-			hotelService.save(oldHotel.get());
-			return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(oldHotel.get()), HttpStatus.OK);
-		} else {
-			return ResponseEntity.notFound().build();
+				return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(hotelService.updateHotelById(hotelId, newHotel)), HttpStatus.OK);
 		}
-	}
 	
 	//Ocenjivanje hotela sa zadatim id-em
 	@RequestMapping(value = "/{id}/add-rating", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -143,16 +122,7 @@ public class HotelController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<Floor>>> getFloorsForHotelWithId(@PathVariable(value = "id") Long hotelId) {
-		Optional<Hotel> hotel = hotelService.findById(hotelId);
-		if(hotel.isPresent()) {
-			List<Floor> floorList = hotel.get().getFloor();
-			if(floorList.isEmpty())
-				return ResponseEntity.noContent().build();
-			else
-				return new ResponseEntity<List<Resource<Floor>>>(HATEOASImplementorHotel.createFloorList(floorList), HttpStatus.OK);
-		}else {
-			return ResponseEntity.notFound().build();
-		}
+				return new ResponseEntity<List<Resource<Floor>>>(HATEOASImplementorHotel.createFloorList(hotelService.getFloors(hotelId)), HttpStatus.OK);
 	}
 	
 	//Kreira sprat u hotelu
@@ -166,14 +136,7 @@ public class HotelController {
 	})
 	public ResponseEntity<Resource<Floor>> createFloorForHotelWithId(@PathVariable(value = "id") Long hotelId,
 			@Valid @RequestBody Floor floor) {
-		Optional<Hotel> hotel = hotelService.findById(hotelId);
-		if(hotel.isPresent()) {
-			hotel.get().add(floor);
-			hotelService.save(hotel.get());
-			return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(floor), HttpStatus.CREATED);
-		}else {
-			return ResponseEntity.notFound().build();
-		}
+			return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(hotelService.createFloor(hotelId, floor)), HttpStatus.CREATED);
 	}
 	
 	//Vraca sve extra option-e u okviru hotela
@@ -186,16 +149,7 @@ public class HotelController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<ExtraOption>>> getExtraOptionsForHotelWithId(@PathVariable(value = "id") Long hotelId) {
-		Optional<Hotel> hotel = hotelService.findById(hotelId);
-		if(hotel.isPresent()) {
-			List<ExtraOption> extraOptionList = hotel.get().getExtraOption();
-			if(extraOptionList.isEmpty())
-				return ResponseEntity.noContent().build();
-			else
-				return new ResponseEntity<List<Resource<ExtraOption>>>(HATEOASImplementorHotel.createExtraOptionList(extraOptionList), HttpStatus.OK);
-		}else {
-			return ResponseEntity.notFound().build();			
-		}
+				return new ResponseEntity<List<Resource<ExtraOption>>>(HATEOASImplementorHotel.createExtraOptionList(hotelService.getExtraOptions(hotelId)), HttpStatus.OK);
 	}
 	
 	//Kreira extra option u hotelu
@@ -209,14 +163,7 @@ public class HotelController {
 	})
 	public ResponseEntity<Resource<ExtraOption>> createExtraOptionForHotelWithId(@PathVariable(value = "id") Long hotelId,
 			@Valid @RequestBody ExtraOption extraOption) {
-		Optional<Hotel> hotel = hotelService.findById(hotelId);
-		if(hotel.isPresent()) {
-			hotel.get().add(extraOption);
-			hotelService.save(hotel.get());
-			return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(extraOption), HttpStatus.CREATED);
-		}else {
-			return ResponseEntity.notFound().build();
-		}
+			return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(hotelService.createExtraOption(hotelId, extraOption)), HttpStatus.CREATED);
 	}
 	
 	//Vraca cenovnik u okviru hotela
@@ -229,16 +176,7 @@ public class HotelController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<Catalogue>> getCatalogueForHotelWithId(@PathVariable(value = "id") Long hotelId) {
-		Optional<Hotel> hotel = hotelService.findById(hotelId);
-		if(hotel.isPresent()) {
-			Catalogue catalogue = hotel.get().getCatalogue();
-			if(catalogue == null)
-				return ResponseEntity.noContent().build();
-			else
-				return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(catalogue), HttpStatus.OK);
-		}else {
-			return ResponseEntity.notFound().build();			
-		}
+				return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(hotelService.getCatalogue(hotelId)), HttpStatus.OK);
 	}
 	
 	//Kreira cenovnik u hotelu
@@ -252,13 +190,6 @@ public class HotelController {
 	})
 	public ResponseEntity<Resource<Catalogue>> createCatalogueForHotelWithId(@PathVariable(value = "id") Long hotelId,
 			@Valid @RequestBody Catalogue catalogue) {
-		Optional<Hotel> hotel = hotelService.findById(hotelId);
-		if(hotel.isPresent()) {
-			hotel.get().setCatalogue(catalogue);
-			hotelService.save(hotel.get());
-			return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(catalogue), HttpStatus.CREATED);
-		}else {
-			return ResponseEntity.notFound().build();
-		}
+			return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(hotelService.createCatalogue(hotelId, catalogue)), HttpStatus.CREATED);
 	}
 }

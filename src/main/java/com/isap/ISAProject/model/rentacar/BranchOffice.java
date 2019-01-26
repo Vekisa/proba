@@ -11,7 +11,10 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.Valid;
+import javax.persistence.Version;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 @Entity
 @Table(name = "branch_office")
@@ -28,7 +31,13 @@ public class BranchOffice {
 	private RentACar rentACar;
 	
 	@OneToMany(mappedBy="branchOffice")
+	@Cascade(CascadeType.ALL)
 	private List<Vehicle> vehicles = new ArrayList<>();
+	
+	@Version
+	private Long version;
+	
+	public BranchOffice() {}
 	
 	public String getAddress() {
 		return address;
@@ -62,8 +71,11 @@ public class BranchOffice {
 		this.vehicles.remove(vehicle);
 	}
 	
-	public void copyFieldsFrom(@Valid BranchOffice newBro) {
-		this.setAddress(newBro.getAddress());
-		this.setRentACar(newBro.getRentACar());
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 }

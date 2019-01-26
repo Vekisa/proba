@@ -6,7 +6,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.Valid;
+import javax.persistence.Version;
 
 import com.isap.ISAProject.model.Company;
 
@@ -16,6 +16,9 @@ public class RentACar extends Company {
 	
 	@OneToMany(mappedBy="rentACar")
 	private List<BranchOffice> branchOffices;
+	
+	@Version
+	private Long version;
 	
 	public RentACar() {
 		this.branchOffices = new ArrayList<>();
@@ -34,9 +37,11 @@ public class RentACar extends Company {
 		this.branchOffices.remove(bo);
 	}
 	
-	public void copyFieldsFrom(@Valid RentACar newRac) {
-		this.setName(newRac.getName());
-		this.setAddress(newRac.getAddress());
-		this.setDescription(newRac.getDescription());
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 }

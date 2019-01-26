@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.Valid;
 
 @Entity
@@ -35,6 +36,9 @@ public class Floor {
 	
 	@OneToMany(mappedBy="floor")
 	private List<Room> room;
+	
+	@Version
+	private Long version;
 	
 	public Floor() {
 		room = new ArrayList<>();
@@ -88,6 +92,14 @@ public class Floor {
 		this.hotel = hotel;
 	}
 	
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
+	}
+
 	public void copyFieldsFrom(@Valid Floor newFloor) {
 		this.setNumber(newFloor.getNumber());
 		this.setNumberOfColumns(newFloor.getNumberOfColumns());

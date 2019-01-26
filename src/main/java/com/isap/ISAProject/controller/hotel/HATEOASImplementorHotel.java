@@ -41,6 +41,7 @@ public class HATEOASImplementorHotel {
 		resource.add(linkTo(methodOn(FloorController.class).getFloorById(floor.getId())).withRel("self"));
 		resource.add(linkTo(methodOn(FloorController.class).getAllFloors(null)).slash("?page=0&size=5").withRel("all-floors"));
 		resource.add(linkTo(methodOn(FloorController.class).getRoomsForFloorWithId(floor.getId())).withRel("floor-rooms"));
+		resource.add(linkTo(methodOn(FloorController.class).getHotelForFloorWithId(floor.getId())).withRel("hotel"));
 		return resource;
 	}
 	
@@ -88,6 +89,8 @@ public class HATEOASImplementorHotel {
 		resource.add(linkTo(methodOn(RoomController.class).getRoomById(room.getId())).withRel("self"));
 		resource.add(linkTo(methodOn(RoomController.class).getAllRooms(null)).slash("?page=0&size=5").withRel("all-rooms"));
 		resource.add(linkTo(methodOn(RoomController.class).getRoomReservationsForRoomWithId(room.getId())).withRel("room-reservations"));
+		resource.add(linkTo(methodOn(RoomController.class).getHotelForRoomWithId(room.getId())).withRel("hotel"));
+		resource.add(linkTo(methodOn(RoomController.class).getFloorForRoomWithId(room.getId())).withRel("floor"));
 		return resource;
 	}
 	
@@ -104,6 +107,7 @@ public class HATEOASImplementorHotel {
 		resource.add(linkTo(methodOn(RoomReservationController.class).getRoomReservationById(roomReservation.getId())).withRel("self"));
 		resource.add(linkTo(methodOn(RoomReservationController.class).getAllRoomReservations(null)).slash("?page=0&size=5").withRel("all-room-reservations"));
 		resource.add(linkTo(methodOn(RoomReservationController.class).getExtraOptionsForRoomReservationWithId(roomReservation.getId())).withRel("room-reservations-extra-options"));
+		resource.add(linkTo(methodOn(RoomReservationController.class).getRoomForRoomReservationWithId(roomReservation.getId())).withRel("room"));
 		return resource;
 	}
 	
