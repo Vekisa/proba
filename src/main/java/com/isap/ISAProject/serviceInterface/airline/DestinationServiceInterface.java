@@ -16,16 +16,16 @@ public interface DestinationServiceInterface {
 	
 	Destination saveDestination(Destination destination);
 	
-	Destination updateDestination(Destination oldDestination, Destination newDestination);
+	Destination updateDestination(Long oldDestinationId, Destination newDestination);
 	
-	void deleteDestination(Destination destination);
+	void deleteDestination(Long destinationId);
 	
-	Flight addFlightToDestination(Flight flight, Destination destination);
+	Flight addFlightToDestination(Flight flight, Long destinationId);
 	
-	List<Flight> getFlightsFromDestination(Destination destination);
+	List<Flight> getFlightsFromDestination(Long destinationId);
 	
-	List<Flight> getFlightsToDestination(Destination destination);
+	List<Flight> getFlightsToDestination(Long destinationId);
 	
-	Airline getAirlineForDestination(Destination destination);
+	Airline getAirlineForDestination(Long destinationId);
 	
 }

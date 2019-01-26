@@ -62,7 +62,7 @@ public class LuggageInfoController {
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<LuggageInfo>> updateLuggageInfoWithId(@PathVariable(value = "id") Long luggageInfoId, @Valid @RequestBody LuggageInfo newLuggageInfo) {
-		return new ResponseEntity<Resource<LuggageInfo>>(HATEOASImplementor.createLuggageInfo(service.updateLuggageInfo(service.findById(luggageInfoId), newLuggageInfo)), HttpStatus.OK);
+		return new ResponseEntity<Resource<LuggageInfo>>(HATEOASImplementor.createLuggageInfo(service.updateLuggageInfo(luggageInfoId, newLuggageInfo)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -73,7 +73,7 @@ public class LuggageInfoController {
 			@ApiResponse(code = 404, message = "Not Found. Informacija o prtljagu sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> deleteLuggageInfoWithId(@PathVariable(value = "id") Long luggageInfoId) {
-		service.deleteLuggageInfo(service.findById(luggageInfoId));
+		service.deleteLuggageInfo(luggageInfoId);
 		return ResponseEntity.ok().build();
 	}
 
@@ -86,7 +86,7 @@ public class LuggageInfoController {
 			@ApiResponse(code = 404, message = "Not Found. Informacija o prtljagu sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<Airline>> getAirlineForLuggageInfoWithId(@PathVariable(value = "id") Long id) {
-		return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(service.getAirlineForLuggageInfo(service.findById(id))), HttpStatus.OK);
+		return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(service.getAirlineForLuggageInfo(id)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}/seats", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -98,7 +98,7 @@ public class LuggageInfoController {
 			@ApiResponse(code = 404, message = "Not Found. Informaciju o prtljagu sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<FlightSeat>>> getSeatsUsingLuggageInfoWithId(@PathVariable(value = "id") Long id) {
-		return new ResponseEntity<List<Resource<FlightSeat>>>(HATEOASImplementor.createFlightSeatsList(service.getSeatsUsingLuggageInfo(service.findById(id))), HttpStatus.OK);
+		return new ResponseEntity<List<Resource<FlightSeat>>>(HATEOASImplementor.createFlightSeatsList(service.getSeatsUsingLuggageInfo(id)), HttpStatus.OK);
 	}
 	
 }

@@ -69,7 +69,7 @@ public class TicketController {
 			@ApiResponse(code = 404, message = "Not Found. Karta sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> deleteTicketWithId(@PathVariable("id") Long ticketId) {
-		service.deleteTicket(service.findById(ticketId));
+		service.deleteTicket(ticketId);
 		return ResponseEntity.ok().build();
 	}
 	
@@ -81,7 +81,7 @@ public class TicketController {
 			@ApiResponse(code = 404, message = "Not Found. Karta sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FlightSeat>> addSeatToTicketWithId(@PathVariable("id") Long ticketId, @RequestParam("seatId") Long seatId) {
-			return new ResponseEntity<Resource<FlightSeat>>(HATEOASImplementor.createFlightSeat(service.addSeatToTicket(seatId, service.findById(ticketId))), HttpStatus.CREATED);
+			return new ResponseEntity<Resource<FlightSeat>>(HATEOASImplementor.createFlightSeat(service.addSeatToTicket(seatId, ticketId)), HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/{id}/seats", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -93,7 +93,7 @@ public class TicketController {
 			@ApiResponse(code = 404, message = "Not Found. Sedište sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<FlightSeat>>> getSeatsForTicketWithId(@PathVariable("id") Long ticketId) {
-				return new ResponseEntity<List<Resource<FlightSeat>>>(HATEOASImplementor.createFlightSeatsList(service.getSeatsOfTicket(service.findById(ticketId))), HttpStatus.OK);
+				return new ResponseEntity<List<Resource<FlightSeat>>>(HATEOASImplementor.createFlightSeatsList(service.getSeatsOfTicket(ticketId)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}/flight", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -105,7 +105,7 @@ public class TicketController {
 			@ApiResponse(code = 404, message = "Not Found. Sedište sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<Flight>> getFlightForTicketWithId(@PathVariable("id") Long ticketId) {
-				return new ResponseEntity<Resource<Flight>>(HATEOASImplementor.createFlight(service.getFlightOfTicket(service.findById(ticketId))), HttpStatus.OK);
+				return new ResponseEntity<Resource<Flight>>(HATEOASImplementor.createFlight(service.getFlightOfTicket(ticketId)), HttpStatus.OK);
 	}
 	
 }

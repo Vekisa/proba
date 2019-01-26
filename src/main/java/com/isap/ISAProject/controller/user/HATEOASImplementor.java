@@ -10,7 +10,7 @@ import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
 
-public class HATEOASImplementorUser {
+class HATEOASImplementor {
 
 	public static Resource<RegisteredUser> createRegisteredUser(RegisteredUser registeredUser) {
 		Resource<RegisteredUser> resource = new Resource<RegisteredUser>(registeredUser);
@@ -20,7 +20,7 @@ public class HATEOASImplementorUser {
 	public static List<Resource<RegisteredUser>> createRegisteredUserList(List<RegisteredUser> registeredUsers) {
 		List<Resource<RegisteredUser>> registeredUserList = new ArrayList<Resource<RegisteredUser>>();
 		for(RegisteredUser registeredUser : registeredUsers) {
-			registeredUserList.add(HATEOASImplementorUser.createRegisteredUser(registeredUser));
+			registeredUserList.add(HATEOASImplementor.createRegisteredUser(registeredUser));
 		}
 		return registeredUserList;
 	}
@@ -33,7 +33,7 @@ public class HATEOASImplementorUser {
 	public static List<Resource<Reservation>> createReservationList(List<Reservation> reservations) {
 		List<Resource<Reservation>> reservationList = new ArrayList<Resource<Reservation>>();
 		for(Reservation reservation : reservations) {
-			reservationList.add(HATEOASImplementorUser.createReservation(reservation));
+			reservationList.add(HATEOASImplementor.createReservation(reservation));
 		}
 		return reservationList;
 	}
@@ -46,7 +46,7 @@ public class HATEOASImplementorUser {
 	public static List<Resource<FriendRequest>> createFriendRequestList(List<FriendRequest> requests) {
 		List<Resource<FriendRequest>> requestList = new ArrayList<Resource<FriendRequest>>();
 		for(FriendRequest request : requests) {
-			requestList.add(HATEOASImplementorUser.createFriendRequest(request));
+			requestList.add(HATEOASImplementor.createFriendRequest(request));
 		}
 		return requestList;
 	}
@@ -59,7 +59,7 @@ public class HATEOASImplementorUser {
 	public static List<Resource<Friendship>> createFriendshipList(List<Friendship> friendships) {
 		List<Resource<Friendship>> requestList = new ArrayList<Resource<Friendship>>();
 		for(Friendship friendship : friendships) {
-			requestList.add(HATEOASImplementorUser.createFriendship(friendship));
+			requestList.add(HATEOASImplementor.createFriendship(friendship));
 		}
 		return requestList;
 	}

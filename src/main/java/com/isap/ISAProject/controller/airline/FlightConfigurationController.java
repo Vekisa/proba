@@ -62,7 +62,7 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> deleteFlightConfigurationWithId(@PathVariable("id") Long configurationId) {
-		service.deleteConfiguration(service.findById(configurationId));
+		service.deleteConfiguration(configurationId);
 		return ResponseEntity.ok().build();
 	}
 
@@ -75,7 +75,7 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija leta sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<FlightSegment>>> getSegmentsForConfigurationWithId(@PathVariable("id") Long configurationId) {
-		return new ResponseEntity<List<Resource<FlightSegment>>>(HATEOASImplementor.createFlightSegmentsList(service.getSegmentsForConfiguration(service.findById(configurationId))), HttpStatus.OK);
+		return new ResponseEntity<List<Resource<FlightSegment>>>(HATEOASImplementor.createFlightSegmentsList(service.getSegmentsForConfiguration(configurationId)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}/segments", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -86,7 +86,7 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija leta sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FlightSegment>> createSegmentForConfigurationWithId(@PathVariable("id") Long configurationId, @Valid @RequestBody FlightSegment flightSegment) {
-		return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementor.createFlightSegment(service.createSegmentForConfiguration(flightSegment, service.findById(configurationId))), HttpStatus.CREATED);
+		return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementor.createFlightSegment(service.createSegmentForConfiguration(flightSegment, configurationId)), HttpStatus.CREATED);
 	}
 
 
@@ -99,7 +99,7 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija leta sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<Airline>> getAirlineForConfigurationWithId(Long id) {
-		return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(service.getAirlineForConfiguration(service.findById(id))), HttpStatus.OK);
+		return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(service.getAirlineForConfiguration(id)), HttpStatus.OK);
 	}
 
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -15,6 +16,9 @@ import com.isap.ISAProject.model.Company;
 @Entity
 @Table(name = "airline")
 public class Airline extends Company {
+	
+	@Version
+	private Long version;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "airline")

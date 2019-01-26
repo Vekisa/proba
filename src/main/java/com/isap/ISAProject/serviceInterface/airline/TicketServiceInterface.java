@@ -16,14 +16,14 @@ public interface TicketServiceInterface {
 	
 	Ticket saveTicket(Ticket ticket);
 	
-	void deleteTicket(Ticket ticket);
+	void deleteTicket(Long ticketId);
 	
-	FlightSeat addSeatToTicket(Long seatId, Ticket ticket);
+	FlightSeat addSeatToTicket(Long seatId, Long ticketId);
 	
-	FlightSeat removeSeatFromTicket(Long seatId, Ticket ticket);
+	FlightSeat removeSeatFromTicket(Long seatId, Long ticketId);
 	
-	List<FlightSeat> getSeatsOfTicket(Ticket ticket);
+	List<FlightSeat> getSeatsOfTicket(Long ticketId);
 	
-	Flight getFlightOfTicket(Ticket ticket);
+	Flight getFlightOfTicket(Long ticketId);
 	
 }

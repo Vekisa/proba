@@ -57,8 +57,9 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
-	public Airline updateAirline(Airline oldAirline, Airline newAirline) {
-		logger.info("> updating airline with id {}", oldAirline.getId());
+	public Airline updateAirline(Long oldAirlineId, Airline newAirline) {
+		logger.info("> updating airline with id {}", oldAirlineId);
+		Airline oldAirline = this.findById(oldAirlineId);
 		oldAirline.setName(newAirline.getName());
 		oldAirline.setAddress(newAirline.getAddress());
 		oldAirline.setDescription(newAirline.getDescription());
@@ -68,15 +69,16 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
-	public void deleteAirline(Airline airline) {
-		logger.info("> deleting airline with id {}", airline.getId());
-		repository.delete(airline);
+	public void deleteAirline(Long airlineId) {
+		logger.info("> deleting airline with id {}", airlineId);
+		repository.deleteById(airlineId);
 		logger.info("< airline deleted");
 	}
 
 	@Override
-	public List<LuggageInfo> getLuggageInfosForAirline(Airline airline) {
-		logger.info("> fetching luggage infos for airline with id {}", airline.getId());
+	public List<LuggageInfo> getLuggageInfosForAirline(Long airlineId) {
+		logger.info("> fetching luggage infos for airline with id {}", airlineId);
+		Airline airline = this.findById(airlineId);
 		List<LuggageInfo> list = airline.getLuggageInfos();
 		logger.info("< luggage infos fetched");
 		if(!list.isEmpty()) return list;
@@ -84,8 +86,9 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
-	public LuggageInfo addLuggageInfoToAirline(Airline airline, LuggageInfo luggageInfo) {
-		logger.info("> adding luggage info to airline with id {}", airline.getId());
+	public LuggageInfo addLuggageInfoToAirline(Long airlineId, LuggageInfo luggageInfo) {
+		logger.info("> adding luggage info to airline with id {}", airlineId);
+		Airline airline = this.findById(airlineId);
 		airline.getLuggageInfos().add(luggageInfo);
 		luggageInfo.setAirline(airline);
 		repository.save(airline);
@@ -94,8 +97,9 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
-	public List<Destination> getDestinationsForAirline(Airline airline) {
-		logger.info("> fetching destinations for airline with id {}", airline.getId());
+	public List<Destination> getDestinationsForAirline(Long airlineId) {
+		logger.info("> fetching destinations for airline with id {}", airlineId);
+		Airline airline = this.findById(airlineId);
 		List<Destination> list = airline.getDestinations();
 		logger.info("< destinations fetched");
 		if(!list.isEmpty()) return list;
@@ -103,8 +107,9 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
-	public Destination addDestinationToAirline(Airline airline, Destination destination) {
-		logger.info("> adding destination to airline with id {}", airline.getId());
+	public Destination addDestinationToAirline(Long airlineId, Destination destination) {
+		logger.info("> adding destination to airline with id {}", airlineId);
+		Airline airline = this.findById(airlineId);
 		airline.getDestinations().add(destination);
 		destination.setAirline(airline);
 		repository.save(airline);
@@ -113,8 +118,9 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
-	public List<FlightConfiguration> getFlightConfigurationsForAirline(Airline airline) {
-		logger.info("> fetching flight configurations for airline with id {}", airline.getId());
+	public List<FlightConfiguration> getFlightConfigurationsForAirline(Long airlineId) {
+		logger.info("> fetching flight configurations for airline with id {}", airlineId);
+		Airline airline = this.findById(airlineId);
 		List<FlightConfiguration> list = airline.getConfigurations();
 		logger.info("< flight configurations fetched");
 		if(!list.isEmpty()) return list;
@@ -122,8 +128,9 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
-	public FlightConfiguration addFlightConfigurationToAirline(Airline airline, FlightConfiguration flightConfiguration) {
-		logger.info("> adding flight configuration to airline with id {}", airline.getId());
+	public FlightConfiguration addFlightConfigurationToAirline(Long airlineId, FlightConfiguration flightConfiguration) {
+		logger.info("> adding flight configuration to airline with id {}", airlineId);
+		Airline airline = this.findById(airlineId);
 		airline.getConfigurations().add(flightConfiguration);
 		flightConfiguration.setAirline(airline);
 		repository.save(airline);
@@ -132,8 +139,9 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
-	public List<FlightSeatCategory> getFlightSeatCategoriesForAirline(Airline airline) {
-		logger.info("> fetching flight seat categories for airline with id {}", airline.getId());
+	public List<FlightSeatCategory> getFlightSeatCategoriesForAirline(Long airlineId) {
+		logger.info("> fetching flight seat categories for airline with id {}", airlineId);
+		Airline airline = this.findById(airlineId);
 		List<FlightSeatCategory> list = airline.getCategories();
 		logger.info("< flight seat categories fetched");
 		if(!list.isEmpty()) return list;
@@ -141,8 +149,9 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
-	public FlightSeatCategory addFlightSeatCategoryToAirline(Airline airline, FlightSeatCategory flightSeatCategory) {
-		logger.info("> adding flight seat category to airline with id {}", airline.getId());
+	public FlightSeatCategory addFlightSeatCategoryToAirline(Long airlineId, FlightSeatCategory flightSeatCategory) {
+		logger.info("> adding flight seat category to airline with id {}", airlineId);
+		Airline airline = this.findById(airlineId);
 		airline.getCategories().add(flightSeatCategory);
 		flightSeatCategory.setAirline(airline);
 		repository.save(airline);

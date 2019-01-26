@@ -62,7 +62,7 @@ public class FlightSegmentController {
 			@ApiResponse(code = 404, message = "Not Found. Segment (leta) sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FlightSegment>> updateFlightSegmentWithId(@PathVariable("id") Long segmentId, @Valid @RequestBody FlightSegment newSegment) {
-			return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementor.createFlightSegment(service.updateSegment(service.findById(segmentId), newSegment)), HttpStatus.OK);
+			return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementor.createFlightSegment(service.updateSegment(segmentId, newSegment)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -73,7 +73,7 @@ public class FlightSegmentController {
 			@ApiResponse(code = 404, message = "Not Found. Segment sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> deleteFlightSegmentWithId(@PathVariable("id") Long segmentId) {
-		service.deleteSegment(service.findById(segmentId));
+		service.deleteSegment(segmentId);
 		return ResponseEntity.ok().build();
 	}
 	
@@ -86,7 +86,7 @@ public class FlightSegmentController {
 			@ApiResponse(code = 404, message = "Not Found. Segment sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FlightConfiguration>> getConfigurationForSegment(@PathVariable("id") Long id) {
-		return new ResponseEntity<Resource<FlightConfiguration>>(HATEOASImplementor.createFlightConfiguration(service.getConfigurationForSegment(service.findById(id))), HttpStatus.OK);
+		return new ResponseEntity<Resource<FlightConfiguration>>(HATEOASImplementor.createFlightConfiguration(service.getConfigurationForSegment(id)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}/category", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -98,7 +98,7 @@ public class FlightSegmentController {
 			@ApiResponse(code = 404, message = "Not Found. Segment sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FlightSeatCategory>> getCategoryForSegment(@PathVariable("id") Long id) {
-		return new ResponseEntity<Resource<FlightSeatCategory>>(HATEOASImplementor.createFlightSeatCategory(service.getCategoryOfSegment(service.findById(id))), HttpStatus.OK);
+		return new ResponseEntity<Resource<FlightSeatCategory>>(HATEOASImplementor.createFlightSeatCategory(service.getCategoryOfSegment(id)), HttpStatus.OK);
 	}
 	
 }

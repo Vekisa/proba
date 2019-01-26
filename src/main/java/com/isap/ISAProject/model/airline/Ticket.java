@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.user.Reservation;
@@ -22,6 +23,9 @@ public class Ticket {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+	
+	@Version
+	private Long version;
 	
 	@Column
 	private double price;

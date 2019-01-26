@@ -21,25 +21,25 @@ public interface AirlineServiceInterface {
 	
 	Airline saveAirline(Airline airline);
 	
-	Airline updateAirline(Airline oldAirline, Airline newAirline);
+	Airline updateAirline(Long oldAirlineId, Airline newAirline);
 	
-	void deleteAirline(Airline airline);
+	void deleteAirline(Long airlineId);
 	
-	List<LuggageInfo> getLuggageInfosForAirline(Airline airline);
+	List<LuggageInfo> getLuggageInfosForAirline(Long airlineId);
 	
-	LuggageInfo addLuggageInfoToAirline(Airline airline, LuggageInfo luggageInfo);
+	LuggageInfo addLuggageInfoToAirline(Long airlineId, LuggageInfo luggageInfo);
 	
-	List<Destination> getDestinationsForAirline(Airline airline);
+	List<Destination> getDestinationsForAirline(Long airlineId);
 	
-	Destination addDestinationToAirline(Airline airline, Destination destination);
+	Destination addDestinationToAirline(Long airlineId, Destination destination);
 	
-	List<FlightConfiguration> getFlightConfigurationsForAirline(Airline airline);
+	List<FlightConfiguration> getFlightConfigurationsForAirline(Long airlineId);
 	
-	FlightConfiguration addFlightConfigurationToAirline(Airline airline, FlightConfiguration flightConfiguration);
+	FlightConfiguration addFlightConfigurationToAirline(Long airlineId, FlightConfiguration flightConfiguration);
 	
-	List<FlightSeatCategory> getFlightSeatCategoriesForAirline(Airline airline);
+	List<FlightSeatCategory> getFlightSeatCategoriesForAirline(Long airlineId);
 	
-	FlightSeatCategory addFlightSeatCategoryToAirline(Airline airline, FlightSeatCategory flightSeatCategory);
+	FlightSeatCategory addFlightSeatCategoryToAirline(Long airlineId, FlightSeatCategory flightSeatCategory);
 	
 	Map<Destination, Integer> getGraphForDestinations(Date beginDate, Date endDate);
 	

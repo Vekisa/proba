@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -24,6 +25,9 @@ public class Destination {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+	
+	@Version
+	private Long version;
 	
 	@Column(nullable = false)
 	private String name;

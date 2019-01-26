@@ -4,20 +4,23 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.Valid;
 
 @Entity
 @Table(name = "registered_user")
 public class RegisteredUser extends SystemUser {
+	
+	private static final long serialVersionUID = 6745667384494012132L;
 
 	@Column
 	private int bonusPoints;
 	
 	@OneToMany(mappedBy="registeredUser")
-	private List<Reservation> history;
+	private List<Reservation> reservations;
 	
 	@OneToMany(mappedBy="sender")
 	private List<FriendRequest> sentRequests;
@@ -25,11 +28,9 @@ public class RegisteredUser extends SystemUser {
 	@OneToMany(mappedBy="receiver")
 	private List<FriendRequest> receivedRequests;
 	
-	@OneToMany(mappedBy="friend")
+	@ManyToMany
+	@JoinTable(name = "friendships_between_users")
 	private List<Friendship> friendships;
-
-	@OneToOne
-	private RegisteredUser friend;
 	
 	public List<Friendship> getFriendships() {
 		return friendships;
@@ -47,12 +48,12 @@ public class RegisteredUser extends SystemUser {
 		this.bonusPoints = bonusPoints;
 	}
 
-	public List<Reservation> getHistory() {
-		return history;
+	public List<Reservation> getReservations() {
+		return reservations;
 	}
 
-	public void setHistory(List<Reservation> history) {
-		this.history = history;
+	public void setReservations(List<Reservation> reservations) {
+		this.reservations = reservations;
 	}
 
 	public List<FriendRequest> getSentRequests() {
@@ -71,33 +72,8 @@ public class RegisteredUser extends SystemUser {
 		this.receivedRequests = receivedRequests;
 	}
 	
-	public void copyFieldsFrom(@Valid RegisteredUser newRegisteredUser) {
-		this.setBonusPoints(newRegisteredUser.getBonusPoints());
-		this.setCity(newRegisteredUser.getCity());
-		this.setEmail(newRegisteredUser.getEmail());
-		this.setFirstName(newRegisteredUser.getFirstName());
-		this.setLastName(newRegisteredUser.getLastName());
-		this.setPhoneNumber(newRegisteredUser.getPhoneNumber());
-		this.setPassword(newRegisteredUser.getPassword());
-	}
-	
 	public void add(@Valid Reservation reservation) {
-		this.getHistory().add(reservation);
+		this.getReservations().add(reservation);
 		reservation.setRegisteredUser(this);
-	}
-	
-	public void addReceived(@Valid FriendRequest request) {
-		this.getReceivedRequests().add(request);
-		request.setReceiver(this);
-	}
-	
-	public void addSent(@Valid FriendRequest request) {
-		this.getSentRequests().add(request);
-		request.setSender(this);
-	}
-	
-	public void add(@Valid Friendship friendship) {
-		this.getFriendships().add(friendship);
-		friendship.setFriend(this);
 	}
 }

@@ -11,7 +11,7 @@ import com.isap.ISAProject.model.user.base.UserBase;
 @MappedSuperclass
 public class SystemUser extends UserBase{
 	
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 689204864806648978L;
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -14,12 +14,12 @@ public interface LuggageInfoServiceInterface {
 	
 	LuggageInfo findById(Long id);
 	
-	LuggageInfo updateLuggageInfo(LuggageInfo oldLuggageInfo, LuggageInfo newLuggageInfo);
+	LuggageInfo updateLuggageInfo(Long oldLuggageInfoId, LuggageInfo newLuggageInfo);
 	
-	void deleteLuggageInfo(LuggageInfo luggageInfo);
+	void deleteLuggageInfo(Long luggageInfoId);
 	
-	Airline getAirlineForLuggageInfo(LuggageInfo luggageInfo);
+	Airline getAirlineForLuggageInfo(Long luggageInfoId);
 	
-	List<FlightSeat> getSeatsUsingLuggageInfo(LuggageInfo luggageInfo);
+	List<FlightSeat> getSeatsUsingLuggageInfo(Long luggageInfoId);
 	
 }
