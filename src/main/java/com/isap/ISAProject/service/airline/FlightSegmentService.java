@@ -44,8 +44,9 @@ public class FlightSegmentService implements FlightSegmentServiceInterface {
 	}
 
 	@Override
-	public FlightSegment updateSegment(FlightSegment oldSegment, FlightSegment newSegment) {
-		logger.info("> updating segment with id {}", oldSegment.getId());
+	public FlightSegment updateSegment(Long oldSegmentId, FlightSegment newSegment) {
+		logger.info("> updating segment with id {}", oldSegmentId);
+		FlightSegment oldSegment = this.findById(oldSegmentId);
 		checkForOverlapping(oldSegment.getConfiguration(), newSegment);
 		oldSegment.setStartRow(newSegment.getStartRow());
 		oldSegment.setEndRow(newSegment.getEndRow());
@@ -56,15 +57,16 @@ public class FlightSegmentService implements FlightSegmentServiceInterface {
 	}
 
 	@Override
-	public void deleteSegment(FlightSegment segment) {
-		logger.info("> deleting segment with id {}", segment.getId());
-		repository.delete(segment);
+	public void deleteSegment(Long segmentId) {
+		logger.info("> deleting segment with id {}", segmentId);
+		repository.deleteById(segmentId);
 		logger.info("< segment deleted");
 	}
 
 	@Override
-	public FlightConfiguration getConfigurationForSegment(FlightSegment segment) {
-		logger.info("> fetching configuration for segment with id {}", segment.getId());
+	public FlightConfiguration getConfigurationForSegment(Long segmentId) {
+		logger.info("> fetching configuration for segment with id {}", segmentId);
+		FlightSegment segment = this.findById(segmentId);
 		FlightConfiguration configuration = segment.getConfiguration();
 		logger.info("< configuration fetched");
 		if(configuration != null) return configuration;
@@ -72,8 +74,9 @@ public class FlightSegmentService implements FlightSegmentServiceInterface {
 	}
 
 	@Override
-	public FlightSeatCategory getCategoryOfSegment(FlightSegment segment) {
-		logger.info("> fetching category for segment with id {}", segment.getId());
+	public FlightSeatCategory getCategoryOfSegment(Long segmentId) {
+		logger.info("> fetching category for segment with id {}", segmentId);
+		FlightSegment segment = this.findById(segmentId);
 		FlightSeatCategory category = segment.getCategory();
 		logger.info("< category fetched");
 		if(category != null) return category;

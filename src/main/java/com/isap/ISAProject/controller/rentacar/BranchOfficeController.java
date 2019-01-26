@@ -2,12 +2,10 @@ package com.isap.ISAProject.controller.rentacar;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -20,11 +18,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.isap.ISAProject.exception.ResourceNotFoundException;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.Vehicle;
-import com.isap.ISAProject.repository.rentacar.BranchOfficeRepository;
+import com.isap.ISAProject.service.rentacar.BranchOfficeService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -35,7 +32,7 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping("/branch_offices")
 public class BranchOfficeController {
 	@Autowired
-	BranchOfficeRepository branchOfficeRepository;
+	BranchOfficeService service;
 	
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Pruža uvid u sve registrovane filijale.", responseContainer = "List", notes = "Vraća onoliko BranchOffice objekata koliko se zahteva paginacijom.", httpMethod = "GET", produces = "application/json")
@@ -45,11 +42,7 @@ public class BranchOfficeController {
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
 	public ResponseEntity<List<Resource<BranchOffice>>> getAllBranchOffices(Pageable pageable){
-		Page<BranchOffice> branches =  branchOfficeRepository.findAll(pageable);
-		if(branches.isEmpty()) {
-			return ResponseEntity.noContent().build();
-		}
-		return new ResponseEntity<List<Resource<BranchOffice>>>(HATEOASImplementorRentacar.branchOfficeLinksList(branches.getContent()), HttpStatus.OK);
+		return new ResponseEntity<List<Resource<BranchOffice>>>(HATEOASImplementorRentacar.branchOfficeLinksList(service.getAllBranchOffices(pageable)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -60,11 +53,7 @@ public class BranchOfficeController {
 			@ApiResponse(code = 404, message = "Not Found. Filijala sa traženim ID-em ne postoji.")
 	})
 	public ResponseEntity<Resource<BranchOffice>> getBranchOfficeById(@PathVariable(value="id") Long broId) {
-		BranchOffice branch = branchOfficeRepository.findById(broId).get();
-		if(branch == null) {
-			throw new ResourceNotFoundException("id: " + broId);
-		}
-		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(branch), HttpStatus.OK);
+		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(service.getBranchOfficeById(broId)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -74,8 +63,7 @@ public class BranchOfficeController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđena filijala nije validna.")
 	})
 	public ResponseEntity<Object> createBranchOffice(@Valid @RequestBody BranchOffice bro) {
-		BranchOffice savedBro = branchOfficeRepository.save(bro);
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedBro.getId()).toUri();
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(service.saveBranchOffice(bro).getId()).toUri();
 		return ResponseEntity.created(location).build();
 	}
 	
@@ -87,14 +75,7 @@ public class BranchOfficeController {
 			@ApiResponse(code = 404, message = "Not Found. Filijala sa prosleđenim ID-em ne postoji.")
 	})
 	public ResponseEntity<Resource<BranchOffice>> updateBranchOffice(@PathVariable(value="id") Long broId, @Valid @RequestBody BranchOffice broDetails) {
-		Optional<BranchOffice> stariBro = branchOfficeRepository.findById(broId);
-		if(stariBro.get() == null) {
-			throw new ResourceNotFoundException("id: " + broId);
-		}
-		else if(stariBro.isPresent()) {
-			stariBro.get().copyFieldsFrom(broDetails);
-		}
-		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(stariBro.get()), HttpStatus.OK);
+		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(service.updateBranchOffice(broId, broDetails)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -105,11 +86,7 @@ public class BranchOfficeController {
 			@ApiResponse(code = 404, message = "Not Found. Filijala sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> deleteBranchOfficeWithID(@PathVariable(value = "id") Long id){
-		BranchOffice deletedBro = branchOfficeRepository.findById(id).get();
-		if(deletedBro == null) {
-			throw new ResourceNotFoundException("id: " + id);
-		}
-		branchOfficeRepository.deleteById(id);
+		service.deleteBranchOfficeWithId(id);
 		return ResponseEntity.ok().build();
 	}
 	
@@ -122,17 +99,7 @@ public class BranchOfficeController {
 			@ApiResponse(code = 404, message = "Not Found. Filijala sa prosleđenim ID-em ne postoji.")
 	})
 	public ResponseEntity<List<Resource<Vehicle>>> getVehiclesForBranchOfficeWithId(@PathVariable(value = "id") Long broId) {
-		Optional<BranchOffice> bro = branchOfficeRepository.findById(broId);
-		if(bro.isPresent()) {
-			List<Vehicle> list = bro.get().getVehicles();
-			if(list.isEmpty()) {
-				return ResponseEntity.noContent().build();
-			} else {
-				return new ResponseEntity<List<Resource<Vehicle>>>(HATEOASImplementorRentacar.vehicleLinksList(list), HttpStatus.OK);
-			}
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return new ResponseEntity<List<Resource<Vehicle>>>(HATEOASImplementorRentacar.vehicleLinksList(service.getVehiclesForBranchOfficeWithId(broId)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}/vehicles", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -144,14 +111,7 @@ public class BranchOfficeController {
 	})
 	public ResponseEntity<Resource<Vehicle>> addVehicleForBranchOfficeWithId(@PathVariable(value = "id") Long broId,
 			@Valid @RequestBody Vehicle vehicle) {
-		Optional<BranchOffice> branch = branchOfficeRepository.findById(broId);
-		if(branch.isPresent()) {
-			branch.get().addVehicle(vehicle);
-			branchOfficeRepository.save(branch.get());
-			return new ResponseEntity<Resource<Vehicle>>(HATEOASImplementorRentacar.vehicleLinks(vehicle), HttpStatus.CREATED);
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return new ResponseEntity<Resource<Vehicle>>(HATEOASImplementorRentacar.vehicleLinks(service.addVehicleForBranchOfficeWithId(broId, vehicle)), HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/{broId}/vehicles/")
@@ -162,15 +122,7 @@ public class BranchOfficeController {
 			@ApiResponse(code = 404, message = "Not Found. Vozilo ili filijala sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> deleteVehicleForBranchOfficeWithId(@PathVariable(value = "broId") Long broId, @Valid @RequestBody Vehicle vehicle){
-		BranchOffice branch = branchOfficeRepository.findById(broId).get();
-		if(branch == null) {
-			throw new ResourceNotFoundException("Filijala sa id-em: " + broId + " ne postoji.");
-		}
-		else if(!branch.getVehicles().contains(vehicle)) {
-			throw new ResourceNotFoundException("Prosleđeno vozilo ne postoji u okviru date filijale.");
-		}
-		branch.getVehicles().remove(vehicle);
-		branchOfficeRepository.save(branch);
+		service.deleteVehicleForBranchOfficeWithId(broId, vehicle);
 		return ResponseEntity.ok().build();
 	}
 }

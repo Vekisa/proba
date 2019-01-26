@@ -10,7 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.Valid;
+import javax.persistence.Version;
 
 import org.springframework.data.annotation.CreatedDate;
 
@@ -46,6 +46,9 @@ public class VehicleReservation {
 	@OneToOne
 	private Reservation reservation;
 	
+	@Version
+	private Long version;
+	
 	public Date getBeginDate() {
 		return beginDate;
 	}
@@ -76,11 +79,13 @@ public class VehicleReservation {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public void copyFieldsFrom(@Valid VehicleReservation newVehRes) {
-		this.setBeginDate(newVehRes.getBeginDate());
-		this.setEndDate(newVehRes.getEndDate());
-		this.setPrice(newVehRes.getPrice());
-		this.setVehicle(newVehRes.getVehicle());
+	
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 
 }

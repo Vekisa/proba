@@ -53,8 +53,9 @@ public class DestinationService implements DestinationServiceInterface {
 	}
 
 	@Override
-	public Destination updateDestination(Destination oldDestination, Destination newDestination) {
-		logger.info("> updating destination with id {}", oldDestination.getId());
+	public Destination updateDestination(Long oldDestinationId, Destination newDestination) {
+		logger.info("> updating destination with id {}", oldDestinationId);
+		Destination oldDestination = this.findById(oldDestinationId);
 		oldDestination.setName(newDestination.getName());
 		repository.save(oldDestination);
 		logger.info("< destination updated");
@@ -62,15 +63,16 @@ public class DestinationService implements DestinationServiceInterface {
 	}
 
 	@Override
-	public void deleteDestination(Destination destination) {
-		logger.info("> deleting destination with id {}", destination.getId());
-		repository.delete(destination);
+	public void deleteDestination(Long destinationId) {
+		logger.info("> deleting destination with id {}", destinationId);
+		repository.deleteById(destinationId);
 		logger.info("< destination deleted");
 	}
 
 	@Override
-	public Flight addFlightToDestination(Flight flight, Destination destination) {
+	public Flight addFlightToDestination(Flight flight, Long destinationId) {
 		logger.info("> adding finish destination to flight with id {}", flight.getId());
+		Destination destination = this.findById(destinationId);
 		destination.getFlightsToHere().add(flight);
 		flight.setFinishDestination(destination);
 		repository.save(destination);
@@ -79,8 +81,9 @@ public class DestinationService implements DestinationServiceInterface {
 	}
 
 	@Override
-	public List<Flight> getFlightsFromDestination(Destination destination) {
-		logger.info("> fetching flights from destination with id {}", destination.getId());
+	public List<Flight> getFlightsFromDestination(Long destinationId) {
+		logger.info("> fetching flights from destination with id {}", destinationId);
+		Destination destination = this.findById(destinationId);
 		List<Flight> list = destination.getFlightsFromHere();
 		logger.info("< flights from destination fetched");
 		if(!list.isEmpty()) return list;
@@ -88,8 +91,9 @@ public class DestinationService implements DestinationServiceInterface {
 	}
 
 	@Override
-	public List<Flight> getFlightsToDestination(Destination destination) {
-		logger.info("> fetching flights to destination with id {}", destination.getId());
+	public List<Flight> getFlightsToDestination(Long destinationId) {
+		logger.info("> fetching flights to destination with id {}", destinationId);
+		Destination destination = this.findById(destinationId);
 		List<Flight> list = destination.getFlightsToHere();
 		logger.info("< flights to destination fetched");
 		if(!list.isEmpty()) return list;
@@ -97,8 +101,9 @@ public class DestinationService implements DestinationServiceInterface {
 	}
 
 	@Override
-	public Airline getAirlineForDestination(Destination destination) {
-		logger.info("> fetching airline for destination with id {}", destination.getId());
+	public Airline getAirlineForDestination(Long destinationId) {
+		logger.info("> fetching airline for destination with id {}", destinationId);
+		Destination destination = this.findById(destinationId);
 		Airline airline = destination.getAirline();
 		logger.info("< airline fetched");
 		if(airline != null) return airline;

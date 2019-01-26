@@ -45,8 +45,9 @@ public class FlightSeatCategoryService implements FlightSeatCategoryServiceInter
 	}
 
 	@Override
-	public FlightSeatCategory updateFlightSeatCategory(FlightSeatCategory oldCategory, FlightSeatCategory newCategory) {
-		logger.info("> updating category with id {}", oldCategory.getId());
+	public FlightSeatCategory updateFlightSeatCategory(Long oldCategoryId, FlightSeatCategory newCategory) {
+		logger.info("> updating category with id {}", oldCategoryId);
+		FlightSeatCategory oldCategory = this.findById(oldCategoryId);
 		oldCategory.setPrice(newCategory.getPrice());
 		oldCategory.setName(newCategory.getName());
 		repository.save(oldCategory);
@@ -55,15 +56,16 @@ public class FlightSeatCategoryService implements FlightSeatCategoryServiceInter
 	}
 
 	@Override
-	public void deleteFlightSeatCategory(FlightSeatCategory category) {
-		logger.info("> deleting category with id {}", category.getId());
-		repository.delete(category);
+	public void deleteFlightSeatCategory(Long categoryId) {
+		logger.info("> deleting category with id {}", categoryId);
+		repository.deleteById(categoryId);
 		logger.info("< category deleted");
 	}
 
 	@Override
-	public List<FlightSeat> getSeatsInCategory(FlightSeatCategory category) {
-		logger.info("> fetching seats for category with id {}", category.getId());
+	public List<FlightSeat> getSeatsInCategory(Long categoryId) {
+		logger.info("> fetching seats for category with id {}", categoryId);
+		FlightSeatCategory category = this.findById(categoryId);
 		List<FlightSeat> list = category.getSeats();
 		logger.info("< seats fetched");
 		if(!list.isEmpty()) return list;
@@ -71,8 +73,9 @@ public class FlightSeatCategoryService implements FlightSeatCategoryServiceInter
 	}
 
 	@Override
-	public List<FlightSegment> getSegmentsOfCategory(FlightSeatCategory category) {
-		logger.info("> fetching segments for category with id {}", category.getId());
+	public List<FlightSegment> getSegmentsOfCategory(Long categoryId) {
+		logger.info("> fetching segments for category with id {}", categoryId);
+		FlightSeatCategory category = this.findById(categoryId);
 		List<FlightSegment> list = category.getSegments();
 		logger.info("< segments fetched");
 		if(!list.isEmpty()) return list;
@@ -80,8 +83,9 @@ public class FlightSeatCategoryService implements FlightSeatCategoryServiceInter
 	}
 
 	@Override
-	public Airline getAirlineOfCategory(FlightSeatCategory category) {
-		logger.info("> fetching airline for category with id {}", category.getId());
+	public Airline getAirlineOfCategory(Long categoryId) {
+		logger.info("> fetching airline for category with id {}", categoryId);
+		FlightSeatCategory category = this.findById(categoryId);
 		Airline airline = category.getAirline();
 		logger.info("< airline fetched");
 		if(airline != null) return airline;

@@ -84,4 +84,12 @@ public class Hotel extends Company {
 		this.getExtraOption().add(extraOption);
 		extraOption.setHotel(this);
 	}
+	
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
+	}
 }

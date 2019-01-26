@@ -63,7 +63,7 @@ public class DestinationController {
 	})
 	public ResponseEntity<Resource<Destination>> updateDestinationWithId(@PathVariable(value = "id") Long destinationId,
 			@Valid @RequestBody Destination newDestination) {
-		return new ResponseEntity<Resource<Destination>>(HATEOASImplementor.createDestination(service.updateDestination(service.findById(destinationId), newDestination)), HttpStatus.OK);
+		return new ResponseEntity<Resource<Destination>>(HATEOASImplementor.createDestination(service.updateDestination(destinationId, newDestination)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -74,7 +74,7 @@ public class DestinationController {
 			@ApiResponse(code = 404, message = "Not Found. Destinacija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> deleteDestinationWithId(@PathVariable(value = "id") Long destinationId) {
-		service.deleteDestination(service.findById(destinationId));
+		service.deleteDestination(destinationId);
 		return ResponseEntity.ok().build();
 	}
 	
@@ -86,7 +86,7 @@ public class DestinationController {
 			@ApiResponse(code = 404, message = "Not Found. Destinacija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<Flight>> addFlightToDestinationWithId(@PathVariable("id") Long destinationId, @Valid @RequestBody Flight flight) {
-		return new ResponseEntity<Resource<Flight>>(HATEOASImplementor.createFlight(service.addFlightToDestination(flight, service.findById(destinationId))), HttpStatus.CREATED);
+		return new ResponseEntity<Resource<Flight>>(HATEOASImplementor.createFlight(service.addFlightToDestination(flight, destinationId)), HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/{id}/flightsFromDestination", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -98,7 +98,7 @@ public class DestinationController {
 			@ApiResponse(code = 404, message = "Not Found. Destinacija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<Flight>>> getFlightsFromDestinationWithId(@PathVariable("id") Long destinationId) {
-		return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementor.createFlightsList(service.getFlightsFromDestination(service.findById(destinationId))), HttpStatus.OK);
+		return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementor.createFlightsList(service.getFlightsFromDestination(destinationId)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}/flightsToDestination", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -110,7 +110,7 @@ public class DestinationController {
 			@ApiResponse(code = 404, message = "Not Found. Destinacija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<Flight>>> getFlightsToDestinationWithId(@PathVariable("id") Long destinationId) {
-		return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementor.createFlightsList(service.getFlightsToDestination(service.findById(destinationId))), HttpStatus.OK);
+		return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementor.createFlightsList(service.getFlightsToDestination(destinationId)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}/airline", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -122,7 +122,7 @@ public class DestinationController {
 			@ApiResponse(code = 404, message = "Not Found. Destinacija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<Airline>> getAirlineForDestinationWithId(@PathVariable("id") Long id) {
-				return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(service.getAirlineForDestination(service.findById(id))), HttpStatus.OK);
+				return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(service.getAirlineForDestination(id)), HttpStatus.OK);
 	}
 	
 }

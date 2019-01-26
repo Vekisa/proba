@@ -46,7 +46,7 @@ public class ReservationController {
 		if(reservations.isEmpty())
 			return ResponseEntity.noContent().build();
 		else
-			return new ResponseEntity<List<Resource<Reservation>>>(HATEOASImplementorUser.createReservationList(reservations.getContent()), HttpStatus.OK);
+			return new ResponseEntity<List<Resource<Reservation>>>(HATEOASImplementor.createReservationList(reservations.getContent()), HttpStatus.OK);
 	}
 	
 	//Kreiranje rezervacije
@@ -60,7 +60,7 @@ public class ReservationController {
 	})
 	public ResponseEntity<Resource<Reservation>> createReservation(@Valid @RequestBody Reservation reservation) {
 		Reservation createdReservation =  reservationRepository.save(reservation);
-		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUser.createReservation(createdReservation), HttpStatus.CREATED);
+		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementor.createReservation(createdReservation), HttpStatus.CREATED);
 	}
 	
 	//Vraca rezervaciju sa zadatim ID-em
@@ -75,7 +75,7 @@ public class ReservationController {
 	public ResponseEntity<Resource<Reservation>> getReservationById(@PathVariable(value="id") Long reservationId) {
 		Optional<Reservation> reservation = reservationRepository.findById(reservationId);
 		if(reservation.isPresent())
-			return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUser.createReservation(reservation.get()), HttpStatus.OK);
+			return new ResponseEntity<Resource<Reservation>>(HATEOASImplementor.createReservation(reservation.get()), HttpStatus.OK);
 		else
 			return ResponseEntity.noContent().build();
 	}
@@ -112,7 +112,7 @@ public class ReservationController {
 		if(oldReservation.isPresent()) {
 			oldReservation.get().copyFieldsFrom(newReservation);
 			reservationRepository.save(oldReservation.get());
-			return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUser.createReservation(oldReservation.get()), HttpStatus.OK);
+			return new ResponseEntity<Resource<Reservation>>(HATEOASImplementor.createReservation(oldReservation.get()), HttpStatus.OK);
 		} else {
 			return ResponseEntity.notFound().build();
 		}

@@ -14,12 +14,12 @@ public interface FlightConfigurationServiceInterface {
 	
 	FlightConfiguration findById(Long id);
 	
-	void deleteConfiguration(FlightConfiguration configuration);
+	void deleteConfiguration(Long configurationId);
 	
-	List<FlightSegment> getSegmentsForConfiguration(FlightConfiguration configuration);
+	List<FlightSegment> getSegmentsForConfiguration(Long configurationId);
 	
-	FlightSegment createSegmentForConfiguration(FlightSegment segment, FlightConfiguration configuration);
+	FlightSegment createSegmentForConfiguration(FlightSegment segment, Long configurationId);
 	
-	Airline getAirlineForConfiguration(FlightConfiguration configuration);
+	Airline getAirlineForConfiguration(Long configurationId);
 	
 }

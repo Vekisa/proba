@@ -44,8 +44,9 @@ public class LuggageInfoService implements LuggageInfoServiceInterface {
 	}
 
 	@Override
-	public LuggageInfo updateLuggageInfo(LuggageInfo oldLuggageInfo, LuggageInfo newLuggageInfo) {
-		logger.info("> updating luggage info with id {}", oldLuggageInfo.getId());
+	public LuggageInfo updateLuggageInfo(Long oldLuggageInfoId, LuggageInfo newLuggageInfo) {
+		logger.info("> updating luggage info with id {}", oldLuggageInfoId);
+		LuggageInfo oldLuggageInfo = this.findById(oldLuggageInfoId);
 		oldLuggageInfo.setMinWeight(newLuggageInfo.getMinWeight());
 		oldLuggageInfo.setMaxWeight(newLuggageInfo.getMaxWeight());
 		oldLuggageInfo.setPrice(newLuggageInfo.getPrice());
@@ -56,15 +57,16 @@ public class LuggageInfoService implements LuggageInfoServiceInterface {
 	}
 
 	@Override
-	public void deleteLuggageInfo(LuggageInfo luggageInfo) {
-		logger.info("> deleting luggage info with id {}", luggageInfo.getId());
-		repository.delete(luggageInfo);
+	public void deleteLuggageInfo(Long luggageInfoId) {
+		logger.info("> deleting luggage info with id {}", luggageInfoId);
+		repository.deleteById(luggageInfoId);
 		logger.info("< luggage info deleted");
 	}
 
 	@Override
-	public Airline getAirlineForLuggageInfo(LuggageInfo luggageInfo) {
-		logger.info("> fetching airline for luggage info with id {}", luggageInfo.getId());
+	public Airline getAirlineForLuggageInfo(Long luggageInfoId) {
+		logger.info("> fetching airline for luggage info with id {}", luggageInfoId);
+		LuggageInfo luggageInfo = this.findById(luggageInfoId);
 		Airline airline = luggageInfo.getAirline();
 		logger.info("< airline fetched");
 		if(airline != null) return airline;
@@ -72,8 +74,9 @@ public class LuggageInfoService implements LuggageInfoServiceInterface {
 	}
 
 	@Override
-	public List<FlightSeat> getSeatsUsingLuggageInfo(LuggageInfo luggageInfo) {
-		logger.info("> fetching luggage infos for airline with id {}", luggageInfo.getId());
+	public List<FlightSeat> getSeatsUsingLuggageInfo(Long luggageInfoId) {
+		logger.info("> fetching luggage infos for airline with id {}", luggageInfoId);
+		LuggageInfo luggageInfo = this.findById(luggageInfoId);
 		List<FlightSeat> list = luggageInfo.getSeats();
 		logger.info("< luggage infos fetched");
 		if(!list.isEmpty()) return list;

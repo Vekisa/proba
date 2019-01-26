@@ -44,15 +44,16 @@ public class FlightConfigurationService implements FlightConfigurationServiceInt
 	}
 
 	@Override
-	public void deleteConfiguration(FlightConfiguration configuration) {
-		logger.info("> deleting configuration with id {}", configuration.getId());
-		repository.delete(configuration);
+	public void deleteConfiguration(Long configurationId) {
+		logger.info("> deleting configuration with id {}", configurationId);
+		repository.deleteById(configurationId);
 		logger.info("< configuration deleted");
 	}
 
 	@Override
-	public List<FlightSegment> getSegmentsForConfiguration(FlightConfiguration configuration) {
-		logger.info("> fetching flight segments for flight configuration with id {}", configuration.getId());
+	public List<FlightSegment> getSegmentsForConfiguration(Long configurationId) {
+		logger.info("> fetching flight segments for flight configuration with id {}", configurationId);
+		FlightConfiguration configuration = this.findById(configurationId);
 		List<FlightSegment> list = configuration.getSegments();
 		logger.info("< flight segments fetched");
 		if(!list.isEmpty()) return list;
@@ -60,8 +61,9 @@ public class FlightConfigurationService implements FlightConfigurationServiceInt
 	}
 
 	@Override
-	public FlightSegment createSegmentForConfiguration(FlightSegment segment, FlightConfiguration configuration) {
-		logger.info("> adding flight segment to flight configuration with id {}", configuration.getId());
+	public FlightSegment createSegmentForConfiguration(FlightSegment segment, Long configurationId) {
+		logger.info("> adding flight segment to flight configuration with id {}", configurationId);
+		FlightConfiguration configuration = this.findById(configurationId);
 		checkForOverlapping(configuration, segment);
 		configuration.getSegments().add(segment);
 		segment.setConfiguration(configuration);
@@ -71,8 +73,9 @@ public class FlightConfigurationService implements FlightConfigurationServiceInt
 	}
 
 	@Override
-	public Airline getAirlineForConfiguration(FlightConfiguration configuration) {
-		logger.info("> fetching airline for configuration with id {}", configuration.getId());
+	public Airline getAirlineForConfiguration(Long configurationId) {
+		logger.info("> fetching airline for configuration with id {}", configurationId);
+		FlightConfiguration configuration = this.findById(configurationId);
 		Airline airline = configuration.getAirline();
 		logger.info("< airline fetched");
 		if(airline != null) return airline;

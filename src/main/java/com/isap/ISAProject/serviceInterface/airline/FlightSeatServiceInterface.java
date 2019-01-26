@@ -17,20 +17,20 @@ public interface FlightSeatServiceInterface {
 	
 	FlightSeat findById(Long id);
 	
-	void deleteSeat(FlightSeat seat);
+	void deleteSeat(Long flightSeatId);
 	
-	FlightSeat setLuggageInfoForSeat(FlightSeat seat, Long luggageInfoId);
+	FlightSeat setLuggageInfoForSeat(Long flightSeatId, Long luggageInfoId);
 	
-	LuggageInfo getLuggageInfoOfSeat(FlightSeat seat);
+	LuggageInfo getLuggageInfoOfSeat(Long flightSeatId);
 	
-	FlightSeat setPassengerToSeat(FlightSeat seat, Long passengerId);
+	FlightSeat setPassengerToSeat(Long flightSeatId, Long passengerId);
 	
-	Passenger getPassengerOfSeat(FlightSeat seat);
+	Passenger getPassengerOfSeat(Long flightSeatId);
 	
-	FlightSeatCategory getCategoryOfSeat(FlightSeat seat);
+	FlightSeatCategory getCategoryOfSeat(Long flightSeatId);
 	
-	Flight getFlightOfSeat(FlightSeat seat);
+	Flight getFlightOfSeat(Long flightSeatId);
 	
-	Ticket getTicketOfSeat(FlightSeat seat);
+	Ticket getTicketOfSeat(Long flightSeatId);
 	
 }

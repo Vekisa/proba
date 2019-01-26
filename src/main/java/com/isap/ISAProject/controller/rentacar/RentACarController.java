@@ -2,12 +2,10 @@ package com.isap.ISAProject.controller.rentacar;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -20,11 +18,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.isap.ISAProject.exception.ResourceNotFoundException;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.RentACar;
-import com.isap.ISAProject.repository.rentacar.RentACarRepository;
+import com.isap.ISAProject.service.rentacar.RentACarService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -35,7 +32,7 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping("/rent-a-cars")
 public class RentACarController {
 	@Autowired
-	private RentACarRepository rentACarRepository;
+	private RentACarService service;
 	
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Pruža uvid u sve registrovane rent-a-car kompanije.", responseContainer = "List", notes = "Vraća onoliko RentACar objekata koliko se zahteva paginacijom.", httpMethod = "GET", produces = "application/json")
@@ -45,11 +42,7 @@ public class RentACarController {
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
 	public ResponseEntity<List<Resource<RentACar>>> getAllRentACars(Pageable pageable){
-		Page<RentACar> rentacars =  rentACarRepository.findAll(pageable);
-		if(rentacars.isEmpty()) {
-			return ResponseEntity.noContent().build();
-		}
-		return new ResponseEntity<List<Resource<RentACar>>>(HATEOASImplementorRentacar.rentacarLinksList(rentacars.getContent()), HttpStatus.OK);
+		return new ResponseEntity<List<Resource<RentACar>>>(HATEOASImplementorRentacar.rentacarLinksList(service.getAllRentACars(pageable)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -60,11 +53,7 @@ public class RentACarController {
 			@ApiResponse(code = 404, message = "Not Found. Rent-a-car kompanija sa traženim ID-em ne postoji.")
 	})
 	public ResponseEntity<Resource<RentACar>> getRentACarById(@PathVariable(value="id") Long racId) {
-		RentACar rentacar = rentACarRepository.findById(racId).get();
-		if(rentacar == null) {
-			throw new ResourceNotFoundException("id: " + racId);
-		}
-		return new ResponseEntity<Resource<RentACar>>(HATEOASImplementorRentacar.rentacarLinks(rentacar), HttpStatus.OK);
+		return new ResponseEntity<Resource<RentACar>>(HATEOASImplementorRentacar.rentacarLinks(service.getRentACarById(racId)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -73,9 +62,8 @@ public class RentACarController {
 			@ApiResponse(code = 201, message = "Created", response = RentACar.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđena rent-a-car kompanija nije validna.")
 	})
-	public ResponseEntity<Object> createRentACar(@Valid @RequestBody RentACar rac) {
-		RentACar savedRentacar = rentACarRepository.save(rac);
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedRentacar.getId()).toUri();
+	public ResponseEntity<Object> saveRentACar(@Valid @RequestBody RentACar rac) {
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(service.saveRentACar(rac).getId()).toUri();
 		return ResponseEntity.created(location).build();
 	}
 	
@@ -88,14 +76,7 @@ public class RentACarController {
 			@ApiResponse(code = 404, message = "Not Found. Rent-a-car kompanija sa prosleđenim ID-em ne postoji.")
 	})
 	public ResponseEntity<Resource<RentACar>> updateRentACar(@PathVariable(value="id") Long racId, @Valid @RequestBody RentACar racDetails) {
-		Optional<RentACar> stariRac = rentACarRepository.findById(racId);
-		if(stariRac.get() == null) {
-			throw new ResourceNotFoundException("id: " + racId);
-		}
-		else if(stariRac.isPresent()) {
-			stariRac.get().copyFieldsFrom(racDetails);
-		}
-		return new ResponseEntity<Resource<RentACar>>(HATEOASImplementorRentacar.rentacarLinks(stariRac.get()), HttpStatus.OK);
+		return new ResponseEntity<Resource<RentACar>>(HATEOASImplementorRentacar.rentacarLinks(service.updateRentACar(racId, racDetails)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -106,11 +87,7 @@ public class RentACarController {
 			@ApiResponse(code = 404, message = "Not Found. Rent-a-car kompanija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> deleteRentACarWithID(@PathVariable(value = "id") Long id){
-		RentACar deletedRac = rentACarRepository.findById(id).get();
-		if(deletedRac == null) {
-			throw new ResourceNotFoundException("id: " + id);
-		}
-		rentACarRepository.deleteById(id);
+		service.deleteRentACar(id);
 		return ResponseEntity.ok().build();
 	}
 	
@@ -123,17 +100,8 @@ public class RentACarController {
 			@ApiResponse(code = 404, message = "Not Found. Rent-a-car kompanija sa prosleđenim ID-em ne postoji.")
 	})
 	public ResponseEntity<List<Resource<BranchOffice>>> getBranchOfficesForRentACarWithId(@PathVariable(value = "id") Long racId) {
-		Optional<RentACar> rentacar = rentACarRepository.findById(racId);
-		if(rentacar.isPresent()) {
-			List<BranchOffice> list = rentacar.get().getBranchOffices();
-			if(list.isEmpty()) {
-				return ResponseEntity.noContent().build();
-			} else {
-				return new ResponseEntity<List<Resource<BranchOffice>>>(HATEOASImplementorRentacar.branchOfficeLinksList(list), HttpStatus.OK);
-			}
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return new ResponseEntity<List<Resource<BranchOffice>>>(HATEOASImplementorRentacar.branchOfficeLinksList(service.getBranchOffices(racId)), HttpStatus.OK);
+			
 	}
 	
 	@RequestMapping(value = "/{id}/branch_offices", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -145,14 +113,7 @@ public class RentACarController {
 	})
 	public ResponseEntity<Resource<BranchOffice>> addBranchOfficeForRentACarWithId(@PathVariable(value = "id") Long racId,
 			@Valid @RequestBody BranchOffice branch) {
-		Optional<RentACar> rentacar = rentACarRepository.findById(racId);
-		if(rentacar.isPresent()) {
-			rentacar.get().addBranchOffice(branch);
-			rentACarRepository.save(rentacar.get());
-			return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(branch), HttpStatus.CREATED);
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(service.addBranchOffice(racId, branch)), HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/{racId}/branch_offices/")
@@ -163,15 +124,7 @@ public class RentACarController {
 			@ApiResponse(code = 404, message = "Not Found. Rent-a-car kompanija ili filijala sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> deleteBranchOfficeForRentACarWithId(@PathVariable(value = "racId") Long racId, @Valid @RequestBody BranchOffice branch){
-		RentACar rentacar = rentACarRepository.findById(racId).get();
-		if(rentacar == null) {
-			throw new ResourceNotFoundException("Rent-a-car kompanija sa id-em: " + racId + " ne postoji.");
-		}
-		else if(!rentacar.getBranchOffices().contains(branch)) {
-			throw new ResourceNotFoundException("Prosleđena filijala ne postoji u okviru date rent-a-car kompanije.");
-		}
-		rentacar.getBranchOffices().remove(branch);
-		rentACarRepository.save(rentacar);
+		service.deleteBranchOffice(racId, branch);
 		return ResponseEntity.ok().build();
 	}
 	

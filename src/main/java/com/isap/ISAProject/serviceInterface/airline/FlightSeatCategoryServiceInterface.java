@@ -15,14 +15,14 @@ public interface FlightSeatCategoryServiceInterface {
 	
 	FlightSeatCategory findById(Long id);
 	
-	FlightSeatCategory updateFlightSeatCategory(FlightSeatCategory oldCategory, FlightSeatCategory newCategory);
+	FlightSeatCategory updateFlightSeatCategory(Long oldCategoryId, FlightSeatCategory newCategory);
 	
-	void deleteFlightSeatCategory(FlightSeatCategory category);
+	void deleteFlightSeatCategory(Long categoryId);
 	
-	List<FlightSeat> getSeatsInCategory(FlightSeatCategory category);
+	List<FlightSeat> getSeatsInCategory(Long categoryId);
 	
-	List<FlightSegment> getSegmentsOfCategory(FlightSeatCategory category);
+	List<FlightSegment> getSegmentsOfCategory(Long categoryId);
 	
-	Airline getAirlineOfCategory(FlightSeatCategory category);
+	Airline getAirlineOfCategory(Long categoryId);
 	
 }

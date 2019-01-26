@@ -16,24 +16,24 @@ public interface FlightServiceInterface {
 	
 	Flight findById(Long id);
 	
-	Flight updateFlight(Flight oldFlight, Flight newFlight);
+	Flight updateFlight(Long oldFlightId, Flight newFlight);
 	
-	void deleteFlight(Flight flight);
+	void deleteFlight(Long flightId);
 	
-	List<FlightSeat> getSeatsForFlight(Flight flight);
+	List<FlightSeat> getSeatsForFlight(Long flightId);
 	
-	Flight addSeatToRowForFlight(int row, Flight flight);
+	Flight addSeatToRowForFlight(int row, Long flightId);
 	
-	List<Ticket> getTicketsForFlight(Flight flight);
+	List<Ticket> getTicketsForFlight(Long flightId);
 	
-	Flight setConfigurationToFlight(Long configurationId, Flight flight);
+	Flight setConfigurationToFlight(Long configurationId, Long flightId);
 	
-	FlightConfiguration getConfigurationOfFlight(Flight flight);
+	FlightConfiguration getConfigurationOfFlight(Long flightId);
 	
-	Flight setFinishDestinationForFlight(Long destinationId, Flight flight);
+	Flight setFinishDestinationForFlight(Long destinationId, Long flightId);
 	
-	Destination getStartDestinationOfFlight(Flight flight);
+	Destination getStartDestinationOfFlight(Long flightId);
 	
-	Destination getFinishDestinationOfFlight(Flight flight);
+	Destination getFinishDestinationOfFlight(Long flightId);
 	
 }

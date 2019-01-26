@@ -53,31 +53,40 @@ public class TicketService implements TicketServiceInterface {
 	}
 
 	@Override
-	public void deleteTicket(Ticket ticket) {
-		logger.info("> deleting ticket with id {}", ticket.getId());
+	public void deleteTicket(Long ticketId) {
+		logger.info("> deleting ticket with id {}", ticketId);
 		// TODO : Kada je moguce obrisati kartu?
-		repository.delete(ticket);
+		repository.deleteById(ticketId);
 		logger.info("< ticket deleted");
 	}
 
 	@Override
-	public FlightSeat addSeatToTicket(Long seatId, Ticket ticket) {
-		logger.info("> adding seat to ticket with id {}", ticket.getId());
-		FlightSeat seat = repository.findSeatById(seatId);
-		if(seat == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested seat doesn't exist.");
+	public FlightSeat addSeatToTicket(Long seatId, Long ticketId) {
+		logger.info("> adding seat to ticket with id {}", ticketId);
+		Ticket ticket = this.findById(ticketId);
+		FlightSeat seat = this.findSeatById(seatId);
 		if(seat.isTaken()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested seat is taken.");
 		ticket.getSeats().add(seat);
 		ticket.setPrice(ticket.getPrice() + seat.getPrice());
 		seat.setTicket(ticket);
 		seat.setState(SeatState.TAKEN);
 		logger.info("< seat added");
-		return null;
+		return seat;
 	}
 	
-	public FlightSeat removeSeatFromTicket(Long seatId, Ticket ticket) {
-		logger.info("> removing seat from ticket with id {}", ticket.getId());
-		FlightSeat seat = repository.findSeatById(seatId);
-		if(seat == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested seat doesn't exist.");
+	private FlightSeat findSeatById(Long id) {
+		logger.info("> fetching seat with id {}", id);
+		FlightSeat seat = repository.findSeatById(id);
+		logger.info("< fetched seat");
+		if(seat != null) return seat;
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested seat doesn't exist.");
+	}
+	
+	@Override
+	public FlightSeat removeSeatFromTicket(Long seatId, Long ticketId) {
+		logger.info("> removing seat from ticket with id {}", ticketId);
+		Ticket ticket = this.findById(ticketId);
+		FlightSeat seat = this.findSeatById(seatId);
 		if(!ticket.getSeats().contains(seat)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested seat is not of this ticket.");
 		ticket.getSeats().remove(seat);
 		ticket.setPrice(ticket.getPrice() - seat.getPrice());
@@ -88,8 +97,9 @@ public class TicketService implements TicketServiceInterface {
 	}
 
 	@Override
-	public List<FlightSeat> getSeatsOfTicket(Ticket ticket) {
-		logger.info("> fetching seats for airline with id {}", ticket.getId());
+	public List<FlightSeat> getSeatsOfTicket(Long ticketId) {
+		logger.info("> fetching seats for airline with id {}", ticketId);
+		Ticket ticket = this.findById(ticketId);
 		List<FlightSeat> list = ticket.getSeats();
 		logger.info("< seats fetched");
 		if(!list.isEmpty()) return list;
@@ -97,9 +107,9 @@ public class TicketService implements TicketServiceInterface {
 	}
 
 	@Override
-	public Flight getFlightOfTicket(Ticket ticket) {
-		logger.info("> fetching ticket of seat with id {}", ticket.getId());
-		Flight flight = repository.findFlightForTicketWithId(ticket.getId());
+	public Flight getFlightOfTicket(Long ticketId) {
+		logger.info("> fetching ticket of seat with id {}", ticketId);
+		Flight flight = repository.findFlightForTicketWithId(ticketId);
 		logger.info("< ticket fetched");
 		if(flight != null) return flight;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Request flight doesn't exist.");

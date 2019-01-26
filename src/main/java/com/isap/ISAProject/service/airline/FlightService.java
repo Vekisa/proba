@@ -26,10 +26,10 @@ import com.isap.ISAProject.serviceInterface.airline.FlightServiceInterface;
 public class FlightService implements FlightServiceInterface {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
 	@Autowired
 	private FlightRepository repository;
-	
+
 	@Override
 	public List<Flight> findAll(Pageable pageable) {
 		logger.info("> fetch flights at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
@@ -44,12 +44,13 @@ public class FlightService implements FlightServiceInterface {
 		Optional<Flight> flight = repository.findById(id);
 		logger.info("< flight fetched");
 		if(flight.isPresent()) return flight.get();
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested flight doesn't exist.");
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested flight doesn't exist.");
 	}
 
 	@Override
-	public Flight updateFlight(Flight oldFlight, Flight newFlight) {
-		logger.info("> updating flight with id {}", oldFlight.getId());
+	public Flight updateFlight(Long oldFlightId, Flight newFlight) {
+		logger.info("> updating flight with id {}", oldFlightId);
+		Flight oldFlight = this.findById(oldFlightId);
 		oldFlight.setArrivalTime(newFlight.getArrivalTime());
 		oldFlight.setDepartureTime(newFlight.getDepartureTime());
 		oldFlight.setFlightLength(newFlight.getFlightLength());
@@ -61,8 +62,9 @@ public class FlightService implements FlightServiceInterface {
 	}
 
 	@Override
-	public void deleteFlight(Flight flight) {
-		logger.info("> deleting flight with id {}", flight.getId());
+	public void deleteFlight(Long flightId) {
+		logger.info("> deleting flight with id {}", flightId);
+		Flight flight = this.findById(flightId);
 		this.checkAndRemoveAllSeats(flight);
 		repository.delete(flight);
 		logger.info("< flight deleted");
@@ -87,10 +89,11 @@ public class FlightService implements FlightServiceInterface {
 			if(fs.getState().equals(SeatState.TAKEN)) return false;
 		return true;
 	}
-	
+
 	@Override
-	public List<FlightSeat> getSeatsForFlight(Flight flight) {
-		logger.info("> fetching seats for airline with id {}", flight.getId());
+	public List<FlightSeat> getSeatsForFlight(Long flightId) {
+		logger.info("> fetching seats for airline with id {}", flightId);
+		Flight flight = this.findById(flightId);
 		List<FlightSeat> list = flight.getSeats();
 		logger.info("< seats fetched");
 		if(!list.isEmpty()) return list;
@@ -98,14 +101,15 @@ public class FlightService implements FlightServiceInterface {
 	}
 
 	@Override
-	public Flight addSeatToRowForFlight(int row, Flight flight) {
-		logger.info("> adding one seat to row {} on flight with id {}", row, flight.getId());
+	public Flight addSeatToRowForFlight(int row, Long flightId) {
+		logger.info("> adding one seat to row {} on flight with id {}", row, flightId);
+		Flight flight = this.findById(flightId);
 		this.addSeatToRow(row, flight);
 		repository.save(flight);
 		logger.info("< seat added");
 		return flight;
 	}
-	
+
 	private void addSeatToRow(int row, Flight flight) {
 		List<FlightSeat> seats = flight.getSeats();
 		for(int i = 0;  i < seats.size(); i++)
@@ -117,24 +121,25 @@ public class FlightService implements FlightServiceInterface {
 	}
 
 	@Override
-	public List<Ticket> getTicketsForFlight(Flight flight) {
-		logger.info("> fetching tickets for flight with id {}", flight.getId());
-		List<Ticket> list = repository.findTicketsForFlightWithId(flight.getId());
+	public List<Ticket> getTicketsForFlight(Long flightId) {
+		logger.info("> fetching tickets for flight with id {}", flightId);
+		List<Ticket> list = repository.findTicketsForFlightWithId(flightId);
 		logger.info("< tickets fetched");
 		if(!list.isEmpty()) return list;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Request tickets do not exist.");
 	}
 
 	@Override
-	public Flight setConfigurationToFlight(Long configurationId, Flight flight) {
-		logger.info("> setting configuration to flight with id {}", flight.getId());
+	public Flight setConfigurationToFlight(Long configurationId, Long flightId) {
+		logger.info("> setting configuration to flight with id {}", flightId);
+		Flight flight = this.findById(flightId);
 		FlightConfiguration configuration = repository.findConfigurationById(configurationId);
 		setConfigurationToFlight(configuration, flight);
 		repository.save(flight);
 		logger.info("< configuration set");
-		return null;
+		return flight;
 	}
-	
+
 	private void setConfigurationToFlight(FlightConfiguration configuration, Flight flight) {
 		if(flight.getConfiguration() != null) checkAndRemoveAllSeats(flight);
 		flight.setConfiguration(configuration);
@@ -150,8 +155,9 @@ public class FlightService implements FlightServiceInterface {
 	}
 
 	@Override
-	public FlightConfiguration getConfigurationOfFlight(Flight flight) {
-		logger.info("> fetching configuration of flight with id {}", flight.getId());
+	public FlightConfiguration getConfigurationOfFlight(Long flightId) {
+		logger.info("> fetching configuration of flight with id {}", flightId);
+		Flight flight = this.findById(flightId);
 		FlightConfiguration configuration = flight.getConfiguration();
 		logger.info("< configuration fetched");
 		if(configuration != null) return configuration;
@@ -159,8 +165,9 @@ public class FlightService implements FlightServiceInterface {
 	}
 
 	@Override
-	public Flight setFinishDestinationForFlight(Long destinationId, Flight flight) {
-		logger.info("> setting finish destination for flight with id {}", flight.getId());
+	public Flight setFinishDestinationForFlight(Long destinationId, Long flightId) {
+		logger.info("> setting finish destination for flight with id {}", flightId);
+		Flight flight = this.findById(flightId);
 		Destination destination = repository.findDestinationById(destinationId);
 		flight.setFinishDestination(destination);
 		destination.getFlightsToHere().add(flight);
@@ -170,8 +177,9 @@ public class FlightService implements FlightServiceInterface {
 	}
 
 	@Override
-	public Destination getStartDestinationOfFlight(Flight flight) {
-		logger.info("> fetching starting destination of flight with id {}", flight.getId());
+	public Destination getStartDestinationOfFlight(Long flightId) {
+		logger.info("> fetching starting destination of flight with id {}", flightId);
+		Flight flight = this.findById(flightId);
 		Destination destination = flight.getStartDestination();
 		logger.info("< starting destination fetched");
 		if(destination != null) return destination;
@@ -179,8 +187,9 @@ public class FlightService implements FlightServiceInterface {
 	}
 
 	@Override
-	public Destination getFinishDestinationOfFlight(Flight flight) {
-		logger.info("> fetching finish destination of flight with id {}", flight.getId());
+	public Destination getFinishDestinationOfFlight(Long flightId) {
+		logger.info("> fetching finish destination of flight with id {}", flightId);
+		Flight flight = this.findById(flightId);
 		Destination destination = flight.getFinishDestination();
 		logger.info("< finish destination fetched");
 		if(destination != null) return destination;

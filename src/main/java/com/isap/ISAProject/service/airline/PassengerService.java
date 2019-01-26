@@ -45,16 +45,17 @@ public class PassengerService implements PassengerServiceInterface {
 	}
 
 	@Override
-	public void deletePassenger(Passenger passenger) {
-		logger.info("> deleting passenger with id {}", passenger.getId());
+	public void deletePassenger(Long passengerId) {
+		logger.info("> deleting passenger with id {}", passengerId);
 		// TODO : Kada je moguce brisati putnika?
-		repository.delete(passenger);
+		repository.deleteById(passengerId);
 		logger.info("< passenger deleted");
 	}
 
 	@Override
-	public Passenger updatePassenger(Passenger oldPassenger, Passenger newPassenger) {
-		logger.info("> updating passenger with id {}", oldPassenger.getId());
+	public Passenger updatePassenger(Long oldPassengerId, Passenger newPassenger) {
+		logger.info("> updating passenger with id {}", oldPassengerId);
+		Passenger oldPassenger = this.findById(oldPassengerId);
 		oldPassenger.setFirstName(newPassenger.getFirstName());
 		oldPassenger.setLastName(newPassenger.getLastName());
 		oldPassenger.setPassportNumber(newPassenger.getPassportNumber());
@@ -64,8 +65,9 @@ public class PassengerService implements PassengerServiceInterface {
 	}
 
 	@Override
-	public List<FlightSeat> getSeatsWithPassenger(Passenger passenger) {
-		logger.info("> fetching seats for airline with id {}", passenger.getId());
+	public List<FlightSeat> getSeatsWithPassenger(Long passengerId) {
+		logger.info("> fetching seats for airline with id {}", passengerId);
+		Passenger passenger = this.findById(passengerId);
 		List<FlightSeat> list = passenger.getFlightSeats();
 		logger.info("< seats fetched");
 		if(!list.isEmpty()) return list;
@@ -73,18 +75,18 @@ public class PassengerService implements PassengerServiceInterface {
 	}
 
 	@Override
-	public List<Flight> getFlightsWithPassenger(Passenger passenger) {
-		logger.info("> fetching seats for airline with id {}", passenger.getId());
-		List<Flight> list = repository.getFlightsForPassenger(passenger.getId());
+	public List<Flight> getFlightsWithPassenger(Long passengerId) {
+		logger.info("> fetching seats for airline with id {}", passengerId);
+		List<Flight> list = repository.getFlightsForPassenger(passengerId);
 		logger.info("< seats fetched");
 		if(!list.isEmpty()) return list;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested flights do not exist.");
 	}
 
 	@Override
-	public List<Ticket> getTicketsOfPassenger(Passenger passenger) {
-		logger.info("> fetching tickets for airline with id {}", passenger.getId());
-		List<Ticket> list = repository.getTicketsForPassenger(passenger.getId());
+	public List<Ticket> getTicketsOfPassenger(Long passengerId) {
+		logger.info("> fetching tickets for airline with id {}", passengerId);
+		List<Ticket> list = repository.getTicketsForPassenger(passengerId);
 		logger.info("< tickets fetched");
 		if(!list.isEmpty()) return list;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested flights do not exist.");

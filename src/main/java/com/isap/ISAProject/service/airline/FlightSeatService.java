@@ -47,23 +47,31 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
-	public void deleteSeat(FlightSeat seat) {
-		logger.info("> deleting seat with id {}", seat.getId());
+	public void deleteSeat(Long flightSeatId) {
+		logger.info("> deleting seat with id {}", flightSeatId);
 		// TODO : Kada je moguce brisati sediste?
-		repository.delete(seat);
+		repository.deleteById(flightSeatId);
 		logger.info("< seat deleted");
 	}
 
 	@Override
-	public FlightSeat setLuggageInfoForSeat(FlightSeat seat, Long luggageInfoId) {
-		logger.info("> setting luggage info to seat with id {}", seat.getId());
-		LuggageInfo luggageInfo = repository.findLuggageInfoWithId(luggageInfoId);
-		if(luggageInfo == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested luggage info doesn't exist.");
+	public FlightSeat setLuggageInfoForSeat(Long flightSeatId, Long luggageInfoId) {
+		logger.info("> setting luggage info to seat with id {}", flightSeatId);
+		LuggageInfo luggageInfo = this.findLuggageInfoById(luggageInfoId);
+		FlightSeat seat = this.findById(flightSeatId);
 		setLuggageInfoForSeat(luggageInfo, seat);
 		luggageInfo.getSeats().add(seat);
 		repository.save(seat);
 		logger.info("< luggage info set");
 		return seat;
+	}
+	
+	private LuggageInfo findLuggageInfoById(Long id) {
+		logger.info("> fetching luggage info with id {}", id);
+		LuggageInfo luggageInfo = repository.findLuggageInfoWithId(id);
+		logger.info("< luggage info fetched");
+		if(luggageInfo != null) return luggageInfo;
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested luggage info doesn't exist.");
 	}
 	
 	private void setLuggageInfoForSeat(LuggageInfo luggageInfo, FlightSeat seat) {
@@ -73,8 +81,9 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
-	public LuggageInfo getLuggageInfoOfSeat(FlightSeat seat) {
-		logger.info("> fetching luggage info of seat with id {}", seat.getId());
+	public LuggageInfo getLuggageInfoOfSeat(Long seatId) {
+		logger.info("> fetching luggage info of seat with id {}", seatId);
+		FlightSeat seat = this.findById(seatId);
 		LuggageInfo luggage = seat.getLuggageInfo();
 		logger.info("< luggage info fetched");
 		if(luggage != null) return luggage;
@@ -82,20 +91,29 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
-	public FlightSeat setPassengerToSeat(FlightSeat seat, Long passengerId) {
-		logger.info("> setting passenger to seat with id {}", seat.getId());
-		Passenger passenger = repository.findPassengerById(passengerId);
-		if(passenger == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested passenger doesn't exist.");
+	public FlightSeat setPassengerToSeat(Long seatId, Long passengerId) {
+		logger.info("> setting passenger to seat with id {}", seatId);
+		Passenger passenger = this.findPassengerById(passengerId);
+		FlightSeat seat = this.findById(seatId);
 		seat.setPassenger(passenger);
 		passenger.getFlightSeats().add(seat);
 		repository.save(seat);
 		logger.info("< passenger set");
 		return seat;
 	}
+	
+	private Passenger findPassengerById(Long id) {
+		logger.info("> fetching passenger with id {}", id);
+		Passenger passenger = repository.findPassengerById(id);
+		logger.info("< passenger fetched");
+		if(passenger != null) return passenger; 
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested passenger doesn't exist.");
+	}
 
 	@Override
-	public Passenger getPassengerOfSeat(FlightSeat seat) {
-		logger.info("> fetching passenger of seat with id {}", seat.getId());
+	public Passenger getPassengerOfSeat(Long seatId) {
+		logger.info("> fetching passenger of seat with id {}", seatId);
+		FlightSeat seat = this.findById(seatId);
 		Passenger passenger = seat.getPassenger();
 		logger.info("< passenger fetched");
 		if(passenger != null) return passenger;
@@ -103,8 +121,9 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
-	public FlightSeatCategory getCategoryOfSeat(FlightSeat seat) {
-		logger.info("> fetching category of seat with id {}", seat.getId());
+	public FlightSeatCategory getCategoryOfSeat(Long seatId) {
+		logger.info("> fetching category of seat with id {}", seatId);
+		FlightSeat seat = this.findById(seatId);
 		FlightSeatCategory category = seat.getCategory();
 		logger.info("< category fetched");
 		if(category != null) return category;
@@ -112,8 +131,9 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
-	public Flight getFlightOfSeat(FlightSeat seat) {
-		logger.info("> fetching flight of seat with id {}", seat.getId());
+	public Flight getFlightOfSeat(Long seatId) {
+		logger.info("> fetching flight of seat with id {}", seatId);
+		FlightSeat seat = this.findById(seatId);
 		Flight flight = seat.getFlight();
 		logger.info("< flight fetched");
 		if(flight != null) return flight;
@@ -121,8 +141,9 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
-	public Ticket getTicketOfSeat(FlightSeat seat) {
-		logger.info("> fetching ticket of seat with id {}", seat.getId());
+	public Ticket getTicketOfSeat(Long seatId) {
+		logger.info("> fetching ticket of seat with id {}", seatId);
+		FlightSeat seat = this.findById(seatId);
 		Ticket ticket = seat.getTicket();
 		logger.info("< ticket fetched");
 		if(ticket != null) return ticket;

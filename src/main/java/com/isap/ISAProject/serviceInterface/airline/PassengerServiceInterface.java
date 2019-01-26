@@ -15,14 +15,14 @@ public interface PassengerServiceInterface {
 	
 	Passenger findById(Long id);
 	
-	void deletePassenger(Passenger passenger);
+	void deletePassenger(Long passengerId);
 	
-	Passenger updatePassenger(Passenger oldPassenger, Passenger newPassenger);
+	Passenger updatePassenger(Long oldPassengerId, Passenger newPassenger);
 	
-	List<FlightSeat> getSeatsWithPassenger(Passenger passenger);
+	List<FlightSeat> getSeatsWithPassenger(Long passengerId);
 	
-	List<Flight> getFlightsWithPassenger(Passenger passenger);
+	List<Flight> getFlightsWithPassenger(Long passengerId);
 	
-	List<Ticket> getTicketsOfPassenger(Passenger passenger);
+	List<Ticket> getTicketsOfPassenger(Long passengerId);
 	 
 }

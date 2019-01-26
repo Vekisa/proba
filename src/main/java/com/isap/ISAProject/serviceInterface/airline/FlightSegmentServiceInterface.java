@@ -14,12 +14,12 @@ public interface FlightSegmentServiceInterface {
 	
 	FlightSegment findById(Long id);
 	
-	FlightSegment updateSegment(FlightSegment oldSegment, FlightSegment newSegment);
+	FlightSegment updateSegment(Long oldSegmentId, FlightSegment newSegment);
 	
-	void deleteSegment(FlightSegment segment);
+	void deleteSegment(Long segmentId);
 	
-	FlightConfiguration getConfigurationForSegment(FlightSegment segment);
+	FlightConfiguration getConfigurationForSegment(Long segmentId);
 	
-	FlightSeatCategory getCategoryOfSegment(FlightSegment segment);
+	FlightSeatCategory getCategoryOfSegment(Long segmentId);
 	
 }
