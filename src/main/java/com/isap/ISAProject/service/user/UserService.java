@@ -11,25 +11,36 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.user.FriendRequest;
 import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
+import com.isap.ISAProject.repository.user.FriendRequestRepository;
+import com.isap.ISAProject.repository.user.FriendshipRepository;
 import com.isap.ISAProject.repository.user.RegisteredUserRepository;
 import com.isap.ISAProject.service.EmailSenderService;
 import com.isap.ISAProject.serviceInterface.user.UserServiceInterface;
 
 @Service
+@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
 public class UserService implements UserServiceInterface {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private RegisteredUserRepository repository;
+	
+	@Autowired
+	private FriendshipRepository friendshipRepository;
+	
+	@Autowired
+	private FriendRequestRepository friendRequestRepository;
 	
 	@Autowired
     private EmailSenderService emailSenderService;
@@ -60,9 +71,11 @@ public class UserService implements UserServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public RegisteredUser saveUser(RegisteredUser user) {
 		logger.info("> saving user");
-		// TODO : Biznis logika memorisanja korisnika + slanje mejla u slucaju uspesnosti + timeout zahteva
+		if(usernameExists(user.getUsername()) || emailExists(user.getEmail()))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username/e-mail is already in use.");
 		repository.save(user);
 		logger.info("< user saved");
 		
@@ -70,6 +83,7 @@ public class UserService implements UserServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public void deleteUser(Long id) {
 		logger.info("> deleting user");
 		// TODO : Biznis logika brisanja korisnika - kada se sme brisati, treba obrisati sve zahteve i prijateljstva koji su povezani, sta sa rez?
@@ -77,22 +91,39 @@ public class UserService implements UserServiceInterface {
 		logger.info("< user deleted");
 	}
 
+	private boolean usernameExists(String username) {
+		return repository.findByUsername(username) != null;
+	}
+	
+	private boolean emailExists(String email) { return repository.findByEmail(email) != null; }
+	
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public RegisteredUser updateUser(Long oldUserId, RegisteredUser newUser) {
 		logger.info("> updating user with id {}", oldUserId);
 		RegisteredUser oldUser = this.findById(oldUserId);
-		// TODO : Biznis logika promene poena i mejla
+		if(usernameExists(newUser.getUsername()))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is already in use.");
 		oldUser.setBonusPoints(newUser.getBonusPoints());
 		oldUser.setCity(newUser.getCity());
-		oldUser.setEmail(newUser.getEmail());
 		oldUser.setFirstName(newUser.getFirstName());
 		oldUser.setLastName(newUser.getLastName());
 		oldUser.setPhoneNumber(newUser.getPhoneNumber());
+		oldUser.setUsername(newUser.getUsername());
 		oldUser.setPassword(newUser.getPassword());
 		logger.info("< updated user");
 		return null;
 	}
 
+	@Override
+	public List<RegisteredUser> getFriends(Long id) {
+		logger.info("> fetching friends from user with id {}", id);
+		List<RegisteredUser> list = repository.findFriendsOfUser(id);
+		logger.info("< fetched friends");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested friends do not exist.");
+	}
+	
 	@Override
 	public List<FriendRequest> getReceivedFriendRequestsOfUser(Long id) {
 		logger.info("> fetching received friend requests of user with id {}", id);
@@ -113,31 +144,34 @@ public class UserService implements UserServiceInterface {
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested friend requests do not exist.");
 	}
 
-	private void checkIfFriends(RegisteredUser user1, RegisteredUser user2) {
-		// TODO : implement
+	private boolean checkIfFriends(RegisteredUser user1, RegisteredUser user2) {
+		return friendshipRepository.findFriendshipOf(user1.getId(), user2.getId()) != null;
 	}
 	
-	private void checkIfRequestExists(RegisteredUser user1, RegisteredUser user2) {
-		// TODO : implement
+	private boolean checkIfRequestExists(RegisteredUser user1, RegisteredUser user2) {
+		return friendRequestRepository.getFriendRequestBetween(user1.getId(), user2.getId()) != null;
 	}
 	
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public FriendRequest sendFriendRequest(Long sendingUserId, Long receivingUserId) {
 		logger.info("> sending friend request from user with id {} to user with id {}", sendingUserId, receivingUserId);
 		RegisteredUser sendingUser = this.findById(sendingUserId);
 		RegisteredUser receivingUser = this.findById(receivingUserId);
-		checkIfFriends(sendingUser, receivingUser);
-		checkIfRequestExists(sendingUser, receivingUser);
+		if(checkIfFriends(sendingUser, receivingUser)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Users are already friends.");
+		if(checkIfRequestExists(sendingUser, receivingUser)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request already exists.");
 		FriendRequest request = new FriendRequest();
-		List<FriendRequest> sentRequests = this.getSentFriendRequestOfUser(sendingUserId);
-		List<FriendRequest> receivedRequests = this.getReceivedFriendRequestsOfUser(receivingUserId);
+		List<FriendRequest> sentRequests = sendingUser.getSentRequests();
+		List<FriendRequest> receivedRequests = receivingUser.getReceivedRequests();
 		sentRequests.add(request);
 		receivedRequests.add(request);
 		request.setSender(sendingUser);
 		request.setReceiver(receivingUser);
 		request.setRequestTime(new Date());
+		repository.save(sendingUser);
+		repository.save(receivingUser);
 		logger.info("< friend request sent");
-		return null;
+		return request;
 	}
 
 	@Override
@@ -160,31 +194,47 @@ public class UserService implements UserServiceInterface {
 	}
 	
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.REPEATABLE_READ)
 	public Friendship acceptFriendRequest(Long recevingUserId, Long sendingUserId) {
 		logger.info("> accepting friend request of user with id {}", recevingUserId);
-		// TODO : Prihvatanje prijateljstva - neophodno je obrisati zahtev za prijateljstvo, a kreirati samo prijateljstvo
+		RegisteredUser friend1 = this.findById(sendingUserId);
+		RegisteredUser friend2 = this.findById(recevingUserId);
+		FriendRequest request = this.getRequest(recevingUserId, sendingUserId);
+		Friendship friendship = new Friendship();
+		friendship.setFriendsSince(new Date());
+		friendship.getFriends().add(friend1);
+		friendship.getFriends().add(friend2);
+		friend1.getFriendships().add(friendship);
+		friend1.getSentRequests().remove(request);
+		friend2.getFriendships().add(friendship);
+		friendshipRepository.save(friendship);
+		repository.save(friend1);
 		logger.info("< friend request accepted");
-		return null;
+		return friendship;
 	}
 	
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public void declineFriendRequest(Long receivingUserId, Long sendingUserId) {
 		logger.info("> declining friend request receivied by user with id {} sent by user with id {}", receivingUserId, sendingUserId);
-		// TODO : Odbijanje zahtevanje - neophodno je obrisati zahtev za prijateljstvo
-		logger.info("< friend request declinged");
+		RegisteredUser sender = this.findById(sendingUserId);
+		RegisteredUser receiver = this.findById(receivingUserId);
+		List<FriendRequest> requests = this.getSentFriendRequestOfUser(sendingUserId);
+		FriendRequest request = null;
+		for(FriendRequest rq : requests)
+			if(rq.getReceiver().equals(receiver))
+				request = rq;
+		requests.remove(request);
+		repository.save(sender);
+		logger.info("< friend request declined");
 	}
 	
 	@Override
-	public void cancelFriendRequest(Long sendingUserId, Long receivingUserId) {
-		logger.info("> cancelling friend request sent by user with id {} to user with id {}", sendingUserId, receivingUserId);
-		// TODO : Odustajanje od zahteva prijateljstva - neophodno je obrisati zahtev za prijateljtsvo
-		logger.info("< friend request cancelled");
-	}
-	
-	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public void removeFriend(Long self, Long friend) {
 		logger.info("> removing friend with id {} as user with id {} (self)", friend, self);
-		// TODO : Uklanjanje prijatelja iz liste prijatelja - neophodno je obrisati instancu prijateljstva i ukloniti je iz lista
+		Friendship friendship = friendshipRepository.findFriendshipOf(self, friend);
+		friendshipRepository.delete(friendship);
 		logger.info("< friend removed");
 	}
 

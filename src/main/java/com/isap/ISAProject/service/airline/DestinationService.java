@@ -1,7 +1,10 @@
 package com.isap.ISAProject.service.airline;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.controller.airline.Coordinates;
 import com.isap.ISAProject.exception.ResourceNotFoundException;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.Destination;
@@ -108,6 +112,44 @@ public class DestinationService implements DestinationServiceInterface {
 		logger.info("< airline fetched");
 		if(airline != null) return airline;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested airline does not exist.");
+	}
+	
+	@Override
+	public Coordinates getCoordinatesForCity(String city) {
+		try {
+			logger.info("> fetching coordinates of city {}", city);
+			city = city.replace(" ", "%20");
+			URL url = new URL("https://nominatim.openstreetmap.org/search?city=" + city + "&format=json");
+			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+			conn.setRequestMethod("GET");
+			conn.connect();
+			if(conn.getResponseCode() != 200) throw new Exception();
+			logger.info("< coordinates fetched");
+			Scanner sc = new Scanner(url.openStream());
+			String currentLine;
+			Coordinates coordinates = new Coordinates();
+			logger.info("> parsing data");
+			while(sc.hasNext()) {
+				currentLine = sc.nextLine();
+				String[] data = currentLine.split(",");
+				for(String s : data) {
+					if(s.contains("\"lon\"")) {
+						String tmp = s.split(":")[1];
+						coordinates.setLon(Double.parseDouble(tmp.substring(1, tmp.length()-1)));
+					}
+					if(s.contains("\"lat\"")) {
+						String tmp = s.split(":")[1];
+						coordinates.setLat(Double.parseDouble(tmp.substring(1, tmp.length()-1)));
+					}
+					if(coordinates.hasValues()) break;
+				}
+			}
+			logger.info("< data parsed");
+			sc.close();
+			return coordinates;
+		} catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "There was an error retrieving coordinates.");
+		}
 	}
 
 }

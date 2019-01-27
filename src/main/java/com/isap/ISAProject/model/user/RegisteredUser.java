@@ -4,11 +4,15 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.Valid;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "registered_user")
@@ -19,58 +23,43 @@ public class RegisteredUser extends SystemUser {
 	@Column
 	private int bonusPoints;
 	
+	@JsonIgnore
+	@Cascade(CascadeType.ALL)
 	@OneToMany(mappedBy="registeredUser")
 	private List<Reservation> reservations;
 	
-	@OneToMany(mappedBy="sender")
+	@JsonIgnore
+	@Cascade(CascadeType.ALL)
+	@OneToMany(mappedBy="sender", orphanRemoval = true)
 	private List<FriendRequest> sentRequests;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy="receiver")
 	private List<FriendRequest> receivedRequests;
 	
-	@ManyToMany
-	@JoinTable(name = "friendships_between_users")
+	@JsonIgnore
+	@ManyToMany(mappedBy = "friends")
 	private List<Friendship> friendships;
 	
-	public List<Friendship> getFriendships() {
-		return friendships;
-	}
+	public List<Friendship> getFriendships() { return friendships; }
 
-	public void setFriendships(List<Friendship> friendships) {
-		this.friendships = friendships;
-	}
+	public void setFriendships(List<Friendship> friendships) { this.friendships = friendships; }
 
-	public int getBonusPoints() {
-		return bonusPoints;
-	}
+	public int getBonusPoints() { return bonusPoints; }
 
-	public void setBonusPoints(int bonusPoints) {
-		this.bonusPoints = bonusPoints;
-	}
+	public void setBonusPoints(int bonusPoints) { this.bonusPoints = bonusPoints; }
 
-	public List<Reservation> getReservations() {
-		return reservations;
-	}
+	public List<Reservation> getReservations() { return reservations; }
 
-	public void setReservations(List<Reservation> reservations) {
-		this.reservations = reservations;
-	}
+	public void setReservations(List<Reservation> reservations) { this.reservations = reservations; }
 
-	public List<FriendRequest> getSentRequests() {
-		return sentRequests;
-	}
+	public List<FriendRequest> getSentRequests() { return sentRequests; }
 
-	public void setSentRequests(List<FriendRequest> sentRequests) {
-		this.sentRequests = sentRequests;
-	}
+	public void setSentRequests(List<FriendRequest> sentRequests) { this.sentRequests = sentRequests; }
 
-	public List<FriendRequest> getReceivedRequests() {
-		return receivedRequests;
-	}
+	public List<FriendRequest> getReceivedRequests() { return receivedRequests; }
 
-	public void setReceivedRequests(List<FriendRequest> receivedRequests) {
-		this.receivedRequests = receivedRequests;
-	}
+	public void setReceivedRequests(List<FriendRequest> receivedRequests) { this.receivedRequests = receivedRequests; }
 	
 	public void add(@Valid Reservation reservation) {
 		this.getReservations().add(reservation);

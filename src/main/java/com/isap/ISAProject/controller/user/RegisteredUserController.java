@@ -230,6 +230,18 @@ public class RegisteredUserController {
 			return new ResponseEntity<Resource<Friendship>>(HATEOASImplementor.createFriendship(service.acceptFriendRequest(receivingUserId, sendingUserId)), HttpStatus.CREATED);
 	}
 	
+	@RequestMapping(value = "/{self}/friends", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća sve prijatelje traženog korisnika.", notes = "Povratna vrednost servisa je lista resursa registrovanih korisnika sa kojima su u prijateljstvu.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content. Registrovani korisnik nema prijatelja."),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
+	})
+	public ResponseEntity<List<Resource<RegisteredUser>>> getFriendsOfUser(@PathVariable("self") Long id) {
+		return new ResponseEntity<List<Resource<RegisteredUser>>>(HATEOASImplementor.createRegisteredUserList(service.getFriends(id)), HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/{self}/declineRequest", method = RequestMethod.DELETE)
 	@ApiOperation(value = "Odbija zahtev za prijateljstvo.", notes = "Ovu operaciju izvršava korisnik kome je poslat zahtev za prijateljstvo.", httpMethod = "DELETE")
 	@ApiResponses(value = {
@@ -238,7 +250,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> declineFriendRequest(@PathVariable("self") Long selfId, @RequestParam("friend") Long friendId) {
-		service.declineFriendRequest(selfId, friendId);
+		service.declineFriendRequest(friendId, selfId);
 		return ResponseEntity.ok().build();
 	}
 	
@@ -250,7 +262,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> cancelFriendRequest(@PathVariable("self") Long selfId, @RequestParam("friend") Long friendId) {
-		service.cancelFriendRequest(selfId, friendId);
+		service.declineFriendRequest(selfId, friendId);
 		return ResponseEntity.ok().build();
 	}
 	
