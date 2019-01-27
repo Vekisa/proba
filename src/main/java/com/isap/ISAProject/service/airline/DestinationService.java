@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.controller.airline.Coordinates;
@@ -20,6 +22,8 @@ import com.isap.ISAProject.exception.ResourceNotFoundException;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.Destination;
 import com.isap.ISAProject.model.airline.Flight;
+import com.isap.ISAProject.model.hotel.Hotel;
+import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.repository.airline.DestinationRepository;
 import com.isap.ISAProject.serviceInterface.airline.DestinationServiceInterface;
 
@@ -51,6 +55,7 @@ public class DestinationService implements DestinationServiceInterface {
 	@Override
 	public Destination saveDestination(Destination destination) {
 		logger.info("> saving destination");
+		// TODO : Proveri da li je destinacija jedinstvena
 		repository.save(destination);
 		logger.info("< destination saved");
 		return destination;
@@ -67,9 +72,13 @@ public class DestinationService implements DestinationServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public void deleteDestination(Long destinationId) {
 		logger.info("> deleting destination with id {}", destinationId);
 		repository.deleteById(destinationId);
+		repository.removeSelfFromAirlines(destinationId);
+		repository.removeSelfFromBranchOffices(destinationId);
+		repository.removeSelfFromHotels(destinationId);
 		logger.info("< destination deleted");
 	}
 
@@ -77,8 +86,8 @@ public class DestinationService implements DestinationServiceInterface {
 	public Flight addFlightToDestination(Flight flight, Long destinationId) {
 		logger.info("> adding finish destination to flight with id {}", flight.getId());
 		Destination destination = this.findById(destinationId);
-		destination.getFlightsToHere().add(flight);
-		flight.setFinishDestination(destination);
+		destination.getFlightsFromHere().add(flight);
+		flight.setStartDestination(destination);
 		repository.save(destination);
 		logger.info("< finish destination added");
 		return flight;
@@ -102,16 +111,6 @@ public class DestinationService implements DestinationServiceInterface {
 		logger.info("< flights to destination fetched");
 		if(!list.isEmpty()) return list;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested flights do not exist.");
-	}
-
-	@Override
-	public Airline getAirlineForDestination(Long destinationId) {
-		logger.info("> fetching airline for destination with id {}", destinationId);
-		Destination destination = this.findById(destinationId);
-		Airline airline = destination.getAirline();
-		logger.info("< airline fetched");
-		if(airline != null) return airline;
-		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested airline does not exist.");
 	}
 	
 	@Override
@@ -150,6 +149,36 @@ public class DestinationService implements DestinationServiceInterface {
 		} catch(Exception e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "There was an error retrieving coordinates.");
 		}
+	}
+
+	@Override
+	public List<Airline> getAirlinesOnLocation(Long id) {
+		logger.info("> fetching airlines on location with id {}", id);
+		Destination destination = this.findById(id);
+		List<Airline> airlines = destination.getAirlines();
+		logger.info("< airlines fetched");
+		if(!airlines.isEmpty()) return airlines;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested airlines do not exist.");
+	}
+	
+	@Override
+	public List<BranchOffice> getBranchOfficesOnLocation(Long id) {
+		logger.info("> fetching offices on location with id {}", id);
+		Destination destination = this.findById(id);
+		List<BranchOffice> offices = destination.getBranchOffices();
+		logger.info("< offices fetched");
+		if(!offices.isEmpty()) return offices;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested offices do not exist.");
+	}
+	
+	@Override
+	public List<Hotel> getHotelsOnLocation(Long id) {
+		logger.info("> fetching hotels on location with id {}", id);
+		Destination destination = this.findById(id);
+		List<Hotel> hotels = destination.getHotels();
+		logger.info("< hotels fetched");
+		if(!hotels.isEmpty()) return hotels;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested hotels do not exist.");
 	}
 
 }

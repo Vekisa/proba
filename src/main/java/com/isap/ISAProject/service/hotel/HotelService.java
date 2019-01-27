@@ -15,10 +15,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.model.airline.Destination;
 import com.isap.ISAProject.model.hotel.Catalogue;
 import com.isap.ISAProject.model.hotel.ExtraOption;
 import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Hotel;
+import com.isap.ISAProject.repository.airline.DestinationRepository;
 import com.isap.ISAProject.repository.hotel.HotelRepository;
 
 @Service
@@ -29,6 +31,9 @@ public class HotelService {
 	
 	@Autowired
 	private HotelRepository hotelRepository;
+
+	@Autowired
+	private DestinationRepository destinationRepository;
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Hotel findById(long id) {
@@ -146,4 +151,25 @@ public class HotelService {
 		logger.info("< create catalogue for hotel");
 		return catalogue;
 	}
+	
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
+	public Hotel changeLocationOfHotel(Long hotelId, Long destinationId) {
+		logger.info("> changing location of hotel with id {}", hotelId);
+		Hotel hotel = this.findById(hotelId);
+		Destination destination = this.findDestination(destinationId);
+		destination.getHotels().add(hotel);
+		hotel.setLocation(destination);
+		destinationRepository.save(destination);
+		logger.info("< location changed");
+		return hotel;
+	}
+	
+	private Destination findDestination(Long id) {
+		logger.info("> fetching destination with id {}", id);
+		Optional<Destination> destination = destinationRepository.findById(id);
+		logger.info("< destination fetched");
+		if(destination.isPresent()) return destination.get();
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested destination doesn't exist.");
+	}
+	
 }

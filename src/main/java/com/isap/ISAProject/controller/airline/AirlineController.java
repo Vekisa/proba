@@ -63,8 +63,8 @@ public class AirlineController {
 			@ApiResponse(code = 201, message = "Created", response = Airline.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđena avio kompanija nije validna.")
 	})
-	public ResponseEntity<Resource<Airline>> createAirline(@Valid @RequestBody Airline airline) {
-		return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(service.saveAirline(airline)), HttpStatus.CREATED);
+	public ResponseEntity<Resource<Airline>> createAirline(@Valid @RequestBody Airline airline, @RequestParam("destination") Long id) {
+		return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(service.saveAirline(airline, id)), HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -76,6 +76,17 @@ public class AirlineController {
 	})
 	public ResponseEntity<Resource<Airline>> updateAirlineWithId(@PathVariable(value = "id") Long airlineId, @Valid @RequestBody Airline newAirline) {
 		return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(service.updateAirline(airlineId, newAirline)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/location", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Ažurira lokaciju zadate avio kompanije.", notes = "Ažurira lokaciju avio kompanije sa prosleđenim ID na osnovu parametra zahteva.", httpMethod = "PUT", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Airline.class),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Avio kompanija ili destinacija sa prosleđenim ID ne postoji.")
+	})
+	public ResponseEntity<Resource<Airline>> changeLocationOfAirline(@PathVariable("id") Long airlineId, @RequestParam("destination") Long id) {
+		return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(service.changeLocationOfAirline(airlineId, id)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

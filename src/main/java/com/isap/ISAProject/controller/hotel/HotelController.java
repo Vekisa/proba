@@ -192,4 +192,16 @@ public class HotelController {
 			@Valid @RequestBody Catalogue catalogue) {
 			return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(hotelService.createCatalogue(hotelId, catalogue)), HttpStatus.CREATED);
 	}
+	
+	@RequestMapping(value = "/{id}/location", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Ažurira lokaciju zadatog hotela.", notes = "Ažurira lokaciju hotela sa prosleđenim ID na osnovu parametra zahteva.", httpMethod = "PUT", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Hotel.class),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Hotel ili destinacija sa prosleđenim ID ne postoji.")
+	})
+	public ResponseEntity<Resource<Hotel>> changeLocationOfAirline(@PathVariable("id") Long hotelId, @RequestParam("destination") Long id) {
+		return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(hotelService.changeLocationOfHotel(hotelId, id)), HttpStatus.OK);
+	}
+	
 }

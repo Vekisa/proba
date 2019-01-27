@@ -84,7 +84,6 @@ class HATEOASImplementor {
 		Resource<Destination> resource = new Resource<Destination>(destination);
 		resource.add(linkTo(methodOn(DestinationController.class).getDestinationById(destination.getId())).withRel("self"));
 		resource.add(linkTo(methodOn(DestinationController.class).getAllDestinations(null)).slash("page=0&size=5").withRel("all-destinations"));
-		resource.add(linkTo(methodOn(DestinationController.class).getAirlineForDestinationWithId(destination.getId())).withRel("owner-airline"));
 		return resource;
 	}
 

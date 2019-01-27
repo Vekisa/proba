@@ -16,10 +16,14 @@ import javax.persistence.Version;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.isap.ISAProject.model.airline.Destination;
+
 @Entity
 @Table(name = "branch_office")
 public class BranchOffice {
 
+	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,13 +31,20 @@ public class BranchOffice {
 	@Column(nullable = false)
 	private String address;
 	
+	@JsonIgnore
 	@ManyToOne
 	private RentACar rentACar;
 	
+	@JsonIgnore
+	@ManyToOne
+	private Destination location;
+	
+	@JsonIgnore
 	@OneToMany(mappedBy="branchOffice")
 	@Cascade(CascadeType.ALL)
 	private List<Vehicle> vehicles = new ArrayList<>();
 	
+	@JsonIgnore
 	@Version
 	private Long version;
 	
@@ -78,4 +89,6 @@ public class BranchOffice {
 	public void setVersion(Long version) {
 		this.version = version;
 	}
+
+	public void setLocation(Destination location) { this.location = location; }
 }

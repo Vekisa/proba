@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -125,4 +126,16 @@ public class BranchOfficeController {
 		service.deleteVehicleForBranchOfficeWithId(broId, vehicle);
 		return ResponseEntity.ok().build();
 	}
+
+	@RequestMapping(value = "/{id}/location", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Ažurira lokaciju zadate filijale.", notes = "Ažurira lokaciju filijale sa prosleđenim ID na osnovu parametra zahteva.", httpMethod = "PUT", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = BranchOffice.class),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Filijala ili destinacija sa prosleđenim ID ne postoji.")
+	})
+	public ResponseEntity<Resource<BranchOffice>> setLocationOfBranchOffice(@PathVariable("id") Long id, @RequestParam("location") Long locationId) {
+		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(service.setLocationOfBranchOffice(id, locationId)), HttpStatus.OK);
+	}
+	
 }

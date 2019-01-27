@@ -10,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.airline.Destination;
@@ -39,6 +42,7 @@ public class FlightService implements FlightServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
 	public Flight findById(Long id) {
 		logger.info("> fetch flight with id {}", id);
 		Optional<Flight> flight = repository.findById(id);
@@ -130,6 +134,7 @@ public class FlightService implements FlightServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
 	public Flight setConfigurationToFlight(Long configurationId, Long flightId) {
 		logger.info("> setting configuration to flight with id {}", flightId);
 		Flight flight = this.findById(flightId);

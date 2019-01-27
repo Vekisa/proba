@@ -25,5 +25,7 @@ public interface TicketServiceInterface {
 	List<FlightSeat> getSeatsOfTicket(Long ticketId);
 	
 	Flight getFlightOfTicket(Long ticketId);
+
+	Ticket addMultipleSeatsToTicket(Long ticketId, List<Long> seats);
 	
 }

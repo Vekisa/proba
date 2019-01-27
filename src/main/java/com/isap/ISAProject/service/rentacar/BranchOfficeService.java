@@ -10,12 +10,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.model.airline.Destination;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.Vehicle;
+import com.isap.ISAProject.repository.airline.DestinationRepository;
 import com.isap.ISAProject.repository.rentacar.BranchOfficeRepository;
 import com.isap.ISAProject.serviceInterface.rentacar.BranchOfficeServiceInterface;
 
@@ -27,6 +30,9 @@ public class BranchOfficeService implements BranchOfficeServiceInterface{
 	
 	@Autowired
 	private BranchOfficeRepository repository;
+	
+	@Autowired
+	private DestinationRepository locationRepository;
 	
 	@Override
 	public List<BranchOffice> getAllBranchOffices(Pageable pageable) {
@@ -103,6 +109,27 @@ public class BranchOfficeService implements BranchOfficeServiceInterface{
 		brOff.removeVehicle(vehicle);
 		this.saveBranchOffice(brOff);
 		logger.info("< vehicle of branch office with id {} deleted", id);
+	}
+
+	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
+	public BranchOffice setLocationOfBranchOffice(Long id, Long locationId) {
+		logger.info("> changing location of branch office with id {}", id);
+		BranchOffice office = this.getBranchOfficeById(id);
+		Destination location = this.getLocation(locationId);
+		location.getBranchOffices().add(office);
+		office.setLocation(location);
+		locationRepository.save(location);
+		logger.info("< changed location of branch office with id {}", id);
+		return office;
+	}
+	
+	private Destination getLocation(Long id) {
+		logger.info("> fetching location with id {}", id);
+		Optional<Destination> location = locationRepository.findById(id);
+		logger.info("< location fetched");
+		if(location.isPresent()) return location.get();
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested location doesn't exist.");
 	}
 	
 }
