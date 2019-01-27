@@ -58,14 +58,7 @@ public class UserService implements UserServiceInterface {
 		logger.info("> fetch user with id {}", id);
 		Optional<RegisteredUser> user = repository.findById(id);
 		logger.info("< user fetched");
-		
-		/*SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo("vmosorinski@gmail.com");
-        mailMessage.setSubject("Complete Registration!");
-        mailMessage.setFrom("bice10izise@gmail.com");
-        mailMessage.setText("CAO");
-        emailSenderService.sendEmail(mailMessage);*/
-		
+	
 		if(user.isPresent()) return user.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested user doesn't exist.");
 	}
@@ -77,7 +70,9 @@ public class UserService implements UserServiceInterface {
 		if(usernameExists(user.getUsername()) || emailExists(user.getEmail()))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username/e-mail is already in use.");
 		repository.save(user);
-		logger.info("< user saved");
+		logger.info("< user saved");	
+
+		emailSenderService.send(user);
 		
 		return user;
 	}
@@ -280,6 +275,12 @@ public class UserService implements UserServiceInterface {
 	public Reservation createReservationForUser(Long id) {
 		// TODO : implement
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Method not implemented.");
+	}
+	
+	public RegisteredUser confirmAccount(String token) {
+		RegisteredUser user = this.findById(Long.parseLong(token));
+		//oznaciti da je potvrdio
+		return user;
 	}
 	
 }

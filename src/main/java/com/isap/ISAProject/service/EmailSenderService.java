@@ -6,6 +6,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.isap.ISAProject.model.user.RegisteredUser;
+
 @Service("emailSenderService")
 public class EmailSenderService {
 
@@ -19,5 +21,14 @@ public class EmailSenderService {
     @Async
     public void sendEmail(SimpleMailMessage email) {
         javaMailSender.send(email);
+    }
+    
+    public void send(RegisteredUser user) {
+    	SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setSubject("Complete Registration!");
+        mailMessage.setFrom("bice10izise@gmail.com");
+        mailMessage.setText("localhost:8080/"+user.getId()+"/confirm-account");
+        this.sendEmail(mailMessage);
     }
 }
