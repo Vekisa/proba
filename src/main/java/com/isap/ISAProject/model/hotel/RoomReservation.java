@@ -15,12 +15,14 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.user.Reservation;
 
 @Entity
 @Table(name = "room_reservation")
 public class RoomReservation {
 	
+	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,12 +42,15 @@ public class RoomReservation {
 	@Column(nullable = false)
 	private int numberOfRooms;
 	
+	@JsonIgnore
 	@ManyToOne
 	private Room room;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "roomReservation")
 	private List<ExtraOption> extraOptions;
 	
+	@JsonIgnore
 	@OneToOne
 	private Reservation reservation;
 	

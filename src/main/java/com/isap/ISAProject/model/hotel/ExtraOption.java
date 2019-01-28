@@ -10,10 +10,13 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "extra_option")
 public class ExtraOption {
 	
+	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,9 +30,11 @@ public class ExtraOption {
 	@Column
 	private double discount;
 	
+	@JsonIgnore
 	@ManyToOne
 	private Hotel hotel;
 	
+	@JsonIgnore
 	@ManyToOne
 	private RoomReservation roomReservation;
 	

@@ -17,12 +17,14 @@ import javax.validation.Valid;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.RatableEntity;
 
 @Entity
 @Table(name = "room")
 public class Room extends RatableEntity {
 	
+	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,12 +32,15 @@ public class Room extends RatableEntity {
 	@Column(nullable = false)
 	private int numberOfBeds;
 	
+	@JsonIgnore
 	@ManyToOne
 	private Floor floor;
 	
+	@JsonIgnore
 	@ManyToOne
 	private RoomType roomType;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy="room")
 	@Cascade(CascadeType.ALL)
 	private List<RoomReservation> roomReservation;

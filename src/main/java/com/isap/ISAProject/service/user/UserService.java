@@ -77,7 +77,8 @@ public class UserService implements UserServiceInterface {
 		logger.info("> save user with username {} and email {}", user.getUsername(), user.getEmail());
 		checkIfUsernameExists(user.getUsername());
 		checkIfEmailExists(user.getEmail());
-		user.setAuthority(AuthorizationLevel.REGULAR_USER);
+		user.setAuthority(AuthorizationLevel.GUEST);
+		emailService.send(user);
 		registeredUsersRepository.save(user);
 		logger.info("< user saved");
 		return user;

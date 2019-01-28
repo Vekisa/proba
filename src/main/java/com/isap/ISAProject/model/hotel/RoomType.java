@@ -14,10 +14,13 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "room_type")
 public class RoomType {
 	
+	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,9 +34,11 @@ public class RoomType {
 	@Column(nullable = false)
 	private double pricePerNight;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy="roomType")
 	private List<Room> room;
 	
+	@JsonIgnore
 	@ManyToOne
 	private Catalogue catalogue;
 	

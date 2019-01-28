@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.model.user.AuthorizationLevel;
 import com.isap.ISAProject.model.user.FriendRequest;
 import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
@@ -250,7 +251,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	
 	public RegisteredUser confirmAccount(String token) {
 		RegisteredUser user = this.findById(Long.parseLong(token));
-		//oznaciti da je potvrdio
+		user.setAuthority(AuthorizationLevel.REGULAR_USER);
 		return user;
 	}
 	

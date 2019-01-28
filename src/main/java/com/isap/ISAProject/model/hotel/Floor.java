@@ -14,10 +14,13 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "floor")
 public class Floor {
 	
+	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,9 +34,11 @@ public class Floor {
 	@Column(nullable = false)
 	private int numberOfColumns;
 	
+	@JsonIgnore
 	@ManyToOne
 	private Hotel hotel;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy="floor")
 	private List<Room> room;
 	

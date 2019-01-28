@@ -9,21 +9,25 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.Valid;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 //@Table(name = "catalogue")
 public class Catalogue {
 	
+	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 	
+	@JsonIgnore
 	@OneToOne
 	private Hotel hotel;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy="catalogue")
 	private List<RoomType> roomType;
 	
