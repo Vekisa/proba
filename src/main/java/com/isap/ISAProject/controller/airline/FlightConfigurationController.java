@@ -98,7 +98,7 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija leta sa prosleđenim ID ne postoji.")
 	})
-	public ResponseEntity<Resource<Airline>> getAirlineForConfigurationWithId(Long id) {
+	public ResponseEntity<Resource<Airline>> getAirlineForConfigurationWithId(@PathVariable("id") Long id) {
 		return new ResponseEntity<Resource<Airline>>(HATEOASImplementor.createAirline(service.getAirlineForConfiguration(id)), HttpStatus.OK);
 	}
 

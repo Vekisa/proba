@@ -10,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.airline.Flight;
@@ -61,6 +64,7 @@ public class TicketService implements TicketServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public FlightSeat addSeatToTicket(Long seatId, Long ticketId) {
 		logger.info("> adding seat to ticket with id {}", ticketId);
 		Ticket ticket = this.findById(ticketId);
@@ -113,6 +117,16 @@ public class TicketService implements TicketServiceInterface {
 		logger.info("< ticket fetched");
 		if(flight != null) return flight;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Request flight doesn't exist.");
+	}
+
+	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
+	public Ticket addMultipleSeatsToTicket(Long ticketId, List<Long> seats) {
+		logger.info("> adding multiple seats to ticket with id {}", ticketId);
+		for(Long seatId : seats)
+			this.addSeatToTicket(seatId, ticketId);
+		logger.info("< seats added");
+		return this.findById(ticketId);
 	}
 
 }

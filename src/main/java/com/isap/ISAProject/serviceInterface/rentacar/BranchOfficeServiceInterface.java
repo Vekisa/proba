@@ -24,4 +24,7 @@ public interface BranchOfficeServiceInterface {
 	Vehicle addVehicleForBranchOfficeWithId(Long id, Vehicle vehicle);
 	
 	void deleteVehicleForBranchOfficeWithId(Long id, Vehicle vehicle);
+	
+	BranchOffice setLocationOfBranchOffice(Long id, Long locationId);
+	
 }

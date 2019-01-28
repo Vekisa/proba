@@ -5,12 +5,15 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.isap.ISAProject.model.airline.Destination;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.Ticket;
 
+@Transactional(propagation = Propagation.MANDATORY)
 public interface FlightRepository extends PagingAndSortingRepository<Flight, Long> {
 
 	@Query("SELECT d FROM Destination d WHERE d.id = :destinationId")

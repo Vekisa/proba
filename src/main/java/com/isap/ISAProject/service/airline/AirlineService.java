@@ -21,6 +21,7 @@ import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.LuggageInfo;
 import com.isap.ISAProject.repository.airline.AirlineRepository;
+import com.isap.ISAProject.repository.airline.DestinationRepository;
 import com.isap.ISAProject.serviceInterface.airline.AirlineServiceInterface;
 
 @Service
@@ -31,6 +32,9 @@ public class AirlineService implements AirlineServiceInterface {
 	@Autowired
 	private AirlineRepository repository;
 
+	@Autowired
+	private DestinationRepository destinationRepository;
+	
 	@Override
 	public List<Airline> findAll(Pageable pageable) {
 		logger.info("> fetch airlines at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
@@ -48,10 +52,21 @@ public class AirlineService implements AirlineServiceInterface {
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested airline doesn't exist.");
 	}
 
+	private Destination findDestination(Long id) {
+		logger.info("> fetching destination with id {}", id);
+		Optional<Destination> destination = destinationRepository.findById(id);
+		logger.info("< destination fetched");
+		if(destination.isPresent()) return destination.get();
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested destination doesn't exist.");
+	}
+	
 	@Override
-	public Airline saveAirline(Airline airline) {
+	public Airline saveAirline(Airline airline, Long id) {
 		logger.info("> saving airline");
-		repository.save(airline);
+		Destination location = this.findDestination(id);
+		airline.setLocation(location);
+		location.getAirlines().add(airline);
+		destinationRepository.save(location);
 		logger.info("< airline saved");
 		return airline;
 	}
@@ -169,6 +184,18 @@ public class AirlineService implements AirlineServiceInterface {
 	public Map<Flight, Integer> getGraphForFlights(Date beginDate, Date endDate) {
 		// TODO : implement
 		return null;
+	}
+
+	@Override
+	public Airline changeLocationOfAirline(Long airlineId, Long id) {
+		logger.info("> changing location of airline with id {}", airlineId);
+		Airline airline = this.findById(airlineId);
+		Destination destination = this.findDestination(id);
+		destination.getAirlines().add(airline);
+		airline.setLocation(destination);
+		destinationRepository.save(destination);
+		logger.info("< location changed");
+		return airline;
 	}
 
 }

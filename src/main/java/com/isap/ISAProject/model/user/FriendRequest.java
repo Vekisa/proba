@@ -15,15 +15,14 @@ import javax.persistence.TemporalType;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "friend_request")
 @EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(value = {"requestTime"}, 
-        allowGetters = true)
 public class FriendRequest {
 	
+	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

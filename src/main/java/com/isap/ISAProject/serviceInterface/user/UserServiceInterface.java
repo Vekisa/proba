@@ -39,8 +39,8 @@ public interface UserServiceInterface {
 
 	void declineFriendRequest(Long receivingUserId, Long sendingUserId);
 	
-	void cancelFriendRequest(Long sendingUserId, Long receivingUserId);
-	
 	void removeFriend(Long self, Long friend);
+
+	List<RegisteredUser> getFriends(Long id);
 
 }

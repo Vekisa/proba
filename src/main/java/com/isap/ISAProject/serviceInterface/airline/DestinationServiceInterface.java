@@ -4,9 +4,12 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
+import com.isap.ISAProject.controller.airline.Coordinates;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.Destination;
 import com.isap.ISAProject.model.airline.Flight;
+import com.isap.ISAProject.model.hotel.Hotel;
+import com.isap.ISAProject.model.rentacar.BranchOffice;
 
 public interface DestinationServiceInterface {
 
@@ -25,7 +28,13 @@ public interface DestinationServiceInterface {
 	List<Flight> getFlightsFromDestination(Long destinationId);
 	
 	List<Flight> getFlightsToDestination(Long destinationId);
-	
-	Airline getAirlineForDestination(Long destinationId);
+
+	Coordinates getCoordinatesForCity(String city);
+
+	List<Airline> getAirlinesOnLocation(Long id);
+
+	List<BranchOffice> getBranchOfficesOnLocation(Long id);
+
+	List<Hotel> getHotelsOnLocation(Long id);
 	
 }

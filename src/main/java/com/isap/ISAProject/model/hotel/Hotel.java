@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -15,21 +16,30 @@ import javax.validation.Valid;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.Company;
+import com.isap.ISAProject.model.airline.Destination;
 
 @Entity
 @Table(name = "hotel")
 public class Hotel extends Company {
 	
+	@JsonIgnore
 	@OneToMany(mappedBy="hotel")
 	@Cascade(CascadeType.ALL)
 	private List<Floor> floor;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy="hotel")
 	private List<ExtraOption> extraOption;
 	
+	@JsonIgnore
 	@OneToOne
 	private Catalogue catalogue;
+	
+	@JsonIgnore
+	@ManyToOne
+	private Destination location;
 	
 	@Version
 	private Long version;
@@ -92,4 +102,6 @@ public class Hotel extends Company {
 	public void setVersion(Long version) {
 		this.version = version;
 	}
+
+	public void setLocation(Destination location) { this.location = location; }
 }

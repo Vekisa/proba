@@ -19,8 +19,6 @@ public interface AirlineServiceInterface {
 	
 	Airline findById(Long id);
 	
-	Airline saveAirline(Airline airline);
-	
 	Airline updateAirline(Long oldAirlineId, Airline newAirline);
 	
 	void deleteAirline(Long airlineId);
@@ -44,5 +42,9 @@ public interface AirlineServiceInterface {
 	Map<Destination, Integer> getGraphForDestinations(Date beginDate, Date endDate);
 	
 	Map<Flight, Integer> getGraphForFlights(Date beginDate, Date endDate);
+
+	Airline saveAirline(Airline airline, Long id);
+
+	Airline changeLocationOfAirline(Long airlineId, Long id);
 	
 }
