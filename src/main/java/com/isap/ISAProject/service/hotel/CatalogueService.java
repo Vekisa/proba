@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -39,6 +40,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cenovnik sa zadatim id-em ne postoji");
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<Catalogue> findAll(Pageable pageable) {
 		logger.info("> Catalogue findAll");
 		Page<Catalogue> catalogues = catalogueRepository.findAll(pageable);
@@ -49,6 +51,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cenovnici ne postoje");
 	}
 	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public Catalogue save(Catalogue catalogue) {
 		logger.info("> Catalogue create");
 		Catalogue savedCatalogue = catalogueRepository.save(catalogue);
@@ -56,6 +59,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 		return savedCatalogue;
 	}
 	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteById(long id) {
 		logger.info("> Catalogue delete");
 		this.findById(id);
@@ -63,6 +67,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 		logger.info("< Catalogue delete");
 	}
 	
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public Catalogue updateCatalogueById(Long catalogueId, Catalogue newCatalogue) {
 		logger.info("> Catalogue update");
 		Catalogue oldCatalogue = this.findById(catalogueId);
@@ -72,6 +77,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 		return oldCatalogue;
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<RoomType> getRoomTypes(Long id){
 		logger.info("> get room-types for catalogue");
 		Catalogue catalogue = this.findById(id);
@@ -83,6 +89,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tipovi soba za dati cenovnik ne postoje");
 	}
 	
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED) 
 	public RoomType createRoomType(Long catalogueId, RoomType roomType){
 		logger.info("> create room-type for catalogue");
 		Catalogue catalogue = this.findById(catalogueId);
@@ -93,6 +100,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 		return roomType;
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public Hotel getHotel(Long catalogueId) {
 		logger.info("> hotel from catalogue", catalogueId);
 		Catalogue catalogue = this.findById(catalogueId);
