@@ -46,4 +46,6 @@ public class Ticket {
 
 	public void setPrice(double price) { this.price = price; }
 	
+	public void setReservation(Reservation reservation) { this.reservation = reservation; }
+	
 }

@@ -50,7 +50,6 @@ public class Reservation {
 	private Date beginDate;
 	
 	@Column(nullable = false)
-	@Temporal(TemporalType.TIMESTAMP)
 	private Date endDate;
 	
 	@ManyToOne

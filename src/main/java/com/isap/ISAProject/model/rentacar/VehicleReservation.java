@@ -87,5 +87,11 @@ public class VehicleReservation {
 	public void setVersion(Long version) {
 		this.version = version;
 	}
+	public Reservation getReservation() {
+		return reservation;
+	}
+	public void setReservation(Reservation reservation) {
+		this.reservation = reservation;
+	}
 
 }
