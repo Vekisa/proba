@@ -12,7 +12,7 @@ public class CerberusUserFactory {
 	public static CerberusUser create(RegisteredUser user) {
 		Collection<? extends GrantedAuthority> authorities;
 		try {
-			authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(user.getAuthorities());
+			authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(user.getAuthority().toString());
 			
 		} catch (Exception e) {
 			authorities = null;

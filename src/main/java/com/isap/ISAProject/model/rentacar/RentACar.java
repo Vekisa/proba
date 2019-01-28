@@ -8,7 +8,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.Company;
+import com.isap.ISAProject.model.user.CompanyAdmin;
 
 @Entity
 @Table(name = "rent_a_car")
@@ -19,6 +21,10 @@ public class RentACar extends Company {
 	
 	@Version
 	private Long version;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "rentACar")
+	private List<CompanyAdmin> admins;
 	
 	public RentACar() {
 		this.branchOffices = new ArrayList<>();
@@ -44,4 +50,7 @@ public class RentACar extends Company {
 	public void setVersion(Long version) {
 		this.version = version;
 	}
+	
+	public List<CompanyAdmin> getAdmins() { return this.admins; }
+	
 }

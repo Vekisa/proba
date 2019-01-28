@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -24,6 +26,11 @@ public class RegisteredUser extends SystemUser {
 	private int bonusPoints;
 	
 	@JsonIgnore
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = true)
+	private AuthorizationLevel authority;
+	
+	@JsonIgnore
 	@Cascade(CascadeType.ALL)
 	@OneToMany(mappedBy="registeredUser")
 	private List<Reservation> reservations;
@@ -40,6 +47,8 @@ public class RegisteredUser extends SystemUser {
 	@JsonIgnore
 	@ManyToMany(mappedBy = "friends")
 	private List<Friendship> friendships;
+	
+	public RegisteredUser() {}
 	
 	public List<Friendship> getFriendships() { return friendships; }
 
@@ -60,6 +69,12 @@ public class RegisteredUser extends SystemUser {
 	public List<FriendRequest> getReceivedRequests() { return receivedRequests; }
 
 	public void setReceivedRequests(List<FriendRequest> receivedRequests) { this.receivedRequests = receivedRequests; }
+	
+	@Override
+	public AuthorizationLevel getAuthority() { return this.authority; }
+
+	@Override
+	public void setAuthority(AuthorizationLevel authority) { this.authority = authority; }
 	
 	public void add(@Valid Reservation reservation) {
 		this.getReservations().add(reservation);
