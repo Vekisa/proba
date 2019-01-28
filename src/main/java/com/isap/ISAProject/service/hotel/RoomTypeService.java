@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -26,6 +28,7 @@ public class RoomTypeService {
 	@Autowired
 	private RoomTypeRepository roomTypeRepository;
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public RoomType findById(long id) {
 		logger.info("> Room-type findById id:{}", id);
 		Optional<RoomType> roomType = roomTypeRepository.findById(id);
@@ -36,6 +39,7 @@ public class RoomTypeService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tip sobe sa zadatim id-em ne postoji");
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<RoomType> findAll(Pageable pageable) {
 		logger.info("> Room-type findAll");
 		Page<RoomType> roomType = roomTypeRepository.findAll(pageable);
@@ -46,6 +50,7 @@ public class RoomTypeService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tipovi soba ne postoje");
 	}
 	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public RoomType save(RoomType roomType) {
 		logger.info("> Room-type create");
 		RoomType savedRoomType = roomTypeRepository.save(roomType);
@@ -53,6 +58,7 @@ public class RoomTypeService {
 		return savedRoomType;
 	}
 	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteById(long id) {
 		logger.info("> Room-type delete");
 		this.findById(id);
@@ -60,6 +66,7 @@ public class RoomTypeService {
 		logger.info("< Room-type delete");
 	}
 	
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public RoomType updateRoomTypeById(Long roomTypeId, RoomType newRoomType) {
 		logger.info("> Room-Type update");
 		RoomType oldRoomType = this.findById(roomTypeId);
@@ -69,6 +76,7 @@ public class RoomTypeService {
 		return oldRoomType;
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public Catalogue getCatalogue(Long roomTypeId) {
 		logger.info("> catalogue from room-type", roomTypeId);
 		RoomType roomType = this.findById(roomTypeId);

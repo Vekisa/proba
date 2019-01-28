@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -28,6 +30,7 @@ public class RoomReservationService {
 	@Autowired
 	private RoomReservationRepository roomReservationRepository;
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public RoomReservation findById(long id) {
 		logger.info("> Rezervacija sobe findById id:{}", id);
 		Optional<RoomReservation> roomReservation = roomReservationRepository.findById(id);
@@ -38,6 +41,7 @@ public class RoomReservationService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rezervacija sobe sa zadatim id-em ne postoji");
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<RoomReservation> findAll(Pageable pageable) {
 		logger.info("> Rezervacija sobe findAll");
 		Page<RoomReservation> roomReservtions = roomReservationRepository.findAll(pageable);
@@ -48,6 +52,7 @@ public class RoomReservationService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rezervacije sobe ne postoje");
 	}
 	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public RoomReservation save(RoomReservation roomReservation) {
 		logger.info("> Rezervacija sobe create");
 		RoomReservation savedRoomReservation = roomReservationRepository.save(roomReservation);
@@ -55,6 +60,7 @@ public class RoomReservationService {
 		return savedRoomReservation;
 	}
 	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteById(long id) {
 		logger.info("> Rezervacija sobe delete");
 		this.findById(id);
@@ -62,6 +68,7 @@ public class RoomReservationService {
 		logger.info("< Rezervacija sobe delete");
 	}
 	
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public RoomReservation updateRoomReservationById(Long roomReservationId, RoomReservation newRoomReservation) {
 		logger.info("> Rezervacija sobe update");
 		RoomReservation oldRoomReservation = this.findById(roomReservationId);
@@ -76,6 +83,7 @@ public class RoomReservationService {
 		return oldRoomReservation;
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<ExtraOption> getExtraOptions(Long id){
 		logger.info("> get extra-options for room-reservation");
 		RoomReservation roomReservation = this.findById(id);
@@ -87,6 +95,7 @@ public class RoomReservationService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Extra optioni za datu rezervaciju ne postoje");
 	}
 	
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public ExtraOption createExtraOption(Long roomReservationId, ExtraOption extraOption){
 		logger.info("> create extra-option for room-resevration");
 		RoomReservation roomReservation = this.findById(roomReservationId);
@@ -97,6 +106,7 @@ public class RoomReservationService {
 		return extraOption;
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public Room getRoom(Long roomReservationId) {
 		logger.info("> room from room-reservation", roomReservationId);
 		RoomReservation roomReservation = this.findById(roomReservationId);

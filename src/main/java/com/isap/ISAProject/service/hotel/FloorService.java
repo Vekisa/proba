@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,6 +29,7 @@ public class FloorService {
 	@Autowired
 	private FloorRepository floorRepository;
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Floor findById(long id) {
 		logger.info("> Floor findById id:{}", id);
 		Optional<Floor> floor = floorRepository.findById(id);
@@ -37,6 +40,7 @@ public class FloorService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hotel sa zadatim id-em ne postoji");
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<Floor> findAll(Pageable pageable) {
 		logger.info("> Floor findAll");
 		Page<Floor> floors = floorRepository.findAll(pageable);
@@ -47,6 +51,7 @@ public class FloorService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hoteli ne postoje");
 	}
 	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public Floor save(Floor floor) {
 		logger.info("> Floor create");
 		Floor savedFloor = floorRepository.save(floor);
@@ -54,6 +59,7 @@ public class FloorService {
 		return savedFloor;
 	}
 	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteById(long id) {
 		logger.info("> Floor delete");
 		this.findById(id);
@@ -61,6 +67,7 @@ public class FloorService {
 		logger.info("< Floor delete");
 	}
 	
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public Floor updateFloorById(Long floorId, Floor newFloor) {
 		logger.info("> Floor update");
 		Floor oldFloor = this.findById(floorId);
@@ -70,6 +77,7 @@ public class FloorService {
 		return oldFloor;
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<Room> getRooms(Long id){
 		logger.info("> get rooms for floor");
 		Floor floor = this.findById(id);
@@ -81,6 +89,7 @@ public class FloorService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sobe za dati sprat ne postoje");
 	}
 	
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public Room createRoom(Long floorId, Room room){
 		logger.info("> create room for floor");
 		Floor floor = this.findById(floorId);
@@ -91,6 +100,7 @@ public class FloorService {
 		return room;
 	}
 	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public Hotel getHotel(Long floorId) {
 		logger.info("> hotel from floor", floorId);
 		Floor floor = this.findById(floorId);
