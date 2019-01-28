@@ -33,6 +33,7 @@ import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.security.TokenUtils;
+import com.isap.ISAProject.service.user.RegisteredUserService;
 import com.isap.ISAProject.service.user.UserService;
 
 import io.swagger.annotations.ApiOperation;
@@ -40,12 +41,15 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @RestController
-@RequestMapping("/registeredUsers")
+@RequestMapping("/users/registered")
 public class RegisteredUserController {
 
 	@Autowired
-	private UserService service;
+	private RegisteredUserService service;
 
+	@Autowired
+	private UserService userService;
+	
 	@Value("X-Auth-Token")
 	private String tokenHeader;
 
@@ -93,16 +97,6 @@ public class RegisteredUserController {
 			return new ResponseEntity<List<Resource<RegisteredUser>>>(HATEOASImplementor.createRegisteredUserList(service.findAll(pageable)), HttpStatus.OK);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Registruje korisnika.", notes = "Povratna vrednost servisa je registrovani korisnik.", httpMethod = "POST", consumes = "application/json", produces = "application/json")
-	@ApiResponses(value = {
-			@ApiResponse(code = 201, message = "Created", response = RegisteredUser.class),
-			@ApiResponse(code = 400, message = "Bad Request. Prosleđena avio kompanija nije validna.")
-	})
-	public ResponseEntity<Resource<RegisteredUser>> createUser(@Valid @RequestBody RegisteredUser registeredUser) {
-		return new ResponseEntity<Resource<RegisteredUser>>(HATEOASImplementor.createRegisteredUser(service.saveUser(registeredUser)), HttpStatus.CREATED);
-	}
-
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraća registrovanog korisnika sa ID.", notes = "Povratna vrednost servisa je resurs registrovanog korisnika koja ima traženi ID.", httpMethod = "GET", produces = "application/json")
 	@ApiResponses(value = {
@@ -113,17 +107,15 @@ public class RegisteredUserController {
 	public ResponseEntity<Resource<RegisteredUser>> getRegisteredUserById(@PathVariable("id") Long userId) {
 			return new ResponseEntity<Resource<RegisteredUser>>(HATEOASImplementor.createRegisteredUser(service.findById(userId)), HttpStatus.OK);
 	}
-
-	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-	@ApiOperation(value = "Briše registrovanog korisnika.", notes = "Briše registrovanog korisnika sa prosleđenim ID", httpMethod = "DELETE")
+	
+	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Memoriše i vraća registrovanog korisnika.", notes = "Povratna vrednost servisa je resurs registrovanog korisnika.", httpMethod = "POST", produces = "application/json", consumes = "application/json")
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
-			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
+			@ApiResponse(code = 201, message = "Created", response = RegisteredUser.class),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni korisnik nije validan.")
 	})
-	public ResponseEntity<?> deleteRegisteredUserWithId(@PathVariable("id") Long userId) {
-		service.deleteUser(userId);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<Resource<RegisteredUser>> createRegisteredUser(@RequestBody @Valid RegisteredUser user) {
+		return new ResponseEntity<Resource<RegisteredUser>>(HATEOASImplementor.createRegisteredUser(userService.createRegisteredUser(user)), HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

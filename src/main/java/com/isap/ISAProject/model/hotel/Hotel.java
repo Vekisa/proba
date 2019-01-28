@@ -19,6 +19,7 @@ import org.hibernate.annotations.CascadeType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.Company;
 import com.isap.ISAProject.model.airline.Destination;
+import com.isap.ISAProject.model.user.CompanyAdmin;
 
 @Entity
 @Table(name = "hotel")
@@ -43,6 +44,10 @@ public class Hotel extends Company {
 	
 	@Version
 	private Long version;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "hotel")
+	private List<CompanyAdmin> admins;
 	
 	public Hotel() {
 		floor = new ArrayList<>();
@@ -104,4 +109,6 @@ public class Hotel extends Company {
 	}
 
 	public void setLocation(Destination location) { this.location = location; }
+	
+	public List<CompanyAdmin> getAdmins() { return this.admins; }
 }

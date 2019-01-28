@@ -5,10 +5,12 @@ import java.util.List;
 
 import org.springframework.hateoas.Resource;
 
+import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.model.user.FriendRequest;
 import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
+import com.isap.ISAProject.model.user.UsersAdmin;
 
 class HATEOASImplementor {
 
@@ -62,5 +64,15 @@ class HATEOASImplementor {
 			requestList.add(HATEOASImplementor.createFriendship(friendship));
 		}
 		return requestList;
+	}
+
+	public static Resource<CompanyAdmin> createCompanyAdmin(CompanyAdmin admin) {
+		Resource<CompanyAdmin> resource = new Resource<CompanyAdmin>(admin);
+		return resource;
+	}
+
+	public static Resource<UsersAdmin> createUsersAdmin(UsersAdmin admin) {
+		Resource<UsersAdmin> resource = new Resource<UsersAdmin>(admin);
+		return resource;
 	}
 }

@@ -5,18 +5,24 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Version;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.user.base.UserBase;
 
 @MappedSuperclass
-public class SystemUser extends UserBase{
+public abstract class SystemUser extends UserBase{
 	
 	private static final long serialVersionUID = 689204864806648978L;
 
+	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+	@Version
+	private Long version;
+	
 	@Column(nullable = false)
 	private String email;
 	
@@ -37,16 +43,13 @@ public class SystemUser extends UserBase{
 	
 	@Column(nullable = false)
 	private String phoneNumber;
-	
-	@Column(nullable = false)
-	private String authorities;
 
 	public SystemUser() {
 		super();
 	}
 	
 	public SystemUser(String email, String username, String password, String firstName, String lastName, String city,
-			String phoneNumber, String authorities) {
+			String phoneNumber/*, AuthorizationLevel authority*/) {
 		super();
 		this.email = email;
 		this.username = username;
@@ -55,7 +58,17 @@ public class SystemUser extends UserBase{
 		this.lastName = lastName;
 		this.city = city;
 		this.phoneNumber = phoneNumber;
-		this.authorities = authorities;
+		//authority.this.authority = authority;
+	}
+
+	public SystemUser(SystemUser user) {
+		this.email = user.getEmail();
+		this.username = user.getUsername();
+		this.password = user.getPassword();
+		this.firstName = user.getFirstName();
+		this.lastName = user.getLastName();
+		this.city = user.getCity();
+		this.phoneNumber = user.getPhoneNumber();
 	}
 
 	public Long getId() { return id; }
@@ -86,8 +99,9 @@ public class SystemUser extends UserBase{
 	
 	public void setUsername(String username) { this.username = username; }
 	
-	public String getAuthorities() { return authorities; }
+	@JsonIgnore
+	public abstract AuthorizationLevel getAuthority();
 	
-	public void setAuthorities(String authorities) { this.authorities = authorities; }
+	public abstract void setAuthority(AuthorizationLevel authority);
 	
 }

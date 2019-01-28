@@ -14,6 +14,7 @@ import org.hibernate.annotations.CascadeType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.Company;
+import com.isap.ISAProject.model.user.CompanyAdmin;
 
 @Entity
 @Table(name = "airline")
@@ -41,6 +42,10 @@ public class Airline extends Company {
 	@Cascade(CascadeType.ALL)
 	private List<FlightSeatCategory> categories;
 	
+	@JsonIgnore
+	@OneToMany(mappedBy = "airline")
+	private List<CompanyAdmin> admins;
+	
 	public List<LuggageInfo> getLuggageInfos() { return luggageInfos; }
 
 	public List<Destination> getDestinations() { return new ArrayList<Destination>(); }
@@ -50,5 +55,7 @@ public class Airline extends Company {
 	public List<FlightSeatCategory> getCategories() { return this.categories; }
 
 	public void setLocation(Destination location) { this.location = location; }
+	
+	public List<CompanyAdmin> getAdmins() { return this.admins; }
 	
 }
