@@ -79,6 +79,12 @@ public class RegisteredUserController {
 		// Return the token
 		return ResponseEntity.ok(new AuthenticationResponse(token));
 	}
+	
+	@RequestMapping(method = RequestMethod.POST, value = "/logout")
+	public ResponseEntity<?> logout(){
+		SecurityContextHolder.clearContext();
+		return ResponseEntity.ok().build();
+	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/protected")
 	// @PreAuthorize("hasRole('ADMIN')")
