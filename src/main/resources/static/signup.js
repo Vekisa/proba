@@ -1,3 +1,9 @@
+function load(){
+	if(localStorage.token != undefined){
+		window.location.href = 'home.html';
+	}
+}
+
 $(document).on('submit','.form-signup',function(e){
 	alert("Saljem serveru");
 	e.preventDefault();
@@ -15,8 +21,9 @@ $(document).on('submit','.form-signup',function(e){
 				window.location.href = 'home.html';		
 			}
 		},
-		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("Error");
+		error : function(xhr, status, error) {
+			$("#error").html(JSON.parse(xhr.responseText).message);
+		      $('#myModal').modal("show");
 		}
 	});
 });

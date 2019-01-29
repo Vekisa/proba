@@ -1,6 +1,8 @@
+function load(){
+	if()
+}
+
 $(document).on('submit','.form-signin',function(e){
-	//alert("Saljem serveru");
-	//alert($('#inputUsername').val() + " " + $('#inputPassword').val());
 	e.preventDefault();
 	$.ajax({
 		url: "/users/registered/auth",
@@ -11,15 +13,14 @@ $(document).on('submit','.form-signin',function(e){
 		dataType:"json",
 		success:function(data){
 			if(data!=null){
-				sessionStorage.setItem("userToken",data);
 				localStorage.token = data.token;
 				alert(data.token);
-				//alert("Success");
 				window.location.href = 'home.html';		
 			}
 		},
-		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("Error");
+		error : function(xhr, status, error) {
+			$("#error").html(JSON.parse(xhr.responseText).message);
+		      $('#myModal').modal("show");
 		}
 	});
 });
