@@ -172,4 +172,8 @@ public class CerberusUser implements UserDetails {
 		this.phoneNumber = phoneNumber;
 	}
 
+	@Override
+	public String toString() {
+		return "CerberusUser [username=" + username + ", password=" + password + "]";
+	}
 }
