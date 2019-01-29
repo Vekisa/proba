@@ -1,5 +1,4 @@
 function load(){
-	if()
 }
 
 $(document).on('submit','.form-signin',function(e){
