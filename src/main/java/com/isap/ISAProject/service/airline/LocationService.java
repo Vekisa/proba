@@ -18,11 +18,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.isap.ISAProject.controller.airline.Coordinates;
-import com.isap.ISAProject.exception.ResourceNotFoundException;
 import com.isap.ISAProject.model.airline.Airline;
-import com.isap.ISAProject.model.airline.Location;
+import com.isap.ISAProject.model.airline.Coordinates;
 import com.isap.ISAProject.model.airline.Flight;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.repository.airline.LocationRepository;
@@ -42,7 +41,8 @@ public class LocationService implements LocationServiceInterface {
 		logger.info("> fetch destinations at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<Location> destinations = repository.findAll(pageable);
 		logger.info("< destinations fetched");
-		return destinations.getContent();
+		if(destinations.hasContent()) return destinations.getContent();
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested locations do not exist.");
 	}
 
 	@Override
@@ -52,14 +52,13 @@ public class LocationService implements LocationServiceInterface {
 		Optional<Location> destination = repository.findById(id);
 		logger.info("< destination fetched");
 		if(destination.isPresent()) return destination.get();
-		throw new ResourceNotFoundException("Destination with ID : " + id + " doesn't exist");
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested location doesn't exist.");
 	}
 
 	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Location saveDestination(Location destination) {
 		logger.info("> saving destination");
-		// TODO : Proveri da li je destinacija jedinstvena
 		repository.save(destination);
 		logger.info("< destination saved");
 		return destination;
@@ -123,7 +122,9 @@ public class LocationService implements LocationServiceInterface {
 	
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	public Coordinates getCoordinatesForCity(String city) {
+	public Coordinates getCoordinatesForCity(Long id) {
+		Location location = this.findById(id);
+		String city = location.getName();
 		try {
 			logger.info("> fetching coordinates of city {}", city);
 			city = city.replace(" ", "%20");

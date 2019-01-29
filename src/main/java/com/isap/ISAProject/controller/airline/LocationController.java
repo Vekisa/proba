@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.isap.ISAProject.controller.hotel.HATEOASImplementorHotel;
 import com.isap.ISAProject.controller.rentacar.HATEOASImplementorRentacar;
 import com.isap.ISAProject.model.airline.Airline;
+import com.isap.ISAProject.model.airline.Coordinates;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.hotel.Hotel;
@@ -153,14 +154,16 @@ public class LocationController {
 		return new ResponseEntity<List<Resource<Hotel>>>(HATEOASImplementorHotel.createHotelsList(service.getHotelsOnLocation(id)), HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/coordinates", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/{id}/coordinates", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraća koordinate prosleđenog grada.", notes = "Povratna vrednost servisa su koordinate u vidu geografske širine i visine.", httpMethod = "GET", produces = "application/json")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "OK", response = Coordinates.class),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Lokacija sa prosleđenim ID ne postoji."),
 			@ApiResponse(code = 500, message = "Internal Server Error. Došlo je do greške prilikom preuzimanja koordinata.")
 	})
-	public ResponseEntity<Coordinates> getLongLatForDestinationWithName(@RequestParam("city") String city) {
-		return new ResponseEntity<Coordinates>(service.getCoordinatesForCity(city), HttpStatus.OK);
+	public ResponseEntity<Coordinates> getLongLatForDestinationWithName(@RequestParam("id") Long id) {
+		return new ResponseEntity<Coordinates>(service.getCoordinatesForCity(id), HttpStatus.OK);
 	}
 
 }

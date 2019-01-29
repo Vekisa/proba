@@ -23,10 +23,10 @@ public abstract class SystemUser extends UserBase{
 	@Version
 	private Long version;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true, length = 30)
 	private String email;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true, length = 30)
 	private String username;
 	
 	@Column(nullable = false)

@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.isap.ISAProject.controller.airline.Coordinates;
 import com.isap.ISAProject.model.airline.Airline;
+import com.isap.ISAProject.model.airline.Coordinates;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.hotel.Hotel;
@@ -29,12 +29,12 @@ public interface LocationServiceInterface {
 	
 	List<Flight> getFlightsToDestination(Long destinationId);
 
-	Coordinates getCoordinatesForCity(String city);
-
 	List<Airline> getAirlinesOnLocation(Long id);
 
 	List<BranchOffice> getBranchOfficesOnLocation(Long id);
 
 	List<Hotel> getHotelsOnLocation(Long id);
+
+	Coordinates getCoordinatesForCity(Long id);
 	
 }

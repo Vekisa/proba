@@ -3,15 +3,11 @@ package com.isap.ISAProject.service.user;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.user.AuthorizationLevel;
 import com.isap.ISAProject.model.user.CompanyAdmin;
@@ -45,24 +41,10 @@ public class UserService implements UserServiceInterface {
 	@Autowired
 	private EmailSenderService emailService;
 	
-	private void checkIfUsernameExists(String username) {
-		if(companyAdminsRepository.findByUsername(username) != null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already in use.");
-		if(usersAdminsRepository.findByUsername(username) != null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already in use.");
-		if(registeredUsersRepository.findByUsername(username) != null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already in use.");
-	}
-	
-	private void checkIfEmailExists(String email) {
-		if(companyAdminsRepository.findByEmail(email) != null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "E-mail already in use.");
-		if(usersAdminsRepository.findByEmail(email) != null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "E-mail already in use.");
-		if(registeredUsersRepository.findByEmail(email) != null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "E-mail already in use.");
-	}
-	
 	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public CompanyAdmin createCompanyAdmin(CompanyAdmin admin) {
 		logger.info("> save admin with username {} and email {}", admin.getUsername(), admin.getEmail());
-		checkIfUsernameExists(admin.getUsername());
-		checkIfEmailExists(admin.getEmail());
 		companyAdminsRepository.save(admin);
 		logger.info("< admin saved");
 		return admin;
@@ -72,8 +54,6 @@ public class UserService implements UserServiceInterface {
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public UsersAdmin createUserAdmin(UsersAdmin admin) {
 		logger.info("> save admin with username {} and email {}", admin.getUsername(), admin.getEmail());
-		checkIfUsernameExists(admin.getUsername());
-		checkIfEmailExists(admin.getEmail());
 		admin.setAuthority(AuthorizationLevel.USERS_ADMIN);
 		usersAdminsRepository.save(admin);
 		logger.info("< admin saved");
@@ -84,8 +64,6 @@ public class UserService implements UserServiceInterface {
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public RegisteredUser createRegisteredUser(RegisteredUser user) {
 		logger.info("> save user with username {} and email {}", user.getUsername(), user.getEmail());
-		checkIfUsernameExists(user.getUsername());
-		checkIfEmailExists(user.getEmail());
 		user.setAuthority(AuthorizationLevel.GUEST);
 		BCryptPasswordEncoder bc = new BCryptPasswordEncoder();	
 		user.setPassword(bc.encode(user.getPassword()));

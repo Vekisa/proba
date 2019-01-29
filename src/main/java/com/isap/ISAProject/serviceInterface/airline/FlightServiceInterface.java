@@ -35,5 +35,7 @@ public interface FlightServiceInterface {
 	Location getStartDestinationOfFlight(Long flightId);
 	
 	Location getFinishDestinationOfFlight(Long flightId);
+
+	Flight createFlight(Long airlineId, Flight flight);
 	
 }

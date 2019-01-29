@@ -19,6 +19,7 @@ import com.isap.ISAProject.model.user.CompanyAdmin;
 @Table(name = "airline")
 public class Airline extends Company {
 	
+	@JsonIgnore
 	@Version
 	private Long version;
 	
@@ -43,6 +44,10 @@ public class Airline extends Company {
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "airline")
+	private List<Flight> flights;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "airline")
 	private List<CompanyAdmin> admins;
 	
 	public List<LuggageInfo> getLuggageInfos() { return luggageInfos; }
@@ -56,5 +61,7 @@ public class Airline extends Company {
 	public void setLocation(Location location) { this.location = location; }
 	
 	public List<CompanyAdmin> getAdmins() { return this.admins; }
+	
+	public List<Flight> getFlights() { return this.flights; }
 	
 }

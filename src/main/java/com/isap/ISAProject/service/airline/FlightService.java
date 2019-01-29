@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSeat;
@@ -22,6 +23,7 @@ import com.isap.ISAProject.model.airline.FlightSegment;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.SeatState;
 import com.isap.ISAProject.model.airline.Ticket;
+import com.isap.ISAProject.repository.airline.AirlineRepository;
 import com.isap.ISAProject.repository.airline.FlightConfigurationRepository;
 import com.isap.ISAProject.repository.airline.FlightRepository;
 import com.isap.ISAProject.repository.airline.LocationRepository;
@@ -40,6 +42,9 @@ public class FlightService implements FlightServiceInterface {
 	
 	@Autowired
 	private FlightConfigurationRepository configurationRepository;
+
+	@Autowired
+	private AirlineRepository airlineRepository;
 	
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -58,6 +63,26 @@ public class FlightService implements FlightServiceInterface {
 		logger.info("< flight fetched");
 		if(flight.isPresent()) return flight.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested flight doesn't exist.");
+	}
+	
+	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public Flight createFlight(Long airlineId, Flight flight) {
+		logger.info("> creating flight for airline with id {}", airlineId);
+		Airline airline = this.findAirline(airlineId);
+		flight.setAirline(airline);
+		flight.setStartDestination(airline.getLocation());
+		repository.save(flight);
+		logger.info("< created flight");
+		return flight;
+	}
+
+	private Airline findAirline(Long airlineId) {
+		logger.info("> fetching airline with id {}", airlineId);
+		Optional<Airline> airline = airlineRepository.findById(airlineId);
+		logger.info("< airline fetched");
+		if(airline.isPresent()) return airline.get();
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested airline doesn't exist.");
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package com.isap.ISAProject.controller.airline;
+package com.isap.ISAProject.model.airline;
 
 public class Coordinates {
 

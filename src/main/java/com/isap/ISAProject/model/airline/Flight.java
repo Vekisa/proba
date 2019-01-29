@@ -47,7 +47,7 @@ public class Flight {
 	@ManyToOne
 	private FlightConfiguration configuration;
 
-	@Column(nullable = false)
+	@Column(nullable = true)
 	private String transfers;
 
 	@Column(nullable = false)
@@ -64,6 +64,10 @@ public class Flight {
 
 	@Column(nullable = false)
 	private double basePrice;
+
+	@JsonIgnore
+	@ManyToOne
+	private Airline airline;
 
 	public boolean isFinished() { return finished; }
 
@@ -105,4 +109,8 @@ public class Flight {
 
 	public void setConfiguration(FlightConfiguration configuration) { this.configuration = configuration; }
 
+	public void setAirline(Airline airline) { this.airline = airline;}
+	
+	public Airline getAirline() { return this.airline; }
+	
 }
