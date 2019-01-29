@@ -6,10 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.isap.ISAProject.model.airline.Destination;
+import com.isap.ISAProject.model.airline.Location;
 
 @Transactional(propagation = Propagation.MANDATORY)
-public interface DestinationRepository extends JpaRepository<Destination, Long> {
+public interface LocationRepository extends JpaRepository<Location, Long> {
 
 	@Modifying
 	@Query(value = "update isap.airline set location_id = null where location_id = ?1", nativeQuery = true)

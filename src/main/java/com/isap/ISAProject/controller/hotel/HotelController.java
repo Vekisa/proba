@@ -17,10 +17,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.isap.ISAProject.controller.airline.HATEOASImplementorAirline;
+import com.isap.ISAProject.controller.user.HATEOASImplementorUsers;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.hotel.Catalogue;
 import com.isap.ISAProject.model.hotel.ExtraOption;
 import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Hotel;
+import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.service.hotel.HotelService;
 
 import io.swagger.annotations.ApiOperation;
@@ -200,8 +204,32 @@ public class HotelController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Hotel ili destinacija sa prosleđenim ID ne postoji.")
 	})
-	public ResponseEntity<Resource<Hotel>> changeLocationOfAirline(@PathVariable("id") Long hotelId, @RequestParam("destination") Long id) {
+	public ResponseEntity<Resource<Hotel>> changeLocationOfHotel(@PathVariable("id") Long hotelId, @RequestParam("destination") Long id) {
 		return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(hotelService.changeLocationOfHotel(hotelId, id)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/location", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća lokaciju hotela.", notes = "Povratna vrednost servisa je resurs lokacija hotela.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Location.class),
+			@ApiResponse(code = 204, message = "No Content. Ne postoji lokacija za dati hotel."),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Hotel sa prosleđenim ID ne postoji.")
+	})
+	public ResponseEntity<Resource<Location>> getLocationOfHotel(@PathVariable("id") Long id) {
+		return new ResponseEntity<Resource<Location>>(HATEOASImplementorAirline.createDestination(hotelService.getLocationOfHotel(id)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/admins", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća admine za datu avio kompaniju.", notes = "Povratna vrednost servisa je lista resursa admina kompanije.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content. Ne postoje admini za datu avio kompaniju."),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
+	})
+	public ResponseEntity<List<Resource<CompanyAdmin>>> getAdminsOfHotel(@PathVariable("id") Long id) {
+		return new ResponseEntity<List<Resource<CompanyAdmin>>>(HATEOASImplementorUsers.createCompanyAdminsList(hotelService.getAdminsOfHotel(id)), HttpStatus.OK);
 	}
 	
 }

@@ -10,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.airline.FlightConfiguration;
@@ -27,6 +30,7 @@ public class FlightSegmentService implements FlightSegmentServiceInterface {
 	private FlightSegmentRepository repository;
 	
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FlightSegment> findAll(Pageable pageable) {
 		logger.info("> fetch segments at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<FlightSegment> segments = repository.findAll(pageable);
@@ -35,6 +39,7 @@ public class FlightSegmentService implements FlightSegmentServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightSegment findById(Long id) {
 		logger.info("> fetch segment with id {}", id);
 		Optional<FlightSegment> segment = repository.findById(id);
@@ -44,6 +49,7 @@ public class FlightSegmentService implements FlightSegmentServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightSegment updateSegment(Long oldSegmentId, FlightSegment newSegment) {
 		logger.info("> updating segment with id {}", oldSegmentId);
 		FlightSegment oldSegment = this.findById(oldSegmentId);
@@ -57,6 +63,7 @@ public class FlightSegmentService implements FlightSegmentServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void deleteSegment(Long segmentId) {
 		logger.info("> deleting segment with id {}", segmentId);
 		repository.deleteById(segmentId);
@@ -64,6 +71,7 @@ public class FlightSegmentService implements FlightSegmentServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightConfiguration getConfigurationForSegment(Long segmentId) {
 		logger.info("> fetching configuration for segment with id {}", segmentId);
 		FlightSegment segment = this.findById(segmentId);
@@ -74,6 +82,7 @@ public class FlightSegmentService implements FlightSegmentServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightSeatCategory getCategoryOfSegment(Long segmentId) {
 		logger.info("> fetching category for segment with id {}", segmentId);
 		FlightSegment segment = this.findById(segmentId);

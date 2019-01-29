@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.isap.ISAProject.controller.user.HATEOASImplementorUsers;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.RentACar;
+import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.service.rentacar.RentACarService;
 
 import io.swagger.annotations.ApiOperation;
@@ -126,6 +128,18 @@ public class RentACarController {
 	public ResponseEntity<?> deleteBranchOfficeForRentACarWithId(@PathVariable(value = "racId") Long racId, @Valid @RequestBody BranchOffice branch){
 		service.deleteBranchOffice(racId, branch);
 		return ResponseEntity.ok().build();
+	}
+	
+	@RequestMapping(value = "/{id}/admins", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća admine za dati rent a car.", notes = "Povratna vrednost servisa je lista resursa admina kompanije.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content. Ne postoje admini za dati rent a car."),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Rent a car sa prosleđenim ID ne postoji.")
+	})
+	public ResponseEntity<List<Resource<CompanyAdmin>>> getAdminsOfAirlineWithId(@PathVariable("id") Long id) {
+		return new ResponseEntity<List<Resource<CompanyAdmin>>>(HATEOASImplementorUsers.createCompanyAdminsList(service.getAdminsOfRentACar(id)), HttpStatus.OK);
 	}
 	
 }

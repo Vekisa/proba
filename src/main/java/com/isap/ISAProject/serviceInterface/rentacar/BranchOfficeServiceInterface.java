@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.Vehicle;
 
@@ -26,5 +27,7 @@ public interface BranchOfficeServiceInterface {
 	void deleteVehicleForBranchOfficeWithId(Long id, Vehicle vehicle);
 	
 	BranchOffice setLocationOfBranchOffice(Long id, Long locationId);
+
+	Location getLocationOfRentACar(Long id);
 	
 }

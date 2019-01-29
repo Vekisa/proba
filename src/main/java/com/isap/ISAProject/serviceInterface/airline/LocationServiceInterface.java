@@ -6,20 +6,20 @@ import org.springframework.data.domain.Pageable;
 
 import com.isap.ISAProject.controller.airline.Coordinates;
 import com.isap.ISAProject.model.airline.Airline;
-import com.isap.ISAProject.model.airline.Destination;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 
-public interface DestinationServiceInterface {
+public interface LocationServiceInterface {
 
-	List<Destination> findAll(Pageable pageable);
+	List<Location> findAll(Pageable pageable);
 	
-	Destination findById(Long id);
+	Location findById(Long id);
 	
-	Destination saveDestination(Destination destination);
+	Location saveDestination(Location destination);
 	
-	Destination updateDestination(Long oldDestinationId, Destination newDestination);
+	Location updateDestination(Long oldDestinationId, Location newDestination);
 	
 	void deleteDestination(Long destinationId);
 	

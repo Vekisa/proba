@@ -35,7 +35,7 @@ public class FriendRequestController {
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
 	public ResponseEntity<List<Resource<FriendRequest>>> getAllFriendRequests(Pageable pageable){
-			return new ResponseEntity<List<Resource<FriendRequest>>>(HATEOASImplementor.createFriendRequestList(service.findAll(pageable)), HttpStatus.OK);
+			return new ResponseEntity<List<Resource<FriendRequest>>>(HATEOASImplementorUsers.createFriendRequestList(service.findAll(pageable)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -46,7 +46,7 @@ public class FriendRequestController {
 			@ApiResponse(code = 404, message = "Not Found. Zahtev za prijateljstvo sa traženim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FriendRequest>> getFriendRequestById(@PathVariable(value="id") Long friendRequestId) {
-			return new ResponseEntity<Resource<FriendRequest>>(HATEOASImplementor.createFriendRequest(service.findById(friendRequestId)), HttpStatus.OK);
+			return new ResponseEntity<Resource<FriendRequest>>(HATEOASImplementorUsers.createFriendRequest(service.findById(friendRequestId)), HttpStatus.OK);
 	}
 
 }

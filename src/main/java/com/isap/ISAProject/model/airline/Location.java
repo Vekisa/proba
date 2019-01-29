@@ -20,7 +20,7 @@ import com.isap.ISAProject.model.rentacar.BranchOffice;
 
 @Entity
 @Table(name = "destination")
-public class Destination {
+public class Location {
 
 	@JsonIgnore
 	@Id

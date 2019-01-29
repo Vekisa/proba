@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.isap.ISAProject.controller.airline.HATEOASImplementorAirline;
 import com.isap.ISAProject.model.airline.Airline;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.Vehicle;
 import com.isap.ISAProject.service.rentacar.BranchOfficeService;
@@ -136,6 +138,18 @@ public class BranchOfficeController {
 	})
 	public ResponseEntity<Resource<BranchOffice>> setLocationOfBranchOffice(@PathVariable("id") Long id, @RequestParam("location") Long locationId) {
 		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(service.setLocationOfBranchOffice(id, locationId)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/location", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća lokaciju filijale.", notes = "Povratna vrednost servisa je resurs filijale.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Location.class),
+			@ApiResponse(code = 204, message = "No Content. Ne postoji lokacija za datu filijalu."),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Filijala sa prosleđenim ID ne postoji.")
+	})
+	public ResponseEntity<Resource<Location>> getLocationOfHotel(@PathVariable("id") Long id) {
+		return new ResponseEntity<Resource<Location>>(HATEOASImplementorAirline.createDestination(service.getLocationOfRentACar(id)), HttpStatus.OK);
 	}
 	
 }

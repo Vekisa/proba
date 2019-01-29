@@ -12,16 +12,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.airline.Airline;
-import com.isap.ISAProject.model.airline.Destination;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSeatCategory;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.LuggageInfo;
+import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.repository.airline.AirlineRepository;
-import com.isap.ISAProject.repository.airline.DestinationRepository;
+import com.isap.ISAProject.repository.airline.LocationRepository;
 import com.isap.ISAProject.serviceInterface.airline.AirlineServiceInterface;
 
 @Service
@@ -33,9 +37,10 @@ public class AirlineService implements AirlineServiceInterface {
 	private AirlineRepository repository;
 
 	@Autowired
-	private DestinationRepository destinationRepository;
+	private LocationRepository destinationRepository;
 	
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Airline> findAll(Pageable pageable) {
 		logger.info("> fetch airlines at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<Airline> airlines = repository.findAll(pageable);
@@ -44,6 +49,7 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Airline findById(Long id) {
 		logger.info("> fetch airline with id {}", id);
 		Optional<Airline> airline = repository.findById(id);
@@ -52,18 +58,19 @@ public class AirlineService implements AirlineServiceInterface {
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested airline doesn't exist.");
 	}
 
-	private Destination findDestination(Long id) {
+	private Location findDestination(Long id) {
 		logger.info("> fetching destination with id {}", id);
-		Optional<Destination> destination = destinationRepository.findById(id);
+		Optional<Location> destination = destinationRepository.findById(id);
 		logger.info("< destination fetched");
 		if(destination.isPresent()) return destination.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested destination doesn't exist.");
 	}
 	
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Airline saveAirline(Airline airline, Long id) {
 		logger.info("> saving airline");
-		Destination location = this.findDestination(id);
+		Location location = this.findDestination(id);
 		airline.setLocation(location);
 		location.getAirlines().add(airline);
 		destinationRepository.save(location);
@@ -72,6 +79,7 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Airline updateAirline(Long oldAirlineId, Airline newAirline) {
 		logger.info("> updating airline with id {}", oldAirlineId);
 		Airline oldAirline = this.findById(oldAirlineId);
@@ -84,6 +92,7 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void deleteAirline(Long airlineId) {
 		logger.info("> deleting airline with id {}", airlineId);
 		repository.deleteById(airlineId);
@@ -91,6 +100,7 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<LuggageInfo> getLuggageInfosForAirline(Long airlineId) {
 		logger.info("> fetching luggage infos for airline with id {}", airlineId);
 		Airline airline = this.findById(airlineId);
@@ -101,6 +111,7 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public LuggageInfo addLuggageInfoToAirline(Long airlineId, LuggageInfo luggageInfo) {
 		logger.info("> adding luggage info to airline with id {}", airlineId);
 		Airline airline = this.findById(airlineId);
@@ -112,27 +123,7 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
-	public List<Destination> getDestinationsForAirline(Long airlineId) {
-		logger.info("> fetching destinations for airline with id {}", airlineId);
-		Airline airline = this.findById(airlineId);
-		List<Destination> list = airline.getDestinations();
-		logger.info("< destinations fetched");
-		if(!list.isEmpty()) return list;
-		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested destinations do not exist.");
-	}
-
-	@Override
-	public Destination addDestinationToAirline(Long airlineId, Destination destination) {
-		logger.info("> adding destination to airline with id {}", airlineId);
-		Airline airline = this.findById(airlineId);
-		airline.getDestinations().add(destination);
-		destination.setAirline(airline);
-		repository.save(airline);
-		logger.info("< destination added");
-		return destination;
-	}
-
-	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FlightConfiguration> getFlightConfigurationsForAirline(Long airlineId) {
 		logger.info("> fetching flight configurations for airline with id {}", airlineId);
 		Airline airline = this.findById(airlineId);
@@ -143,6 +134,7 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightConfiguration addFlightConfigurationToAirline(Long airlineId, FlightConfiguration flightConfiguration) {
 		logger.info("> adding flight configuration to airline with id {}", airlineId);
 		Airline airline = this.findById(airlineId);
@@ -154,6 +146,7 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FlightSeatCategory> getFlightSeatCategoriesForAirline(Long airlineId) {
 		logger.info("> fetching flight seat categories for airline with id {}", airlineId);
 		Airline airline = this.findById(airlineId);
@@ -164,6 +157,7 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightSeatCategory addFlightSeatCategoryToAirline(Long airlineId, FlightSeatCategory flightSeatCategory) {
 		logger.info("> adding flight seat category to airline with id {}", airlineId);
 		Airline airline = this.findById(airlineId);
@@ -175,7 +169,7 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
-	public Map<Destination, Integer> getGraphForDestinations(Date beginDate, Date endDate) {
+	public Map<Location, Integer> getGraphForDestinations(Date beginDate, Date endDate) {
 		// TODO : implement
 		return null;
 	}
@@ -187,15 +181,33 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Airline changeLocationOfAirline(Long airlineId, Long id) {
 		logger.info("> changing location of airline with id {}", airlineId);
 		Airline airline = this.findById(airlineId);
-		Destination destination = this.findDestination(id);
+		Location destination = this.findDestination(id);
 		destination.getAirlines().add(airline);
 		airline.setLocation(destination);
 		destinationRepository.save(destination);
 		logger.info("< location changed");
 		return airline;
+	}
+
+	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public List<CompanyAdmin> getAdminsOfAirline(Long id) {
+		logger.info("> fetching admins of airline with id {}", id);
+		Airline airline = this.findById(id);
+		List<CompanyAdmin> list = airline.getAdmins();
+		logger.info("< admins fetched");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested admins do not exist.");
+	}
+
+	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public Location getLocationOfAirline(Long id) {
+		return this.findDestination(id);
 	}
 
 }

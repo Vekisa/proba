@@ -15,10 +15,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.isap.ISAProject.model.airline.Destination;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.Vehicle;
-import com.isap.ISAProject.repository.airline.DestinationRepository;
+import com.isap.ISAProject.repository.airline.LocationRepository;
 import com.isap.ISAProject.repository.rentacar.BranchOfficeRepository;
 import com.isap.ISAProject.serviceInterface.rentacar.BranchOfficeServiceInterface;
 
@@ -32,7 +32,7 @@ public class BranchOfficeService implements BranchOfficeServiceInterface{
 	private BranchOfficeRepository repository;
 	
 	@Autowired
-	private DestinationRepository locationRepository;
+	private LocationRepository locationRepository;
 	
 	@Override
 	public List<BranchOffice> getAllBranchOffices(Pageable pageable) {
@@ -116,7 +116,7 @@ public class BranchOfficeService implements BranchOfficeServiceInterface{
 	public BranchOffice setLocationOfBranchOffice(Long id, Long locationId) {
 		logger.info("> changing location of branch office with id {}", id);
 		BranchOffice office = this.getBranchOfficeById(id);
-		Destination location = this.getLocation(locationId);
+		Location location = this.getLocation(locationId);
 		location.getBranchOffices().add(office);
 		office.setLocation(location);
 		locationRepository.save(location);
@@ -124,12 +124,18 @@ public class BranchOfficeService implements BranchOfficeServiceInterface{
 		return office;
 	}
 	
-	private Destination getLocation(Long id) {
+	private Location getLocation(Long id) {
 		logger.info("> fetching location with id {}", id);
-		Optional<Destination> location = locationRepository.findById(id);
+		Optional<Location> location = locationRepository.findById(id);
 		logger.info("< location fetched");
 		if(location.isPresent()) return location.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested location doesn't exist.");
+	}
+
+	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public Location getLocationOfRentACar(Long id) {
+		return this.getLocation(id);
 	}
 	
 }

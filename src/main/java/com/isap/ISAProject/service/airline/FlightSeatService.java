@@ -10,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.airline.Flight;
@@ -30,6 +33,7 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	private FlightSeatsRepository repository;
 	
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FlightSeat> findAll(Pageable pageable) {
 		logger.info("> fetch seats at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<FlightSeat> seats = repository.findAll(pageable);
@@ -38,6 +42,7 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightSeat findById(Long id) {
 		logger.info("> fetch seat with id {}", id);
 		Optional<FlightSeat> seat = repository.findById(id);
@@ -47,6 +52,7 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void deleteSeat(Long flightSeatId) {
 		logger.info("> deleting seat with id {}", flightSeatId);
 		// TODO : Kada je moguce brisati sediste?
@@ -55,6 +61,7 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightSeat setLuggageInfoForSeat(Long flightSeatId, Long luggageInfoId) {
 		logger.info("> setting luggage info to seat with id {}", flightSeatId);
 		LuggageInfo luggageInfo = this.findLuggageInfoById(luggageInfoId);
@@ -81,6 +88,7 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public LuggageInfo getLuggageInfoOfSeat(Long seatId) {
 		logger.info("> fetching luggage info of seat with id {}", seatId);
 		FlightSeat seat = this.findById(seatId);
@@ -91,6 +99,7 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightSeat setPassengerToSeat(Long seatId, Long passengerId) {
 		logger.info("> setting passenger to seat with id {}", seatId);
 		Passenger passenger = this.findPassengerById(passengerId);
@@ -111,6 +120,7 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Passenger getPassengerOfSeat(Long seatId) {
 		logger.info("> fetching passenger of seat with id {}", seatId);
 		FlightSeat seat = this.findById(seatId);
@@ -121,6 +131,7 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightSeatCategory getCategoryOfSeat(Long seatId) {
 		logger.info("> fetching category of seat with id {}", seatId);
 		FlightSeat seat = this.findById(seatId);
@@ -131,6 +142,7 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Flight getFlightOfSeat(Long seatId) {
 		logger.info("> fetching flight of seat with id {}", seatId);
 		FlightSeat seat = this.findById(seatId);
@@ -141,6 +153,7 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Ticket getTicketOfSeat(Long seatId) {
 		logger.info("> fetching ticket of seat with id {}", seatId);
 		FlightSeat seat = this.findById(seatId);

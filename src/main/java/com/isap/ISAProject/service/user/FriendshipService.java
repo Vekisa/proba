@@ -10,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.user.Friendship;
@@ -25,6 +28,7 @@ public class FriendshipService implements FriendshipServiceInterface {
 	private FriendshipRepository repository;
 	
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public List<Friendship> findAll(Pageable pageable) {
 		logger.info("> fetching friendships at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<Friendship> friendships = repository.findAll(pageable);
@@ -33,6 +37,7 @@ public class FriendshipService implements FriendshipServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public Friendship findById(Long id) {
 		logger.info("> fetching friendship with id {}", id);
 		Optional<Friendship> friendship = repository.findById(id);

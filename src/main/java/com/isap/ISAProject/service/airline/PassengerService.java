@@ -10,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.airline.Flight;
@@ -28,6 +31,7 @@ public class PassengerService implements PassengerServiceInterface {
 	private PassengerRepository repository;
 	
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Passenger> findAll(Pageable pageable) {
 		logger.info("> fetch passengers at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<Passenger> passengers = repository.findAll(pageable);
@@ -36,6 +40,7 @@ public class PassengerService implements PassengerServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Passenger findById(Long id) {
 		logger.info("> fetch passenger with id {}", id);
 		Optional<Passenger> passenger = repository.findById(id);
@@ -45,6 +50,7 @@ public class PassengerService implements PassengerServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void deletePassenger(Long passengerId) {
 		logger.info("> deleting passenger with id {}", passengerId);
 		// TODO : Kada je moguce brisati putnika?
@@ -53,6 +59,7 @@ public class PassengerService implements PassengerServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Passenger updatePassenger(Long oldPassengerId, Passenger newPassenger) {
 		logger.info("> updating passenger with id {}", oldPassengerId);
 		Passenger oldPassenger = this.findById(oldPassengerId);
@@ -65,6 +72,7 @@ public class PassengerService implements PassengerServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FlightSeat> getSeatsWithPassenger(Long passengerId) {
 		logger.info("> fetching seats for airline with id {}", passengerId);
 		Passenger passenger = this.findById(passengerId);
@@ -75,6 +83,7 @@ public class PassengerService implements PassengerServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Flight> getFlightsWithPassenger(Long passengerId) {
 		logger.info("> fetching seats for airline with id {}", passengerId);
 		List<Flight> list = repository.getFlightsForPassenger(passengerId);
@@ -84,6 +93,7 @@ public class PassengerService implements PassengerServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Ticket> getTicketsOfPassenger(Long passengerId) {
 		logger.info("> fetching tickets for airline with id {}", passengerId);
 		List<Ticket> list = repository.getTicketsForPassenger(passengerId);

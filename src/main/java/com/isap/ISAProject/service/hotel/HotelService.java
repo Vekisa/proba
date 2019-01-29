@@ -15,12 +15,13 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.isap.ISAProject.model.airline.Destination;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.hotel.Catalogue;
 import com.isap.ISAProject.model.hotel.ExtraOption;
 import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Hotel;
-import com.isap.ISAProject.repository.airline.DestinationRepository;
+import com.isap.ISAProject.model.user.CompanyAdmin;
+import com.isap.ISAProject.repository.airline.LocationRepository;
 import com.isap.ISAProject.repository.hotel.HotelRepository;
 
 @Service
@@ -33,7 +34,7 @@ public class HotelService {
 	private HotelRepository hotelRepository;
 
 	@Autowired
-	private DestinationRepository destinationRepository;
+	private LocationRepository destinationRepository;
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Hotel findById(long id) {
@@ -156,7 +157,7 @@ public class HotelService {
 	public Hotel changeLocationOfHotel(Long hotelId, Long destinationId) {
 		logger.info("> changing location of hotel with id {}", hotelId);
 		Hotel hotel = this.findById(hotelId);
-		Destination destination = this.findDestination(destinationId);
+		Location destination = this.findDestination(destinationId);
 		destination.getHotels().add(hotel);
 		hotel.setLocation(destination);
 		destinationRepository.save(destination);
@@ -164,12 +165,28 @@ public class HotelService {
 		return hotel;
 	}
 	
-	private Destination findDestination(Long id) {
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	private Location findDestination(Long id) {
 		logger.info("> fetching destination with id {}", id);
-		Optional<Destination> destination = destinationRepository.findById(id);
+		Optional<Location> destination = destinationRepository.findById(id);
 		logger.info("< destination fetched");
 		if(destination.isPresent()) return destination.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested destination doesn't exist.");
+	}
+	
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public List<CompanyAdmin> getAdminsOfHotel(Long id) {
+		logger.info("> fetching admins of hotel with id {}", id);
+		Hotel hotel = this.findById(id);
+		List<CompanyAdmin> list = hotel.getAdmins();
+		logger.info("< admins fetched");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested admins do not exist.");
+	}
+
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public Location getLocationOfHotel(Long id) {
+		return this.findDestination(id);
 	}
 	
 }

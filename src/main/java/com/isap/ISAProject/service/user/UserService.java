@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -57,7 +58,7 @@ public class UserService implements UserServiceInterface {
 	}
 	
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public CompanyAdmin createCompanyAdmin(CompanyAdmin admin) {
 		logger.info("> save admin with username {} and email {}", admin.getUsername(), admin.getEmail());
 		checkIfUsernameExists(admin.getUsername());
@@ -68,7 +69,7 @@ public class UserService implements UserServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public UsersAdmin createUserAdmin(UsersAdmin admin) {
 		logger.info("> save admin with username {} and email {}", admin.getUsername(), admin.getEmail());
 		checkIfUsernameExists(admin.getUsername());
@@ -80,7 +81,7 @@ public class UserService implements UserServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public RegisteredUser createRegisteredUser(RegisteredUser user) {
 		logger.info("> save user with username {} and email {}", user.getUsername(), user.getEmail());
 		checkIfUsernameExists(user.getUsername());

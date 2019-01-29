@@ -41,7 +41,7 @@ public class PassengerController {
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
 	public ResponseEntity<List<Resource<Passenger>>> getAllPassengers(Pageable pageable) {
-		return new ResponseEntity<List<Resource<Passenger>>>(HATEOASImplementor.createPassengersList(service.findAll(pageable)), HttpStatus.OK);
+		return new ResponseEntity<List<Resource<Passenger>>>(HATEOASImplementorAirline.createPassengersList(service.findAll(pageable)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -52,7 +52,7 @@ public class PassengerController {
 			@ApiResponse(code = 404, message = "Not Found. Putnik sa traženim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<Passenger>> getPassengerWithId(@PathVariable("id") Long id) {
-		return new ResponseEntity<Resource<Passenger>>(HATEOASImplementor.createPassenger(service.findById(id)), HttpStatus.OK);
+		return new ResponseEntity<Resource<Passenger>>(HATEOASImplementorAirline.createPassenger(service.findById(id)), HttpStatus.OK);
 	}	
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -75,7 +75,7 @@ public class PassengerController {
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<Passenger>> updatePassengerWithId(@PathVariable("id") Long id, @RequestBody @Valid Passenger newPassenger) {
-		return new ResponseEntity<Resource<Passenger>>(HATEOASImplementor.createPassenger(service.updatePassenger(id, newPassenger)), HttpStatus.OK);
+		return new ResponseEntity<Resource<Passenger>>(HATEOASImplementorAirline.createPassenger(service.updatePassenger(id, newPassenger)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}/seats", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -87,7 +87,7 @@ public class PassengerController {
 			@ApiResponse(code = 404, message = "Not Found. Putnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<FlightSeat>>> getSeatsForPassengerWithId(@PathVariable("id") Long id) {
-		return new ResponseEntity<List<Resource<FlightSeat>>>(HATEOASImplementor.createFlightSeatsList(service.getSeatsWithPassenger(id)), HttpStatus.OK);
+		return new ResponseEntity<List<Resource<FlightSeat>>>(HATEOASImplementorAirline.createFlightSeatsList(service.getSeatsWithPassenger(id)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}/flights", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -99,7 +99,7 @@ public class PassengerController {
 			@ApiResponse(code = 404, message = "Not Found. Putnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<Flight>>> getFlightsForPassengerWithId(@PathVariable("id") Long id) {
-		return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementor.createFlightsList(service.getFlightsWithPassenger(id)), HttpStatus.OK);
+		return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementorAirline.createFlightsList(service.getFlightsWithPassenger(id)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}/tickets", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -111,7 +111,7 @@ public class PassengerController {
 			@ApiResponse(code = 404, message = "Not Found. Putnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<Ticket>>> getTicketsForPassengerWithId(@PathVariable("id") Long id) {
-		return new ResponseEntity<List<Resource<Ticket>>>(HATEOASImplementor.createTicketsList(service.getTicketsOfPassenger(id)), HttpStatus.OK);
+		return new ResponseEntity<List<Resource<Ticket>>>(HATEOASImplementorAirline.createTicketsList(service.getTicketsOfPassenger(id)), HttpStatus.OK);
 	}
 
 }

@@ -95,7 +95,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
 	public ResponseEntity<List<Resource<RegisteredUser>>> getAllRegisteredUsers(Pageable pageable) {
-			return new ResponseEntity<List<Resource<RegisteredUser>>>(HATEOASImplementor.createRegisteredUserList(service.findAll(pageable)), HttpStatus.OK);
+			return new ResponseEntity<List<Resource<RegisteredUser>>>(HATEOASImplementorUsers.createRegisteredUserList(service.findAll(pageable)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -106,7 +106,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa traženim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<RegisteredUser>> getRegisteredUserById(@PathVariable("id") Long userId) {
-			return new ResponseEntity<Resource<RegisteredUser>>(HATEOASImplementor.createRegisteredUser(service.findById(userId)), HttpStatus.OK);
+			return new ResponseEntity<Resource<RegisteredUser>>(HATEOASImplementorUsers.createRegisteredUser(service.findById(userId)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -116,7 +116,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni korisnik nije validan.")
 	})
 	public ResponseEntity<Resource<RegisteredUser>> createRegisteredUser(@RequestBody @Valid RegisteredUser user) {
-		return new ResponseEntity<Resource<RegisteredUser>>(HATEOASImplementor.createRegisteredUser(userService.createRegisteredUser(user)), HttpStatus.CREATED);
+		return new ResponseEntity<Resource<RegisteredUser>>(HATEOASImplementorUsers.createRegisteredUser(userService.createRegisteredUser(user)), HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -127,7 +127,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<RegisteredUser>> updateUserWithId(@PathVariable("id") Long userId, @Valid @RequestBody RegisteredUser newRegisteredUser) {
-			return new ResponseEntity<Resource<RegisteredUser>>(HATEOASImplementor.createRegisteredUser(service.updateUser(userId, newRegisteredUser)), HttpStatus.OK);
+			return new ResponseEntity<Resource<RegisteredUser>>(HATEOASImplementorUsers.createRegisteredUser(service.updateUser(userId, newRegisteredUser)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}/activeReservations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -139,7 +139,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<Reservation>>> getReservationsForUserWithId(@PathVariable("id") Long userId) {
-				return new ResponseEntity<List<Resource<Reservation>>>(HATEOASImplementor.createReservationList(service.getActiveReservationsOfUser(userId)), HttpStatus.OK);
+				return new ResponseEntity<List<Resource<Reservation>>>(HATEOASImplementorUsers.createReservationList(service.getActiveReservationsOfUser(userId)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}/history", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -151,7 +151,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<Reservation>>> getReservationsHistoryForUserWithId(@PathVariable("id") Long userId) {
-				return new ResponseEntity<List<Resource<Reservation>>>(HATEOASImplementor.createReservationList(service.getReservationHistoryOfUser(userId)), HttpStatus.OK);
+				return new ResponseEntity<List<Resource<Reservation>>>(HATEOASImplementorUsers.createReservationList(service.getReservationHistoryOfUser(userId)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}/reservations", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -162,7 +162,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<Reservation>> createReservationForUserWithId(@PathVariable("id") Long userId) {
-			return new ResponseEntity<Resource<Reservation>>(HATEOASImplementor.createReservation(service.createReservationForUser(userId)), HttpStatus.CREATED);
+			return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(service.createReservationForUser(userId)), HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/{id}/receivedRequests", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -174,7 +174,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<FriendRequest>>> getReceivedFriendRequestsForUserWithId(@PathVariable("id") Long userId) {
-				return new ResponseEntity<List<Resource<FriendRequest>>>(HATEOASImplementor.createFriendRequestList(service.getReceivedFriendRequestsOfUser(userId)), HttpStatus.OK);
+				return new ResponseEntity<List<Resource<FriendRequest>>>(HATEOASImplementorUsers.createFriendRequestList(service.getReceivedFriendRequestsOfUser(userId)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{from}/sendRequestTo", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -185,7 +185,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FriendRequest>> sendFriendRequest(@PathVariable("from") Long sendingUserId, @RequestParam("to") Long receivingUserId) {
-			return new ResponseEntity<Resource<FriendRequest>>(HATEOASImplementor.createFriendRequest(service.sendFriendRequest(sendingUserId, receivingUserId)), HttpStatus.CREATED);
+			return new ResponseEntity<Resource<FriendRequest>>(HATEOASImplementorUsers.createFriendRequest(service.sendFriendRequest(sendingUserId, receivingUserId)), HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/{id}/sentRequests", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -197,7 +197,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<FriendRequest>>> getSentFriendRequestsForUserWithId(@PathVariable("id") Long userId) {
-				return new ResponseEntity<List<Resource<FriendRequest>>>(HATEOASImplementor.createFriendRequestList(service.getSentFriendRequestOfUser(userId)), HttpStatus.OK);
+				return new ResponseEntity<List<Resource<FriendRequest>>>(HATEOASImplementorUsers.createFriendRequestList(service.getSentFriendRequestOfUser(userId)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}/friendships", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -209,7 +209,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<Friendship>>> getFriendshipsForUserWithId(@PathVariable("id") Long userId) {
-				return new ResponseEntity<List<Resource<Friendship>>>(HATEOASImplementor.createFriendshipList(service.getFriendshipsOfUser(userId)), HttpStatus.OK);
+				return new ResponseEntity<List<Resource<Friendship>>>(HATEOASImplementorUsers.createFriendshipList(service.getFriendshipsOfUser(userId)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{self}/acceptRequest", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -220,7 +220,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<Friendship>> acceptFriendRequest(@PathVariable(value = "self") Long receivingUserId, @RequestParam("from") Long sendingUserId) {
-			return new ResponseEntity<Resource<Friendship>>(HATEOASImplementor.createFriendship(service.acceptFriendRequest(receivingUserId, sendingUserId)), HttpStatus.CREATED);
+			return new ResponseEntity<Resource<Friendship>>(HATEOASImplementorUsers.createFriendship(service.acceptFriendRequest(receivingUserId, sendingUserId)), HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/{self}/friends", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -232,7 +232,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<List<Resource<RegisteredUser>>> getFriendsOfUser(@PathVariable("self") Long id) {
-		return new ResponseEntity<List<Resource<RegisteredUser>>>(HATEOASImplementor.createRegisteredUserList(service.getFriends(id)), HttpStatus.OK);
+		return new ResponseEntity<List<Resource<RegisteredUser>>>(HATEOASImplementorUsers.createRegisteredUserList(service.getFriends(id)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{self}/declineRequest", method = RequestMethod.DELETE)
@@ -279,7 +279,6 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found")
 	})
 	public ModelAndView confirmAccountWithToken(@PathVariable("token") String userToken) {
-			//return new ResponseEntity<Resource<RegisteredUser>>(HATEOASImplementor.createRegisteredUser(service.confirmAccount(userToken)), HttpStatus.OK);
 		service.confirmAccount(userToken);
 		return new ModelAndView("redirect:/signin.html");
 	}

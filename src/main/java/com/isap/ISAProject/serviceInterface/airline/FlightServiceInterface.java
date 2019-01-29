@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.isap.ISAProject.model.airline.Destination;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSeat;
@@ -32,8 +32,8 @@ public interface FlightServiceInterface {
 	
 	Flight setFinishDestinationForFlight(Long destinationId, Long flightId);
 	
-	Destination getStartDestinationOfFlight(Long flightId);
+	Location getStartDestinationOfFlight(Long flightId);
 	
-	Destination getFinishDestinationOfFlight(Long flightId);
+	Location getFinishDestinationOfFlight(Long flightId);
 	
 }

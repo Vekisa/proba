@@ -44,7 +44,7 @@ public class ReservationController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<List<Resource<Reservation>>> getReservations(Pageable pageable){
-			return new ResponseEntity<List<Resource<Reservation>>>(HATEOASImplementor.createReservationList(reservationService.findAll(pageable)), HttpStatus.OK);
+			return new ResponseEntity<List<Resource<Reservation>>>(HATEOASImplementorUsers.createReservationList(reservationService.findAll(pageable)), HttpStatus.OK);
 	}
 	
 	//Kreiranje rezervacije
@@ -58,7 +58,7 @@ public class ReservationController {
 	})
 	public ResponseEntity<Resource<Reservation>> createReservation(@Valid @RequestBody Reservation reservation, @Valid @RequestBody Ticket ticket,
 			@Valid @RequestBody VehicleReservation vehicleReservation, @Valid @RequestBody RoomReservation roomReservation) {
-		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementor.createReservation(reservationService.save(reservation,ticket,
+		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.save(reservation,ticket,
 				vehicleReservation, roomReservation)), HttpStatus.CREATED);
 	}
 	
@@ -72,7 +72,7 @@ public class ReservationController {
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
 	public ResponseEntity<Resource<Reservation>> getReservationById(@PathVariable(value="id") Long reservationId) {
-			return new ResponseEntity<Resource<Reservation>>(HATEOASImplementor.createReservation(reservationService.findById(reservationId)), HttpStatus.OK);
+			return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.findById(reservationId)), HttpStatus.OK);
 	}
 	
 	//Brisanje rezervaciju sa zadatim id-em
