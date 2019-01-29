@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.hotel.ExtraOption;
+import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.repository.hotel.ExtraOptionRepository;
 
@@ -81,11 +82,23 @@ public class ExtraOptionService {
 		logger.info("> room-reservation from extra-option", extraOptionId);
 		ExtraOption extraOption = this.findById(extraOptionId);
 		RoomReservation roomReservation = extraOption.getRoomReservation();
-		logger.info("< room-type from room");
+		logger.info("< room-reservation from extra-option");
 		if(roomReservation != null)
 			return roomReservation;
 		else
-			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Extra option za datu rezervaciju nije postavljen");
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Rezervacija sobe za dati extra-option nije postavljen");
+	}
+	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
+	public Hotel getHotel(Long extraOptionId) {
+		logger.info("> hotel from extra-option", extraOptionId);
+		ExtraOption extraOption = this.findById(extraOptionId);
+		Hotel hotel = extraOption.getHotel();
+		logger.info("< hotel from extra-option");
+		if(hotel != null)
+			return hotel;
+		else
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Hotel za dati extra-option nije postavljen");
 	}
 
 }

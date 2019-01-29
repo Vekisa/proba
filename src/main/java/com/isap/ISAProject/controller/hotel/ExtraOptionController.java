@@ -18,7 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.isap.ISAProject.model.hotel.Catalogue;
 import com.isap.ISAProject.model.hotel.ExtraOption;
+import com.isap.ISAProject.model.hotel.Hotel;
+import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.service.hotel.ExtraOptionService;
 
 import io.swagger.annotations.ApiOperation;
@@ -97,5 +100,31 @@ public class ExtraOptionController {
 	public ResponseEntity<Resource<ExtraOption>> updateExtraOptionWithId(@PathVariable(value = "id") Long extraOptionId,
 			@Valid @RequestBody ExtraOption newExtraOption) {
 			return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(extraOptionService.updateExtraOptionById(extraOptionId, newExtraOption)), HttpStatus.OK);
+	}
+	
+	//Vraca hotel u okviru extra-optiona
+	@RequestMapping(value = "/{id}/hotel", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća hotel", notes = "Povratna vrednost servisa je hotel",
+			httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Hotel.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request")
+	})
+	public ResponseEntity<Resource<Hotel>> getHotelForExtraOptionWithId(@PathVariable(value = "id") Long extraOptionId) {
+				return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(extraOptionService.getHotel(extraOptionId)), HttpStatus.OK);
+	}
+	
+	//Vraca hotel u okviru extra-optiona
+	@RequestMapping(value = "/{id}/room-reservation", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća rezervaciju sobe", notes = "Povratna vrednost servisa je rezervacija sobe",
+			httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = RoomReservation.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request")
+	})
+	public ResponseEntity<Resource<RoomReservation>> getRoomReservationForExtraOptionWithId(@PathVariable(value = "id") Long extraOptionId) {
+				return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(extraOptionService.getRoomReservation(extraOptionId)), HttpStatus.OK);
 	}
 }

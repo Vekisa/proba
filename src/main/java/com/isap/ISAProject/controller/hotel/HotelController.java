@@ -130,7 +130,7 @@ public class HotelController {
 	@ApiOperation(value = "Kreira sprat u okviru zadatog hotela", notes = "Povratna vrednost metode je kreiran sprat.",
 			httpMethod = "POST", produces = "application/json", consumes = "application/json")
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "OK", response = Hotel.class),
+			@ApiResponse(code = 200, message = "OK", response = Floor.class),
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
@@ -144,7 +144,7 @@ public class HotelController {
 	@ApiOperation(value = "Vraća extra-options za dati hotel.", notes = "Povratna vrednost servisa je lista extra option-a.",
 			httpMethod = "GET", produces = "application/json")
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "OK", response = Hotel.class),
+			@ApiResponse(code = 200, message = "OK", response = ExtraOption.class),
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
@@ -157,7 +157,7 @@ public class HotelController {
 	@ApiOperation(value = "Kreira sprat u okviru zadatog hotela", notes = "Povratna vrednost metode je kreiran sprat.",
 			httpMethod = "POST", produces = "application/json", consumes = "application/json")
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "OK", response = Hotel.class),
+			@ApiResponse(code = 200, message = "OK", response = ExtraOption.class),
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
@@ -171,7 +171,7 @@ public class HotelController {
 	@ApiOperation(value = "Vraća cenovnik za dati hotel.", notes = "Povratna vrednost servisa je cenovnik",
 			httpMethod = "GET", produces = "application/json")
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "OK", response = Hotel.class),
+			@ApiResponse(code = 200, message = "OK", response = Catalogue.class),
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
