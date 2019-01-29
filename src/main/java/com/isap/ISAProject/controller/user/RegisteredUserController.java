@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.isap.ISAProject.domain.json.request.AuthenticationRequest;
 import com.isap.ISAProject.domain.json.response.AuthenticationResponse;
@@ -270,15 +271,17 @@ public class RegisteredUserController {
 		return ResponseEntity.ok().build();
 	}
 	
-	@RequestMapping(value = "/{token}/confirm-account", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/{token}/confirm-account", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraca potvrdjenog korisnika.", notes = "Potvrdjuje korisnika.", httpMethod = "PUT", consumes = "application/json", produces = "application/json")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "OK", response = RegisteredUser.class),
 			@ApiResponse(code = 400, message = "Bad Request"),
 			@ApiResponse(code = 404, message = "Not Found")
 	})
-	public ResponseEntity<Resource<RegisteredUser>> confirmAccountWithToken(@PathVariable("token") String userToken) {
-			return new ResponseEntity<Resource<RegisteredUser>>(HATEOASImplementor.createRegisteredUser(service.confirmAccount(userToken)), HttpStatus.OK);
+	public ModelAndView confirmAccountWithToken(@PathVariable("token") String userToken) {
+			//return new ResponseEntity<Resource<RegisteredUser>>(HATEOASImplementor.createRegisteredUser(service.confirmAccount(userToken)), HttpStatus.OK);
+		service.confirmAccount(userToken);
+		return new ModelAndView("redirect:/signin.html");
 	}
 	
 }

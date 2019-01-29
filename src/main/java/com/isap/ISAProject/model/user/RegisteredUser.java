@@ -8,6 +8,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.Valid;
 
@@ -48,6 +49,10 @@ public class RegisteredUser extends SystemUser {
 	@ManyToMany(mappedBy = "friends")
 	private List<Friendship> friendships;
 	
+	@JsonIgnore
+	@OneToOne
+	private ConfirmationToken confirmationToken;
+	
 	public RegisteredUser() {}
 	
 	public List<Friendship> getFriendships() { return friendships; }
@@ -76,6 +81,14 @@ public class RegisteredUser extends SystemUser {
 	@Override
 	public void setAuthority(AuthorizationLevel authority) { this.authority = authority; }
 	
+	public ConfirmationToken getConfirmationToken() {
+		return confirmationToken;
+	}
+
+	public void setConfirmationToken(ConfirmationToken confirmationToken) {
+		this.confirmationToken = confirmationToken;
+	}
+
 	public void add(@Valid Reservation reservation) {
 		this.getReservations().add(reservation);
 		reservation.setRegisteredUser(this);

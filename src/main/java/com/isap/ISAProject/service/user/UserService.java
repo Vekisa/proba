@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,9 +14,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.user.AuthorizationLevel;
 import com.isap.ISAProject.model.user.CompanyAdmin;
+import com.isap.ISAProject.model.user.ConfirmationToken;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.UsersAdmin;
 import com.isap.ISAProject.repository.user.CompanyAdminRepository;
+import com.isap.ISAProject.repository.user.ConfirmationTokenRepository;
 import com.isap.ISAProject.repository.user.RegisteredUserRepository;
 import com.isap.ISAProject.repository.user.UsersAdminRepository;
 import com.isap.ISAProject.service.EmailSenderService;
@@ -32,6 +37,9 @@ public class UserService implements UserServiceInterface {
 	
 	@Autowired
 	private RegisteredUserRepository registeredUsersRepository;
+	
+	@Autowired
+	private ConfirmationTokenRepository confirmationTokenRepository; 
 	
 	@Autowired
 	private EmailSenderService emailService;
@@ -78,6 +86,16 @@ public class UserService implements UserServiceInterface {
 		checkIfUsernameExists(user.getUsername());
 		checkIfEmailExists(user.getEmail());
 		user.setAuthority(AuthorizationLevel.GUEST);
+		BCryptPasswordEncoder bc = new BCryptPasswordEncoder();	
+		user.setPassword(bc.encode(user.getPassword()));
+	
+		//email
+		ConfirmationToken confTok = new ConfirmationToken();
+		user.setConfirmationToken(confTok);
+		confTok.setUser(user);
+		registeredUsersRepository.save(user);
+		confirmationTokenRepository.save(confTok);
+		
 		emailService.send(user);
 		registeredUsersRepository.save(user);
 		logger.info("< user saved");

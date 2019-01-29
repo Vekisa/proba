@@ -28,7 +28,7 @@ public class EmailSenderService {
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Complete Registration!");
         mailMessage.setFrom("bice10izise@gmail.com");
-        mailMessage.setText("localhost:8080/"+user.getId()+"/confirm-account");
+        mailMessage.setText("http://localhost:8080/users/registered/"+user.getConfirmationToken().getConfirmationToken()+"/confirm-account");
         this.sendEmail(mailMessage);
     }
 }

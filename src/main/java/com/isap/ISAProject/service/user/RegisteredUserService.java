@@ -18,10 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.user.AuthorizationLevel;
+import com.isap.ISAProject.model.user.ConfirmationToken;
 import com.isap.ISAProject.model.user.FriendRequest;
 import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
+import com.isap.ISAProject.repository.user.ConfirmationTokenRepository;
 import com.isap.ISAProject.repository.user.FriendRequestRepository;
 import com.isap.ISAProject.repository.user.FriendshipRepository;
 import com.isap.ISAProject.repository.user.RegisteredUserRepository;
@@ -41,6 +43,9 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	
 	@Autowired
 	private FriendRequestRepository friendRequestRepository;
+	
+	@Autowired 
+	private ConfirmationTokenRepository confirmationTokenRepository;
 	
 	@Override
 	public List<RegisteredUser> findAll(Pageable pageable) {
@@ -249,10 +254,15 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Method not implemented.");
 	}
 	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public RegisteredUser confirmAccount(String token) {
-		RegisteredUser user = this.findById(Long.parseLong(token));
-		user.setAuthority(AuthorizationLevel.REGULAR_USER);
-		return user;
+		ConfirmationToken confTok = confirmationTokenRepository.findByString(token);
+		if(confTok == null)
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Ne postoji user sa poslatim tokenom");
+		confTok.getUser().setAuthority(AuthorizationLevel.REGULAR_USER);
+		repository.save(confTok.getUser());
+		confirmationTokenRepository.save(confTok);
+		return confTok.getUser();
 	}
 	
 }
