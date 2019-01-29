@@ -17,7 +17,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.isap.ISAProject.model.airline.Destination;
+import com.isap.ISAProject.model.airline.Location;
 
 @Entity
 @Table(name = "branch_office")
@@ -37,7 +37,7 @@ public class BranchOffice {
 	
 	@JsonIgnore
 	@ManyToOne
-	private Destination location;
+	private Location location;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy="branchOffice")
@@ -90,5 +90,5 @@ public class BranchOffice {
 		this.version = version;
 	}
 
-	public void setLocation(Destination location) { this.location = location; }
+	public void setLocation(Location location) { this.location = location; }
 }

@@ -1,6 +1,5 @@
 package com.isap.ISAProject.model.airline;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -30,7 +29,7 @@ public class Airline extends Company {
 	
 	@JsonIgnore
 	@ManyToOne
-	private Destination location;
+	private Location location;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "airline")
@@ -47,14 +46,14 @@ public class Airline extends Company {
 	private List<CompanyAdmin> admins;
 	
 	public List<LuggageInfo> getLuggageInfos() { return luggageInfos; }
-
-	public List<Destination> getDestinations() { return new ArrayList<Destination>(); }
+	
+	public Location getLocation() { return this.location; }
 
 	public List<FlightConfiguration> getConfigurations() { return this.configurations; }
 
 	public List<FlightSeatCategory> getCategories() { return this.categories; }
 
-	public void setLocation(Destination location) { this.location = location; }
+	public void setLocation(Location location) { this.location = location; }
 	
 	public List<CompanyAdmin> getAdmins() { return this.admins; }
 	

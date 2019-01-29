@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.RentACar;
+import com.isap.ISAProject.model.user.CompanyAdmin;
 
 public interface RentACarServiceInterface {
 	List<RentACar> getAllRentACars(Pageable pageable);
@@ -23,4 +24,6 @@ public interface RentACarServiceInterface {
 	BranchOffice addBranchOffice(Long id, BranchOffice brOff);
 	
 	void deleteBranchOffice(Long id, BranchOffice brOff);
+
+	List<CompanyAdmin> getAdminsOfRentACar(Long id);
 }

@@ -10,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.airline.Airline;
@@ -27,6 +30,7 @@ public class LuggageInfoService implements LuggageInfoServiceInterface {
 	private LuggageInfoRepository repository;
 	
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<LuggageInfo> findAll(Pageable pageable) {
 		logger.info("> fetch luggage infos at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<LuggageInfo> luggageInfos = repository.findAll(pageable);
@@ -35,6 +39,7 @@ public class LuggageInfoService implements LuggageInfoServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public LuggageInfo findById(Long id) {
 		logger.info("> fetch luggage info with id {}", id);
 		Optional<LuggageInfo> luggageInfo = repository.findById(id);
@@ -44,6 +49,7 @@ public class LuggageInfoService implements LuggageInfoServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public LuggageInfo updateLuggageInfo(Long oldLuggageInfoId, LuggageInfo newLuggageInfo) {
 		logger.info("> updating luggage info with id {}", oldLuggageInfoId);
 		LuggageInfo oldLuggageInfo = this.findById(oldLuggageInfoId);
@@ -57,6 +63,7 @@ public class LuggageInfoService implements LuggageInfoServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void deleteLuggageInfo(Long luggageInfoId) {
 		logger.info("> deleting luggage info with id {}", luggageInfoId);
 		repository.deleteById(luggageInfoId);
@@ -64,6 +71,7 @@ public class LuggageInfoService implements LuggageInfoServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Airline getAirlineForLuggageInfo(Long luggageInfoId) {
 		logger.info("> fetching airline for luggage info with id {}", luggageInfoId);
 		LuggageInfo luggageInfo = this.findById(luggageInfoId);
@@ -74,6 +82,7 @@ public class LuggageInfoService implements LuggageInfoServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FlightSeat> getSeatsUsingLuggageInfo(Long luggageInfoId) {
 		logger.info("> fetching luggage infos for airline with id {}", luggageInfoId);
 		LuggageInfo luggageInfo = this.findById(luggageInfoId);

@@ -43,6 +43,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	private FriendRequestRepository friendRequestRepository;
 	
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<RegisteredUser> findAll(Pageable pageable) {
 		logger.info("> fetch users at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<RegisteredUser> users = repository.findAll(pageable);
@@ -51,6 +52,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public RegisteredUser findById(Long id) {
 		logger.info("> fetch user with id {}", id);
 		Optional<RegisteredUser> user = repository.findById(id);
@@ -65,7 +67,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	}
 	
 	@Override
-	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public RegisteredUser updateUser(Long oldUserId, RegisteredUser newUser) {
 		logger.info("> updating user with id {}", oldUserId);
 		RegisteredUser oldUser = this.findById(oldUserId);
@@ -83,6 +85,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<RegisteredUser> getFriends(Long id) {
 		logger.info("> fetching friends from user with id {}", id);
 		List<RegisteredUser> list = repository.findFriendsOfUser(id);
@@ -92,6 +95,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	}
 	
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FriendRequest> getReceivedFriendRequestsOfUser(Long id) {
 		logger.info("> fetching received friend requests of user with id {}", id);
 		RegisteredUser oldUser = this.findById(id);
@@ -102,6 +106,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FriendRequest> getSentFriendRequestOfUser(Long id) {
 		logger.info("> fetching sent friend requests of user with id {}", id);
 		RegisteredUser oldUser = this.findById(id);
@@ -120,7 +125,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	}
 	
 	@Override
-	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FriendRequest sendFriendRequest(Long sendingUserId, Long receivingUserId) {
 		logger.info("> sending friend request from user with id {} to user with id {}", sendingUserId, receivingUserId);
 		RegisteredUser sendingUser = this.findById(sendingUserId);
@@ -142,6 +147,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Friendship> getFriendshipsOfUser(Long userId) {
 		logger.info("> fetching friendships of user with id {}", userId);
 		RegisteredUser user = this.findById(userId);
@@ -161,7 +167,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	}
 	
 	@Override
-	@Transactional(readOnly = false, isolation = Isolation.REPEATABLE_READ)
+	@Transactional(readOnly = false, isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRED)
 	public Friendship acceptFriendRequest(Long recevingUserId, Long sendingUserId) {
 		logger.info("> accepting friend request of user with id {}", recevingUserId);
 		RegisteredUser friend1 = this.findById(sendingUserId);
@@ -181,7 +187,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	}
 	
 	@Override
-	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void declineFriendRequest(Long receivingUserId, Long sendingUserId) {
 		logger.info("> declining friend request receivied by user with id {} sent by user with id {}", receivingUserId, sendingUserId);
 		RegisteredUser sender = this.findById(sendingUserId);
@@ -197,7 +203,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	}
 	
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void removeFriend(Long self, Long friend) {
 		logger.info("> removing friend with id {} as user with id {} (self)", friend, self);
 		Friendship friendship = friendshipRepository.findFriendshipOf(self, friend);
@@ -206,6 +212,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Reservation> getActiveReservationsOfUser(Long id) {
 		logger.info("> fetching active reservations of user with id {}", id);
 		RegisteredUser user = this.findById(id);
@@ -216,6 +223,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Reservation> getReservationHistoryOfUser(Long id) {
 		logger.info("> fetching active reservations of user with id {}", id);
 		RegisteredUser user = this.findById(id);

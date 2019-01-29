@@ -31,6 +31,7 @@ public class TicketService implements TicketServiceInterface {
 	private TicketRepository repository;
 	
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Ticket> findAll(Pageable pageable) {
 		logger.info("> fetch tickets at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<Ticket> tickets = repository.findAll(pageable);
@@ -39,6 +40,7 @@ public class TicketService implements TicketServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Ticket findById(Long id) {
 		logger.info("> fetch ticket with id {}", id);
 		Optional<Ticket> ticket = repository.findById(id);
@@ -48,6 +50,7 @@ public class TicketService implements TicketServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Ticket saveTicket(Ticket ticket) {
 		logger.info("> saving ticket");
 		repository.save(ticket);
@@ -56,6 +59,7 @@ public class TicketService implements TicketServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void deleteTicket(Long ticketId) {
 		logger.info("> deleting ticket with id {}", ticketId);
 		// TODO : Kada je moguce obrisati kartu?
@@ -64,7 +68,7 @@ public class TicketService implements TicketServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightSeat addSeatToTicket(Long seatId, Long ticketId) {
 		logger.info("> adding seat to ticket with id {}", ticketId);
 		Ticket ticket = this.findById(ticketId);
@@ -87,6 +91,7 @@ public class TicketService implements TicketServiceInterface {
 	}
 	
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightSeat removeSeatFromTicket(Long seatId, Long ticketId) {
 		logger.info("> removing seat from ticket with id {}", ticketId);
 		Ticket ticket = this.findById(ticketId);
@@ -101,6 +106,7 @@ public class TicketService implements TicketServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FlightSeat> getSeatsOfTicket(Long ticketId) {
 		logger.info("> fetching seats for airline with id {}", ticketId);
 		Ticket ticket = this.findById(ticketId);
@@ -111,6 +117,7 @@ public class TicketService implements TicketServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Flight getFlightOfTicket(Long ticketId) {
 		logger.info("> fetching ticket of seat with id {}", ticketId);
 		Flight flight = repository.findFlightForTicketWithId(ticketId);

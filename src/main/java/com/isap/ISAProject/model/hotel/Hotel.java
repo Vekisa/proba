@@ -18,7 +18,7 @@ import org.hibernate.annotations.CascadeType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.Company;
-import com.isap.ISAProject.model.airline.Destination;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 
 @Entity
@@ -40,7 +40,7 @@ public class Hotel extends Company {
 	
 	@JsonIgnore
 	@ManyToOne
-	private Destination location;
+	private Location location;
 	
 	@Version
 	private Long version;
@@ -108,7 +108,9 @@ public class Hotel extends Company {
 		this.version = version;
 	}
 
-	public void setLocation(Destination location) { this.location = location; }
+	public void setLocation(Location location) { this.location = location; }
 	
 	public List<CompanyAdmin> getAdmins() { return this.admins; }
+
+	public Location getLocation() { return this.location; }
 }

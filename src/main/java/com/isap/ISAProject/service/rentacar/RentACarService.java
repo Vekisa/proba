@@ -10,12 +10,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.RentACar;
+import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.repository.rentacar.RentACarRepository;
 import com.isap.ISAProject.serviceInterface.rentacar.RentACarServiceInterface;
 
@@ -106,4 +108,15 @@ public class RentACarService implements RentACarServiceInterface {
 		logger.info("< branch office of rent-a-car with id {} deleted", id);
 	}
 
+	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public List<CompanyAdmin> getAdminsOfRentACar(Long id) {
+		logger.info("> fetching admins of rent-a-car with id {}", id);
+		RentACar rentACar = this.getRentACarById(id);
+		List<CompanyAdmin> list = rentACar.getAdmins();
+		logger.info("< admins fetched");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested admins do not exist.");
+	}
+	
 }

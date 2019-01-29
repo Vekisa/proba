@@ -12,7 +12,7 @@ import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.model.user.UsersAdmin;
 
-class HATEOASImplementor {
+public class HATEOASImplementorUsers {
 
 	public static Resource<RegisteredUser> createRegisteredUser(RegisteredUser registeredUser) {
 		Resource<RegisteredUser> resource = new Resource<RegisteredUser>(registeredUser);
@@ -22,7 +22,7 @@ class HATEOASImplementor {
 	public static List<Resource<RegisteredUser>> createRegisteredUserList(List<RegisteredUser> registeredUsers) {
 		List<Resource<RegisteredUser>> registeredUserList = new ArrayList<Resource<RegisteredUser>>();
 		for(RegisteredUser registeredUser : registeredUsers) {
-			registeredUserList.add(HATEOASImplementor.createRegisteredUser(registeredUser));
+			registeredUserList.add(HATEOASImplementorUsers.createRegisteredUser(registeredUser));
 		}
 		return registeredUserList;
 	}
@@ -35,7 +35,7 @@ class HATEOASImplementor {
 	public static List<Resource<Reservation>> createReservationList(List<Reservation> reservations) {
 		List<Resource<Reservation>> reservationList = new ArrayList<Resource<Reservation>>();
 		for(Reservation reservation : reservations) {
-			reservationList.add(HATEOASImplementor.createReservation(reservation));
+			reservationList.add(HATEOASImplementorUsers.createReservation(reservation));
 		}
 		return reservationList;
 	}
@@ -48,7 +48,7 @@ class HATEOASImplementor {
 	public static List<Resource<FriendRequest>> createFriendRequestList(List<FriendRequest> requests) {
 		List<Resource<FriendRequest>> requestList = new ArrayList<Resource<FriendRequest>>();
 		for(FriendRequest request : requests) {
-			requestList.add(HATEOASImplementor.createFriendRequest(request));
+			requestList.add(HATEOASImplementorUsers.createFriendRequest(request));
 		}
 		return requestList;
 	}
@@ -61,7 +61,7 @@ class HATEOASImplementor {
 	public static List<Resource<Friendship>> createFriendshipList(List<Friendship> friendships) {
 		List<Resource<Friendship>> requestList = new ArrayList<Resource<Friendship>>();
 		for(Friendship friendship : friendships) {
-			requestList.add(HATEOASImplementor.createFriendship(friendship));
+			requestList.add(HATEOASImplementorUsers.createFriendship(friendship));
 		}
 		return requestList;
 	}
@@ -74,5 +74,19 @@ class HATEOASImplementor {
 	public static Resource<UsersAdmin> createUsersAdmin(UsersAdmin admin) {
 		Resource<UsersAdmin> resource = new Resource<UsersAdmin>(admin);
 		return resource;
+	}
+
+	public static List<Resource<UsersAdmin>> createUsersAdminList(List<UsersAdmin> admins) {
+		List<Resource<UsersAdmin>> list = new ArrayList<Resource<UsersAdmin>>();
+		for(UsersAdmin admin : admins)
+			list.add(HATEOASImplementorUsers.createUsersAdmin(admin));
+		return list;
+	}
+
+	public static List<Resource<CompanyAdmin>> createCompanyAdminsList(List<CompanyAdmin> admins) {
+		List<Resource<CompanyAdmin>> list = new ArrayList<Resource<CompanyAdmin>>();
+		for(CompanyAdmin admin : admins)
+			list.add(HATEOASImplementorUsers.createCompanyAdmin(admin));
+		return list;
 	}
 }

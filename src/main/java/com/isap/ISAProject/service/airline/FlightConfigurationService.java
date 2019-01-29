@@ -10,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.airline.Airline;
@@ -27,6 +30,7 @@ public class FlightConfigurationService implements FlightConfigurationServiceInt
 	private FlightConfigurationRepository repository;
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FlightConfiguration> findAll(Pageable pageable) {
 		logger.info("> fetch configurations at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<FlightConfiguration> configurations = repository.findAll(pageable);
@@ -35,6 +39,7 @@ public class FlightConfigurationService implements FlightConfigurationServiceInt
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightConfiguration findById(Long id) {
 		logger.info("> fetch configuration with id {}", id);
 		Optional<FlightConfiguration> configuration = repository.findById(id);
@@ -44,6 +49,7 @@ public class FlightConfigurationService implements FlightConfigurationServiceInt
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void deleteConfiguration(Long configurationId) {
 		logger.info("> deleting configuration with id {}", configurationId);
 		repository.deleteById(configurationId);
@@ -51,6 +57,7 @@ public class FlightConfigurationService implements FlightConfigurationServiceInt
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FlightSegment> getSegmentsForConfiguration(Long configurationId) {
 		logger.info("> fetching flight segments for flight configuration with id {}", configurationId);
 		FlightConfiguration configuration = this.findById(configurationId);
@@ -61,6 +68,7 @@ public class FlightConfigurationService implements FlightConfigurationServiceInt
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightSegment createSegmentForConfiguration(FlightSegment segment, Long configurationId) {
 		logger.info("> adding flight segment to flight configuration with id {}", configurationId);
 		FlightConfiguration configuration = this.findById(configurationId);
@@ -73,6 +81,7 @@ public class FlightConfigurationService implements FlightConfigurationServiceInt
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Airline getAirlineForConfiguration(Long configurationId) {
 		logger.info("> fetching airline for configuration with id {}", configurationId);
 		FlightConfiguration configuration = this.findById(configurationId);

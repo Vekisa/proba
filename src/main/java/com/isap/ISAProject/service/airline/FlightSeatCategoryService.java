@@ -10,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.airline.Airline;
@@ -28,6 +31,7 @@ public class FlightSeatCategoryService implements FlightSeatCategoryServiceInter
 	private FlightSeatCategoryRepository repository;	
 	
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FlightSeatCategory> findAll(Pageable pageable) {
 		logger.info("> fetch categories at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<FlightSeatCategory> categories = repository.findAll(pageable);
@@ -36,6 +40,7 @@ public class FlightSeatCategoryService implements FlightSeatCategoryServiceInter
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightSeatCategory findById(Long id) {
 		logger.info("> fetch category with id {}", id);
 		Optional<FlightSeatCategory> category = repository.findById(id);
@@ -45,6 +50,7 @@ public class FlightSeatCategoryService implements FlightSeatCategoryServiceInter
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightSeatCategory updateFlightSeatCategory(Long oldCategoryId, FlightSeatCategory newCategory) {
 		logger.info("> updating category with id {}", oldCategoryId);
 		FlightSeatCategory oldCategory = this.findById(oldCategoryId);
@@ -56,6 +62,7 @@ public class FlightSeatCategoryService implements FlightSeatCategoryServiceInter
 	}
 
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void deleteFlightSeatCategory(Long categoryId) {
 		logger.info("> deleting category with id {}", categoryId);
 		repository.deleteById(categoryId);
@@ -63,6 +70,7 @@ public class FlightSeatCategoryService implements FlightSeatCategoryServiceInter
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FlightSeat> getSeatsInCategory(Long categoryId) {
 		logger.info("> fetching seats for category with id {}", categoryId);
 		FlightSeatCategory category = this.findById(categoryId);
@@ -73,6 +81,7 @@ public class FlightSeatCategoryService implements FlightSeatCategoryServiceInter
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FlightSegment> getSegmentsOfCategory(Long categoryId) {
 		logger.info("> fetching segments for category with id {}", categoryId);
 		FlightSeatCategory category = this.findById(categoryId);
@@ -83,6 +92,7 @@ public class FlightSeatCategoryService implements FlightSeatCategoryServiceInter
 	}
 
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Airline getAirlineOfCategory(Long categoryId) {
 		logger.info("> fetching airline for category with id {}", categoryId);
 		FlightSeatCategory category = this.findById(categoryId);

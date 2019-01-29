@@ -32,11 +32,11 @@ public class Flight {
 	
 	@JsonIgnore
 	@ManyToOne
-	private Destination startDestination;
+	private Location startDestination;
 
 	@JsonIgnore
 	@ManyToOne
-	private Destination finishDestination;
+	private Location finishDestination;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "flight", orphanRemoval = true)
@@ -89,17 +89,17 @@ public class Flight {
 
 	public void setTransfers(String transfers) { this.transfers = transfers; }
 
-	public void setStartDestination(Destination destination) { this.startDestination = destination; }
+	public void setStartDestination(Location destination) { this.startDestination = destination; }
 
-	public void setFinishDestination(Destination destination) { this.finishDestination = destination; }
+	public void setFinishDestination(Location destination) { this.finishDestination = destination; }
 
 	public  List<FlightSeat> getSeats() { return this.seats; }
 
 	public Long getId() { return this.id; }
 
-	public Destination getStartDestination() { return startDestination; }
+	public Location getStartDestination() { return startDestination; }
 
-	public Destination getFinishDestination() { return finishDestination; }
+	public Location getFinishDestination() { return finishDestination; }
 
 	public FlightConfiguration getConfiguration() { return configuration; }
 

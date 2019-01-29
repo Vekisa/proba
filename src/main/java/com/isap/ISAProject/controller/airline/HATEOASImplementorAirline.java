@@ -11,7 +11,7 @@ import javax.validation.Valid;
 import org.springframework.hateoas.Resource;
 
 import com.isap.ISAProject.model.airline.Airline;
-import com.isap.ISAProject.model.airline.Destination;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSeat;
@@ -21,7 +21,7 @@ import com.isap.ISAProject.model.airline.LuggageInfo;
 import com.isap.ISAProject.model.airline.Passenger;
 import com.isap.ISAProject.model.airline.Ticket;
 
-class HATEOASImplementor {
+public class HATEOASImplementorAirline {
 
 	/**
 	 * Linkovi koji će biti kreirani : na sebe, na sve aviokompanije, na svaku od svojih kolekcija
@@ -32,7 +32,6 @@ class HATEOASImplementor {
 		Resource<Airline> resource = new Resource<Airline>(airline);
 		resource.add(linkTo(methodOn(AirlineController.class).getAirlineById(airline.getId())).withRel("self"));
 		resource.add(linkTo(methodOn(AirlineController.class).getAllAirlines(null)).slash("?page=0&size=5").withRel("all-airlines"));
-		resource.add(linkTo(methodOn(AirlineController.class).getDestinationsForAirlineWithId(airline.getId())).withRel("airline-destinations"));
 		resource.add(linkTo(methodOn(AirlineController.class).getLuggageInfosForAirlineWithId(airline.getId())).withRel("airline-luggage-infos"));
 		resource.add(linkTo(methodOn(AirlineController.class).getFlightConfigurationsForAirlineWithId(airline.getId())).withRel("airline-flight-configurations"));
 		// TODO : Link za brze rezervacije
@@ -46,7 +45,7 @@ class HATEOASImplementor {
 	public static List<Resource<Airline>> createAirlinesList(List<Airline> airlines) {
 		List<Resource<Airline>> list = new ArrayList<Resource<Airline>>();
 		for(Airline a : airlines) {
-			list.add(HATEOASImplementor.createAirline(a));
+			list.add(HATEOASImplementorAirline.createAirline(a));
 		}
 		return list;
 	}
@@ -71,7 +70,7 @@ class HATEOASImplementor {
 	public static List<Resource<LuggageInfo>> createLuggageInfosList(List<LuggageInfo> luggageInfos) {
 		List<Resource<LuggageInfo>> list = new ArrayList<Resource<LuggageInfo>>();
 		for(LuggageInfo li : luggageInfos)
-			list.add(HATEOASImplementor.createLuggageInfo(li));
+			list.add(HATEOASImplementorAirline.createLuggageInfo(li));
 		return list;
 	}
 
@@ -80,10 +79,10 @@ class HATEOASImplementor {
 	 * @param destination
 	 * @return Resurs koji poštuje HATEOAS princip
 	 */
-	public static Resource<Destination> createDestination(Destination destination) {
-		Resource<Destination> resource = new Resource<Destination>(destination);
-		resource.add(linkTo(methodOn(DestinationController.class).getDestinationById(destination.getId())).withRel("self"));
-		resource.add(linkTo(methodOn(DestinationController.class).getAllDestinations(null)).slash("page=0&size=5").withRel("all-destinations"));
+	public static Resource<Location> createDestination(Location destination) {
+		Resource<Location> resource = new Resource<Location>(destination);
+		resource.add(linkTo(methodOn(LocationController.class).getDestinationById(destination.getId())).withRel("self"));
+		resource.add(linkTo(methodOn(LocationController.class).getAllDestinations(null)).slash("page=0&size=5").withRel("all-destinations"));
 		return resource;
 	}
 
@@ -91,10 +90,10 @@ class HATEOASImplementor {
 	 * @param destinations - Lista destinacija za koje se kreiraju linkovi
 	 * @return Lista resursa destinacija sa kreiranim linkovima
 	 */
-	public static List<Resource<Destination>> createDestinationsList( List<Destination> destinations) {
-		List<Resource<Destination>> list = new ArrayList<Resource<Destination>>();
-		for(Destination d : destinations)
-			list.add(HATEOASImplementor.createDestination(d));
+	public static List<Resource<Location>> createDestinationsList( List<Location> destinations) {
+		List<Resource<Location>> list = new ArrayList<Resource<Location>>();
+		for(Location d : destinations)
+			list.add(HATEOASImplementorAirline.createDestination(d));
 		return list;
 	}
 
@@ -120,7 +119,7 @@ class HATEOASImplementor {
 	public static List<Resource<FlightConfiguration>> createFlightConfigurationsList(List<FlightConfiguration> flightConfigurations) {
 		List<Resource<FlightConfiguration>> list = new ArrayList<Resource<FlightConfiguration>>();
 		for(FlightConfiguration fc : flightConfigurations)
-			list.add(HATEOASImplementor.createFlightConfiguration(fc));
+			list.add(HATEOASImplementorAirline.createFlightConfiguration(fc));
 		return list;
 	}
 
@@ -147,7 +146,7 @@ class HATEOASImplementor {
 			List<FlightSegment> flightSegments) {
 		List<Resource<FlightSegment>> list = new ArrayList<Resource<FlightSegment>>();
 		for(FlightSegment fs : flightSegments)
-			list.add(HATEOASImplementor.createFlightSegment(fs));
+			list.add(HATEOASImplementorAirline.createFlightSegment(fs));
 		return list;
 	}
 
@@ -174,7 +173,7 @@ class HATEOASImplementor {
 	public static List<Resource<Flight>> createFlightsList(List<Flight> flights) {
 		List<Resource<Flight>> list = new ArrayList<Resource<Flight>>();
 		for(Flight f : flights)
-			list.add(HATEOASImplementor.createFlight(f));
+			list.add(HATEOASImplementorAirline.createFlight(f));
 		return list;
 	}
 
@@ -202,7 +201,7 @@ class HATEOASImplementor {
 			List<FlightSeatCategory> flightSeatCategories) {
 		List<Resource<FlightSeatCategory>> list = new ArrayList<Resource<FlightSeatCategory>>();
 		for(FlightSeatCategory fsc : flightSeatCategories)
-			list.add(HATEOASImplementor.createFlightSeatCategory(fsc));
+			list.add(HATEOASImplementorAirline.createFlightSeatCategory(fsc));
 		return list;
 	}
 
@@ -230,7 +229,7 @@ class HATEOASImplementor {
 			List<FlightSeat> seats) {
 		List<Resource<FlightSeat>> list = new ArrayList<Resource<FlightSeat>>();
 		for(FlightSeat fs : seats)
-			list.add(HATEOASImplementor.createFlightSeat(fs));
+			list.add(HATEOASImplementorAirline.createFlightSeat(fs));
 		return list;
 	}
 
@@ -257,7 +256,7 @@ class HATEOASImplementor {
 			List<Ticket> tickets) {
 		List<Resource<Ticket>> list = new ArrayList<Resource<Ticket>>();
 		for(Ticket t : tickets)
-			list.add(HATEOASImplementor.createTicket(t));
+			list.add(HATEOASImplementorAirline.createTicket(t));
 		return list;
 	}
 
@@ -283,7 +282,7 @@ class HATEOASImplementor {
 	public static List<Resource<Passenger>> createPassengersList(List<Passenger> passengers) {
 		List<Resource<Passenger>> list = new ArrayList<Resource<Passenger>>();
 		for(Passenger p : passengers)
-			list.add(HATEOASImplementor.createPassenger(p));
+			list.add(HATEOASImplementorAirline.createPassenger(p));
 		return list;
 	}
 

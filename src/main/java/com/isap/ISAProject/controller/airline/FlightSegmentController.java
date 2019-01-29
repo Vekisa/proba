@@ -40,7 +40,7 @@ public class FlightSegmentController {
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni")
 	})
 	public ResponseEntity<List<Resource<FlightSegment>>> getAllFlightSegments(Pageable pageable) {
-			return new ResponseEntity<List<Resource<FlightSegment>>>(HATEOASImplementor.createFlightSegmentsList(service.findAll(pageable)), HttpStatus.OK);
+			return new ResponseEntity<List<Resource<FlightSegment>>>(HATEOASImplementorAirline.createFlightSegmentsList(service.findAll(pageable)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -51,7 +51,7 @@ public class FlightSegmentController {
 			@ApiResponse(code = 404, message = "Not Found. Segment (leta) sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FlightSegment>> getFlightSegmentWithId(@PathVariable("id") Long segmentId) {
-			return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementor.createFlightSegment(service.findById(segmentId)), HttpStatus.OK);
+			return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementorAirline.createFlightSegment(service.findById(segmentId)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -62,7 +62,7 @@ public class FlightSegmentController {
 			@ApiResponse(code = 404, message = "Not Found. Segment (leta) sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FlightSegment>> updateFlightSegmentWithId(@PathVariable("id") Long segmentId, @Valid @RequestBody FlightSegment newSegment) {
-			return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementor.createFlightSegment(service.updateSegment(segmentId, newSegment)), HttpStatus.OK);
+			return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementorAirline.createFlightSegment(service.updateSegment(segmentId, newSegment)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -86,7 +86,7 @@ public class FlightSegmentController {
 			@ApiResponse(code = 404, message = "Not Found. Segment sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FlightConfiguration>> getConfigurationForSegment(@PathVariable("id") Long id) {
-		return new ResponseEntity<Resource<FlightConfiguration>>(HATEOASImplementor.createFlightConfiguration(service.getConfigurationForSegment(id)), HttpStatus.OK);
+		return new ResponseEntity<Resource<FlightConfiguration>>(HATEOASImplementorAirline.createFlightConfiguration(service.getConfigurationForSegment(id)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}/category", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -98,7 +98,7 @@ public class FlightSegmentController {
 			@ApiResponse(code = 404, message = "Not Found. Segment sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<Resource<FlightSeatCategory>> getCategoryForSegment(@PathVariable("id") Long id) {
-		return new ResponseEntity<Resource<FlightSeatCategory>>(HATEOASImplementor.createFlightSeatCategory(service.getCategoryOfSegment(id)), HttpStatus.OK);
+		return new ResponseEntity<Resource<FlightSeatCategory>>(HATEOASImplementorAirline.createFlightSeatCategory(service.getCategoryOfSegment(id)), HttpStatus.OK);
 	}
 	
 }
