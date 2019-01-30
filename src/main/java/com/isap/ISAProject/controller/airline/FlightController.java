@@ -17,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Flight;
-import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSeat;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.service.airline.FlightService;
 
@@ -64,8 +63,8 @@ public class FlightController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili let nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Let sa traženim ID ne postoji.")
 	})
-	public ResponseEntity<Resource<Flight>> createFlightForAirline(@RequestBody @Valid Flight flight, @RequestParam("airline") Long id) {
-		return new ResponseEntity<Resource<Flight>>(HATEOASImplementorAirline.createFlight(service.createFlight(id, flight)), HttpStatus.CREATED);
+	public ResponseEntity<Resource<Flight>> createFlightForAirline(@RequestBody @Valid Flight flight, @RequestParam("airline") Long id, @RequestParam("destination") Long destinationId) {
+		return new ResponseEntity<Resource<Flight>>(HATEOASImplementorAirline.createFlight(service.createFlight(id, flight, destinationId)), HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -170,18 +169,6 @@ public class FlightController {
 	})
 	public ResponseEntity<Resource<Location>> getFinishDestinationForFlightWithId(@PathVariable("id") Long id) {
 		return new ResponseEntity<Resource<Location>>(HATEOASImplementorAirline.createDestination(service.getFinishDestinationOfFlight(id)), HttpStatus.OK);
-	}
-
-	@RequestMapping(value = "/{id}/configuration", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Vraća konfiguraciju datog leta.", notes = "Povratna vrednost servisa je konfiguracija leta.", httpMethod = "GET", produces = "application/json")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "OK", response = FlightConfiguration.class),
-			@ApiResponse(code = 204, message = "No Content. Letu nije pridružena konfiguracija."),
-			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
-			@ApiResponse(code = 404, message = "Not Found. Let sa prosleđenim ID ne postoji.")
-	})
-	public ResponseEntity<Resource<FlightConfiguration>> getFlightConfigurationForFlightWithId(@PathVariable("id") Long id) {
-		return new ResponseEntity<Resource<FlightConfiguration>>(HATEOASImplementorAirline.createFlightConfiguration(service.getConfigurationOfFlight(id)), HttpStatus.OK);
 	}
 
 }

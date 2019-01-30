@@ -36,10 +36,6 @@ public class FlightConfiguration {
 	@JsonIgnore
 	@ManyToOne
 	private Airline airline;
-
-	@JsonIgnore
-	@OneToMany(mappedBy = "configuration")
-	private List<Flight> flights;
 	
 	public void setAirline(Airline airline) { this.airline = airline; }
 
