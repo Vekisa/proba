@@ -1,14 +1,16 @@
 package com.isap.ISAProject.model.hotel;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -35,76 +37,33 @@ public class ExtraOption {
 	private Hotel hotel;
 	
 	@JsonIgnore
-	@ManyToOne
-	private RoomReservation roomReservation;
+	@ManyToMany(mappedBy = "extraOptions")
+	private List<RoomReservation> roomReservations;
 	
+	@JsonIgnore
 	@Version
 	private Long version;
 	
-	public ExtraOption() {
-		
-	}
+	public ExtraOption() { }
 
-	public Long getId() {
-		return id;
-	}
+	public Long getId() { return id; }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+	public double getPricePerDay() { return pricePerDay; }
 
-	public double getPricePerDay() {
-		return pricePerDay;
-	}
+	public void setPricePerDay(double pricePerDay) { this.pricePerDay = pricePerDay; }
 
-	public void setPricePerDay(double pricePerDay) {
-		this.pricePerDay = pricePerDay;
-	}
+	public String getDescription() { return description; }
 
-	public String getDescription() {
-		return description;
-	}
+	public void setDescription(String description) { this.description = description; }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+	public double getDiscount() { return discount; }
 
-	public double getDiscount() {
-		return discount;
-	}
+	public void setDiscount(double discount) { this.discount = discount; }
 
-	public void setDiscount(double discount) {
-		this.discount = discount;
-	}
+	public Hotel getHotel() { return hotel; }
 
-	public Hotel getHotel() {
-		return hotel;
-	}
+	public void setHotel(Hotel hotel) { this.hotel = hotel; }
 
-	public void setHotel(Hotel hotel) {
-		this.hotel = hotel;
-	}
-
-	public Long getVersion() {
-		return version;
-	}
-
-	public void setVersion(Long version) {
-		this.version = version;
-	}
-
-	public RoomReservation getRoomReservation() {
-		return roomReservation;
-	}
-
-	public void setRoomReservation(RoomReservation roomReservation) {
-		this.roomReservation = roomReservation;
-	}
-	
-	public void copyFieldsFrom(@Valid ExtraOption newExtraOption) {
-		this.setPricePerDay(newExtraOption.getPricePerDay());
-		this.setDescription(newExtraOption.getDescription());
-		this.setDiscount(newExtraOption.getDiscount());
-	}
+	public List<RoomReservation> getRoomReservations() { return this.roomReservations; }
 
 }

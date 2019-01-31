@@ -18,8 +18,8 @@ public interface FlightConfigurationServiceInterface {
 	
 	List<FlightSegment> getSegmentsForConfiguration(Long configurationId);
 	
-	FlightSegment createSegmentForConfiguration(FlightSegment segment, Long configurationId);
-	
 	Airline getAirlineForConfiguration(Long configurationId);
+
+	FlightSegment createSegmentForConfiguration(FlightSegment segment, Long configurationId, Long categoryId);
 	
 }

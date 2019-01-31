@@ -59,5 +59,7 @@ public class FlightSegment {
 	public FlightConfiguration getConfiguration() { return this.configuration; }
 	
 	public FlightSeatCategory getCategory() { return this.category; }
+
+	public void setCategory(FlightSeatCategory category) { this.category = category; }
 	
 }

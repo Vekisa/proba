@@ -43,10 +43,6 @@ public class Flight {
 	@Cascade(CascadeType.ALL)
 	private List<FlightSeat> seats;
 
-	@JsonIgnore
-	@ManyToOne
-	private FlightConfiguration configuration;
-
 	@Column(nullable = true)
 	private String transfers;
 
@@ -104,10 +100,6 @@ public class Flight {
 	public Location getStartDestination() { return startDestination; }
 
 	public Location getFinishDestination() { return finishDestination; }
-
-	public FlightConfiguration getConfiguration() { return configuration; }
-
-	public void setConfiguration(FlightConfiguration configuration) { this.configuration = configuration; }
 
 	public void setAirline(Airline airline) { this.airline = airline;}
 	

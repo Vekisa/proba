@@ -17,8 +17,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
+import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.FlightSegment;
 import com.isap.ISAProject.repository.airline.FlightConfigurationRepository;
+import com.isap.ISAProject.repository.airline.FlightSeatCategoryRepository;
+import com.isap.ISAProject.repository.airline.FlightSegmentRepository;
 import com.isap.ISAProject.serviceInterface.airline.FlightConfigurationServiceInterface;
 
 @Service
@@ -29,6 +32,12 @@ public class FlightConfigurationService implements FlightConfigurationServiceInt
 	@Autowired
 	private FlightConfigurationRepository repository;
 
+	@Autowired
+	private FlightSeatCategoryRepository categoriesRepository;
+	
+	@Autowired
+	private FlightSegmentRepository segmentsRepository;
+	
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FlightConfiguration> findAll(Pageable pageable) {
@@ -69,15 +78,27 @@ public class FlightConfigurationService implements FlightConfigurationServiceInt
 
 	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	public FlightSegment createSegmentForConfiguration(FlightSegment segment, Long configurationId) {
+	public FlightSegment createSegmentForConfiguration(FlightSegment segment, Long configurationId, Long categoryId) {
 		logger.info("> adding flight segment to flight configuration with id {}", configurationId);
 		FlightConfiguration configuration = this.findById(configurationId);
+		FlightSeatCategory category = this.findCategory(categoryId);
+		if(!configuration.getAirline().equals(category.getAirline()))
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Configuration and category don't belong to the same airline.");
 		checkForOverlapping(configuration, segment);
-		configuration.getSegments().add(segment);
+		checkForContinuity(configuration, segment);
 		segment.setConfiguration(configuration);
-		repository.save(configuration);
+		segment.setCategory(category);
+		segmentsRepository.save(segment);
 		logger.info("< flight segment added");
 		return segment;
+	}
+
+	private FlightSeatCategory findCategory(Long id) {
+		logger.info("> fetching category with id {}", id);
+		Optional<FlightSeatCategory> category = categoriesRepository.findById(id);
+		logger.info("< category fetched");
+		if(category.isPresent()) return category.get();
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested category doesn't exist.");
 	}
 
 	@Override
@@ -102,6 +123,13 @@ public class FlightConfigurationService implements FlightConfigurationServiceInt
 		for(FlightSegment fs : configuration.getSegments())
 			if(segmentOverlapsWithAnother(fs, segment)) 
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Flight segment overlaps with existing flight segments.");
+	}
+	
+	private void checkForContinuity(FlightConfiguration configuration, FlightSegment segment) {
+		for(FlightSegment fs : configuration.getSegments())
+			if(fs.getEndRow() + 1 == segment.getStartRow())
+				return;
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Flight segment needs to be connected to existing flight segments");
 	}
 
 }

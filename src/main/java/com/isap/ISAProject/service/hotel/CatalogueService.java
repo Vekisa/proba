@@ -19,6 +19,7 @@ import com.isap.ISAProject.model.hotel.Catalogue;
 import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.repository.hotel.CatalogueRepository;
+import com.isap.ISAProject.repository.hotel.RoomTypeRepository;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,6 +29,9 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
 	private CatalogueRepository catalogueRepository;
+
+	@Autowired
+	private RoomTypeRepository roomTypeRepository;
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Catalogue findById(long id) {
@@ -71,7 +75,6 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 	public Catalogue updateCatalogueById(Long catalogueId, Catalogue newCatalogue) {
 		logger.info("> Catalogue update");
 		Catalogue oldCatalogue = this.findById(catalogueId);
-		oldCatalogue.copyFieldsFrom(newCatalogue);
 		catalogueRepository.save(oldCatalogue);
 		logger.info("< Catalogue update");
 		return oldCatalogue;
@@ -81,7 +84,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 	public List<RoomType> getRoomTypes(Long id){
 		logger.info("> get room-types for catalogue");
 		Catalogue catalogue = this.findById(id);
-		List<RoomType> roomTypeList = catalogue.getRoomType();
+		List<RoomType> roomTypeList = catalogue.getRoomTypes();
 		logger.info("< get room-types for catalogue");
 		if(!roomTypeList.isEmpty())
 			return roomTypeList;
@@ -93,21 +96,20 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 	public RoomType createRoomType(Long catalogueId, RoomType roomType){
 		logger.info("> create room-type for catalogue");
 		Catalogue catalogue = this.findById(catalogueId);
-		catalogue.getRoomType().add(roomType);
 		roomType.setCatalogue(catalogue);
-		this.save(catalogue);
+		roomTypeRepository.save(roomType);
 		logger.info("< create room-type for catalogue");
 		return roomType;
 	}
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
-	public Hotel getHotel(Long catalogueId) {
+	public List<Hotel> getHotels(Long catalogueId) {
 		logger.info("> hotel from catalogue", catalogueId);
 		Catalogue catalogue = this.findById(catalogueId);
-		Hotel hotel = catalogue.getHotel();
+		List<Hotel> hotels = catalogue.getHotels();
 		logger.info("< hotel from catalogue");
-		if(hotel != null)
-			return hotel;
+		if(!hotels.isEmpty())
+			return hotels;
 		else
 			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Hotel za dati cenovnik nije postavljen");
 	}

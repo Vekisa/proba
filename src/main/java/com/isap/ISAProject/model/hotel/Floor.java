@@ -12,7 +12,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -28,91 +27,32 @@ public class Floor {
 	@Column(nullable = false)
 	private int number;
 	
-	@Column(nullable = false)
-	private int numberOfRows;
-	
-	@Column(nullable = false)
-	private int numberOfColumns;
-	
 	@JsonIgnore
 	@ManyToOne
 	private Hotel hotel;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy="floor")
-	private List<Room> room;
+	private List<Room> rooms;
 	
+	@JsonIgnore
 	@Version
 	private Long version;
 	
 	public Floor() {
-		room = new ArrayList<>();
+		rooms = new ArrayList<>();
 	}
 
-	public Long getId() {
-		return id;
-	}
+	public Long getId() { return id; }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+	public int getNumber() { return number; }
 
-	public int getNumber() {
-		return number;
-	}
+	public void setNumber(int number) { this.number = number; }
 
-	public void setNumber(int number) {
-		this.number = number;
-	}
+	public List<Room> getRooms() { return this.rooms; }
 
-	public int getNumberOfRows() {
-		return numberOfRows;
-	}
+	public Hotel getHotel() { return hotel; }
 
-	public void setNumberOfRows(int numberOfRows) {
-		this.numberOfRows = numberOfRows;
-	}
+	public void setHotel(Hotel hotel) { this.hotel = hotel; }
 
-	public int getNumberOfColumns() {
-		return numberOfColumns;
-	}
-
-	public void setNumberOfColumns(int numberOfColumns) {
-		this.numberOfColumns = numberOfColumns;
-	}
-
-	public List<Room> getRoom() {
-		return room;
-	}
-
-	public void setRoom(List<Room> room) {
-		this.room = room;
-	}
-
-	public Hotel getHotel() {
-		return hotel;
-	}
-
-	public void setHotel(Hotel hotel) {
-		this.hotel = hotel;
-	}
-	
-	public Long getVersion() {
-		return version;
-	}
-
-	public void setVersion(Long version) {
-		this.version = version;
-	}
-
-	public void copyFieldsFrom(@Valid Floor newFloor) {
-		this.setNumber(newFloor.getNumber());
-		this.setNumberOfColumns(newFloor.getNumberOfColumns());
-		this.setNumberOfRows(newFloor.getNumberOfRows());
-	}
-	
-	public void add(@Valid Room room) {
-		this.getRoom().add(room);
-		room.setFloor(this);
-	}
 }

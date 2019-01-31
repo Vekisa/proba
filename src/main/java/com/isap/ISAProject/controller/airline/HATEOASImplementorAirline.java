@@ -139,7 +139,6 @@ public class HATEOASImplementorAirline {
 		resource.add(linkTo(methodOn(FlightController.class).getAllFlights(null)).slash("page=0%size=5").withRel("all-flights"));
 		resource.add(linkTo(methodOn(FlightController.class).getStartDestinationForFlightWithId(flight.getId())).withRel("start-destination"));
 		resource.add(linkTo(methodOn(FlightController.class).getFinishDestinationForFlightWithId(flight.getId())).withRel("finish-destination"));
-		resource.add(linkTo(methodOn(FlightController.class).getFlightConfigurationForFlightWithId(flight.getId())).withRel("configuration"));
 		resource.add(linkTo(methodOn(FlightController.class).getFlightSeatsForFlightWithId(flight.getId())).withRel("seats"));
 		return resource;
 	}

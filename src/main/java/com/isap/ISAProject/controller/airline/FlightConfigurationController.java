@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.airline.Airline;
@@ -85,8 +86,8 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili segment nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija leta sa prosleđenim ID ne postoji.")
 	})
-	public ResponseEntity<Resource<FlightSegment>> createSegmentForConfigurationWithId(@PathVariable("id") Long configurationId, @Valid @RequestBody FlightSegment flightSegment) {
-		return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementorAirline.createFlightSegment(service.createSegmentForConfiguration(flightSegment, configurationId)), HttpStatus.CREATED);
+	public ResponseEntity<Resource<FlightSegment>> createSegmentForConfigurationWithId(@PathVariable("id") Long configurationId, @Valid @RequestBody FlightSegment flightSegment, @RequestParam("category") Long categoryId) {
+		return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementorAirline.createFlightSegment(service.createSegmentForConfiguration(flightSegment, configurationId, categoryId)), HttpStatus.CREATED);
 	}
 
 

@@ -12,7 +12,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import javax.validation.Valid;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -43,69 +42,30 @@ public class Room extends RatableEntity {
 	@JsonIgnore
 	@OneToMany(mappedBy="room")
 	@Cascade(CascadeType.ALL)
-	private List<RoomReservation> roomReservation;
+	private List<RoomReservation> roomReservations;
 	
+	@JsonIgnore
 	@Version
 	private Long version;
 	
 	public Room() {
-		roomReservation = new ArrayList<>();
+		roomReservations = new ArrayList<>();
 	}
 
-	public Long getId() {
-		return id;
-	}
+	public Long getId() { return id; }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+	public int getNumberOfBeds() { return numberOfBeds; }
 
-	public int getNumberOfBeds() {
-		return numberOfBeds;
-	}
+	public void setNumberOfBeds(int numberOfBeds) { this.numberOfBeds = numberOfBeds; }
 
-	public void setNumberOfBeds(int numberOfBeds) {
-		this.numberOfBeds = numberOfBeds;
-	}
+	public Floor getFloor() { return floor; }
 
-	public Floor getFloor() {
-		return floor;
-	}
+	public void setFloor(Floor floor) { this.floor = floor; }
 
-	public void setFloor(Floor floor) {
-		this.floor = floor;
-	}
+	public RoomType getRoomType() { return roomType; }
 
-	public RoomType getRoomType() {
-		return roomType;
-	}
+	public void setRoomType(RoomType roomType) { this.roomType = roomType; }
 
-	public void setRoomType(RoomType roomType) {
-		this.roomType = roomType;
-	}
-
-	public List<RoomReservation> getRoomReservation() {
-		return roomReservation;
-	}
-
-	public void setRoomReservation(List<RoomReservation> roomReservation) {
-		this.roomReservation = roomReservation;
-	}
-
-	public Long getVersion() {
-		return version;
-	}
-
-	public void setVersion(Long version) {
-		this.version = version;
-	}
-
-	public void copyFieldsFrom(@Valid Room newRoom) {
-		this.setNumberOfBeds(newRoom.getNumberOfBeds());
-	}
+	public List<RoomReservation> getRoomReservations() { return roomReservations; }
 	
-	public void add(@Valid RoomReservation roomReservation) {
-		this.getRoomReservation().add(roomReservation);
-		roomReservation.setRoom(this);
-	}
 }

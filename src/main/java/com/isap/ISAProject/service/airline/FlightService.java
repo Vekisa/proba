@@ -67,16 +67,31 @@ public class FlightService implements FlightServiceInterface {
 	
 	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	public Flight createFlight(Long airlineId, Flight flight) {
+	public Flight createFlight(Long airlineId, Flight flight, Long destinationId) {
 		logger.info("> creating flight for airline with id {}", airlineId);
 		Airline airline = this.findAirline(airlineId);
+		Location destination = this.findLocation(destinationId);
+		Location location = airline.getLocation();
 		flight.setAirline(airline);
-		flight.setStartDestination(airline.getLocation());
+		flight.setStartDestination(location);
+		flight.setFinishDestination(destination);
+		location.getFlightsFromHere().add(flight);
+		destination.getFlightsToHere().add(flight);
 		repository.save(flight);
+		locationRepository.save(location);
+		locationRepository.save(destination);
 		logger.info("< created flight");
 		return flight;
 	}
 
+	private Location findLocation(Long id) {
+		logger.info("> fetching location with id {}", id);
+		Optional<Location> location = locationRepository.findById(id);
+		logger.info("< location fetched");
+		if(location.isPresent()) return location.get();
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested location doesn't exist.");
+	}
+	
 	private Airline findAirline(Long airlineId) {
 		logger.info("> fetching airline with id {}", airlineId);
 		Optional<Airline> airline = airlineRepository.findById(airlineId);
@@ -177,17 +192,25 @@ public class FlightService implements FlightServiceInterface {
 	public Flight setConfigurationToFlight(Long configurationId, Long flightId) {
 		logger.info("> setting configuration to flight with id {}", flightId);
 		Flight flight = this.findById(flightId);
-		Optional<FlightConfiguration> configuration = configurationRepository.findById(configurationId);
-		if(!configuration.isPresent()) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested configuration doesn't exist.");
-		setConfigurationToFlight(configuration.get(), flight);
+		FlightConfiguration configuration = this.findConfiguration(configurationId);
+		if(!flight.getAirline().equals(configuration.getAirline())) 
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested configuration doesn't belong to the same airline.");
+		setConfigurationToFlight(configuration, flight);
 		repository.save(flight);
 		logger.info("< configuration set");
 		return flight;
 	}
+	
+	private FlightConfiguration findConfiguration(Long id) {
+		logger.info("> fetching configuration with id {}", id);
+		Optional<FlightConfiguration> configuration = configurationRepository.findById(id);
+		logger.info("< configuration fetched");
+		if(configuration.isPresent()) return configuration.get();
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested configuration doesn't exist.");
+	}
 
 	private void setConfigurationToFlight(FlightConfiguration configuration, Flight flight) {
-		if(flight.getConfiguration() != null) checkAndRemoveAllSeats(flight);
-		flight.setConfiguration(configuration);
+		checkAndRemoveAllSeats(flight);
 		for(FlightSegment fs : configuration.getSegments())
 			for(int i = fs.getStartRow(); i <= fs.getEndRow(); i++)
 				for(int j = 1; j <= fs.getColumns(); j++) {
@@ -197,17 +220,6 @@ public class FlightService implements FlightServiceInterface {
 					seat.setCategory(fs.getCategory());
 					flight.getSeats().add(seat);
 				}
-	}
-
-	@Override
-	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	public FlightConfiguration getConfigurationOfFlight(Long flightId) {
-		logger.info("> fetching configuration of flight with id {}", flightId);
-		Flight flight = this.findById(flightId);
-		FlightConfiguration configuration = flight.getConfiguration();
-		logger.info("< configuration fetched");
-		if(configuration != null) return configuration;
-		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Request configuration doesn't exist.");
 	}
 
 	@Override

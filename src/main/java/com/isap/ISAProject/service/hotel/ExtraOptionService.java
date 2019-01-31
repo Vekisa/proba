@@ -71,20 +71,22 @@ public class ExtraOptionService {
 	public ExtraOption updateExtraOptionById(Long extraOptionId, ExtraOption newExtraOption) {
 		logger.info("> Extra-option update");
 		ExtraOption oldExtraOption = this.findById(extraOptionId);
-		oldExtraOption.copyFieldsFrom(newExtraOption);
+		oldExtraOption.setPricePerDay(newExtraOption.getPricePerDay());
+		oldExtraOption.setDescription(newExtraOption.getDescription());
+		oldExtraOption.setDiscount(newExtraOption.getDiscount());
 		extraOptionRepository.save(oldExtraOption);
 		logger.info("< Extra-option update");
 		return oldExtraOption;
 	}
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
-	public RoomReservation getRoomReservation(Long extraOptionId) {
-		logger.info("> room-reservation from extra-option", extraOptionId);
+	public List<RoomReservation> getRoomReservation(Long extraOptionId) {
+		logger.info("> room-reservations from extra-option", extraOptionId);
 		ExtraOption extraOption = this.findById(extraOptionId);
-		RoomReservation roomReservation = extraOption.getRoomReservation();
-		logger.info("< room-reservation from extra-option");
-		if(roomReservation != null)
-			return roomReservation;
+		List<RoomReservation> roomReservations = extraOption.getRoomReservations();
+		logger.info("< room-reservations from extra-option");
+		if(!roomReservations.isEmpty())
+			return roomReservations;
 		else
 			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Rezervacija sobe za dati extra-option nije postavljen");
 	}

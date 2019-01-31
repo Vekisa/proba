@@ -20,6 +20,7 @@ public class GlobalExceptionController {
 		if(ex instanceof ResponseStatusException) {
 			if(((ResponseStatusException) ex).getStatus().equals(HttpStatus.NOT_FOUND)) return ResponseEntity.notFound().header("message", ((ResponseStatusException) ex).getReason()).build();
 			if(((ResponseStatusException) ex).getStatus().equals(HttpStatus.NO_CONTENT)) return ResponseEntity.noContent().header("message", ((ResponseStatusException) ex).getReason()).build();
+			if(((ResponseStatusException) ex).getStatus().equals(HttpStatus.BAD_REQUEST)) return ResponseEntity.badRequest().header("message", ((ResponseStatusException) ex).getReason()).build();
 		}
 		if(ex instanceof DataIntegrityViolationException) return ResponseEntity.badRequest().header("message", "Value already exists.").build();
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

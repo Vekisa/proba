@@ -28,14 +28,12 @@ public interface FlightServiceInterface {
 	
 	Flight setConfigurationToFlight(Long configurationId, Long flightId);
 	
-	FlightConfiguration getConfigurationOfFlight(Long flightId);
-	
 	Flight setFinishDestinationForFlight(Long destinationId, Long flightId);
 	
 	Location getStartDestinationOfFlight(Long flightId);
 	
 	Location getFinishDestinationOfFlight(Long flightId);
 
-	Flight createFlight(Long airlineId, Flight flight);
+	Flight createFlight(Long airlineId, Flight flight, Long destinationId);
 	
 }

@@ -19,6 +19,7 @@ import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.repository.hotel.FloorRepository;
+import com.isap.ISAProject.repository.hotel.RoomRepository;
 
 @Service
 @Transactional(readOnly = true)
@@ -29,6 +30,9 @@ public class FloorService {
 	@Autowired
 	private FloorRepository floorRepository;
 	
+	@Autowired
+	private RoomRepository roomRepository;
+	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Floor findById(long id) {
 		logger.info("> Floor findById id:{}", id);
@@ -37,7 +41,7 @@ public class FloorService {
 		if(floor.isPresent())
 			return floor.get();
 		else 
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hotel sa zadatim id-em ne postoji");
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sprat sa zadatim id-em ne postoji");
 	}
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
@@ -71,7 +75,7 @@ public class FloorService {
 	public Floor updateFloorById(Long floorId, Floor newFloor) {
 		logger.info("> Floor update");
 		Floor oldFloor = this.findById(floorId);
-		oldFloor.copyFieldsFrom(newFloor);
+		oldFloor.setNumber(newFloor.getNumber());
 		floorRepository.save(oldFloor);
 		logger.info("< Floor update");
 		return oldFloor;
@@ -81,7 +85,7 @@ public class FloorService {
 	public List<Room> getRooms(Long id){
 		logger.info("> get rooms for floor");
 		Floor floor = this.findById(id);
-		List<Room> roomList = floor.getRoom();
+		List<Room> roomList = floor.getRooms();
 		logger.info("< get rooms for floor");
 		if(!roomList.isEmpty())
 			return roomList ;
@@ -93,9 +97,9 @@ public class FloorService {
 	public Room createRoom(Long floorId, Room room){
 		logger.info("> create room for floor");
 		Floor floor = this.findById(floorId);
-		floor.getRoom().add(room);
+		room.setRating(0);
 		room.setFloor(floor);
-		this.save(floor);
+		roomRepository.save(room);
 		logger.info("< create room for floor");
 		return room;
 	}
