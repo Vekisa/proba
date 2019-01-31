@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.hotel.Floor;
@@ -97,6 +98,11 @@ public class RoomController {
 	public ResponseEntity<Resource<Room>> updateRoomWithId(@PathVariable(value = "id") Long roomId,
 			@Valid @RequestBody Room newRoom) {
 			return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(roomService.updateRoomById(roomId, newRoom)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/type", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<Room>> setRoomTypeForRoom(@PathVariable("id") Long id, @RequestParam("roomtype") Long roomTypeId) {
+		return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(roomService.setRoomTypeForRoom(roomTypeId, id)), HttpStatus.OK);
 	}
 	
 	//Vraca rezervacije za datu sobu

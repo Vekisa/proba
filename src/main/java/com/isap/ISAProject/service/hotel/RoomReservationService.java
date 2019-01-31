@@ -3,6 +3,7 @@ package com.isap.ISAProject.service.hotel;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.isap.ISAProject.model.hotel.ExtraOption;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
+import com.isap.ISAProject.repository.hotel.ExtraOptionRepository;
 import com.isap.ISAProject.repository.hotel.RoomReservationRepository;
 
 @Service
@@ -29,6 +31,9 @@ public class RoomReservationService {
 	
 	@Autowired
 	private RoomReservationRepository roomReservationRepository;
+	
+	@Autowired
+	private ExtraOptionRepository optionsRepository;
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public RoomReservation findById(long id) {
@@ -78,6 +83,9 @@ public class RoomReservationService {
 		if(room!= null && !checkIfRoomIsFree(newRoomReservation.getBeginDate(), oldRoomReservation.getEndDate(), room))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba nije slobodna u tom periodu");	
 		oldRoomReservation.copyFieldsFrom(newRoomReservation);
+		Long difference = oldRoomReservation.getEndDate().getTime() - oldRoomReservation.getBeginDate().getTime();
+		oldRoomReservation.setNumberOfNights((int) TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS));
+		recalculateReservationPrice(oldRoomReservation);
 		roomReservationRepository.save(oldRoomReservation);
 		logger.info("< Rezervacija sobe update");
 		return oldRoomReservation;
@@ -100,12 +108,53 @@ public class RoomReservationService {
 		logger.info("> create extra-option for room-resevration");
 		RoomReservation roomReservation = this.findById(roomReservationId);
 		roomReservation.getExtraOptions().add(extraOption);
-		extraOption.setRoomReservation(roomReservation);
+		extraOption.getRoomReservations().add(roomReservation);
 		this.save(roomReservation);
 		logger.info("< create extra-option for room-resevration");
 		return extraOption;
 	}
 	
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
+	public ExtraOption addExtraOption(Long id, Long extraOptionId) {
+		logger.info("> adding extra option to room with id {}", id);
+		RoomReservation roomReservation = this.findById(id);
+		ExtraOption option = this.findExtraOption(extraOptionId);
+		if(!roomReservation.getRoom().getFloor().getHotel().equals(option.getHotel()))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Room and options don't belong to the same hotel.");
+		logger.info("< extra option added");
+		roomReservation.getExtraOptions().add(option);
+		recalculateReservationPrice(roomReservation);
+		this.save(roomReservation);
+		return option;
+	}
+	
+	private void recalculateReservationPrice(RoomReservation roomReservation) {
+		roomReservation.setPrice(roomReservation.getRoom().getRoomType().getPricePerNight() * roomReservation.getNumberOfNights());
+		for(ExtraOption eo : roomReservation.getExtraOptions())
+			roomReservation.setPrice(roomReservation.getPrice() + eo.getPricePerDay() * roomReservation.getNumberOfNights());
+	}
+
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
+	public void removeExtraOption(Long id, Long extraOptionId) {
+		logger.info("> removing extra option from room with id {}", id);
+		RoomReservation roomReservation = this.findById(id);
+		ExtraOption option = this.findExtraOption(extraOptionId);
+		if(!roomReservation.getExtraOptions().contains(option))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Option doesn't belong to reservation.");
+		logger.info("< extra option removed");
+		roomReservation.getExtraOptions().remove(option);
+		recalculateReservationPrice(roomReservation);
+		this.save(roomReservation);
+	}
+	
+	private ExtraOption findExtraOption(Long extraOptionId) {
+		logger.info("> fetching extra option with id {}", extraOptionId);
+		Optional<ExtraOption> option = optionsRepository.findById(extraOptionId);
+		logger.info("< extra option fetched");
+		if(option.isPresent()) return option.get();
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested extra option doesn't exist.");
+		}
+
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public Room getRoom(Long roomReservationId) {
 		logger.info("> room from room-reservation", roomReservationId);
@@ -121,7 +170,7 @@ public class RoomReservationService {
 	public boolean checkIfRoomIsFree(Date start, Date end, Room room) {
 		Date reservedStart = null;
 		Date reservedEnd = null;
-		for(RoomReservation roomReservation :room.getRoomReservation()) {
+		for(RoomReservation roomReservation :room.getRoomReservations()) {
 			reservedStart = roomReservation.getBeginDate();
 			reservedEnd = roomReservation.getEndDate();
 			if((start.after(reservedStart) && start.before(reservedEnd)) || (end.after(reservedStart) && end.before(reservedEnd)))

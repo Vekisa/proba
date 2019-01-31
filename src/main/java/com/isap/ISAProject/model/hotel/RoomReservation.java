@@ -8,12 +8,17 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.Valid;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.user.Reservation;
@@ -42,18 +47,26 @@ public class RoomReservation {
 	@Column(nullable = false)
 	private int numberOfRooms;
 	
+	@Column(nullable = false)
+	private double price;
+	
 	@JsonIgnore
 	@ManyToOne
 	private Room room;
 	
 	@JsonIgnore
-	@OneToMany(mappedBy = "roomReservation")
+	@Cascade({CascadeType.PERSIST, CascadeType.MERGE})
+	@ManyToMany
+	@JoinTable(name = "options_for_rooms",
+			   joinColumns = { @JoinColumn(name = "reservation_id") },
+			   inverseJoinColumns = { @JoinColumn(name = "option_id")} )
 	private List<ExtraOption> extraOptions;
 	
 	@JsonIgnore
 	@OneToOne
 	private Reservation reservation;
 	
+	@JsonIgnore
 	@Version
 	private Long version;
 	
@@ -151,6 +164,14 @@ public class RoomReservation {
 
 	public void add(@Valid ExtraOption extraOption) {
 		this.getExtraOptions().add(extraOption);
-		extraOption.setRoomReservation(this);
+		//extraOption.setRoomReservation(this);
+	}
+
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
 	}
 }

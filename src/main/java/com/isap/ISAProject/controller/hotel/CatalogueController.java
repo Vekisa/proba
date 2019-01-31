@@ -127,14 +127,14 @@ public class CatalogueController {
 	
 	//vraca hotel od prosledjenog cenovnika
 	@RequestMapping(value = "/{id}/hotel", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Vraca hotel.", notes = "Povratna vrednost servisa je hotel kome cenovnik", httpMethod = "GET", produces = "application/json")
+	@ApiOperation(value = "Vraca hotele..", notes = "Povratna vrednost servisa su hoteli koji koriste cenovnik.", httpMethod = "GET", produces = "application/json")
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "OK", response = Hotel.class),
+			@ApiResponse(code = 200, message = "OK", response = List.class),
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request"),
 			@ApiResponse(code = 404, message = "Not Found")
 	})
-	public ResponseEntity<Resource<Hotel>> getHotelForCatalogueWithId(@PathVariable("id") Long catalogueId) {
-				return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(catalogueService.getHotel(catalogueId)), HttpStatus.OK);
+	public ResponseEntity<List<Resource<Hotel>>> getHotelsForCatalogueWithId(@PathVariable("id") Long catalogueId) {
+				return new ResponseEntity<List<Resource<Hotel>>>(HATEOASImplementorHotel.createHotelsList(catalogueService.getHotels(catalogueId)), HttpStatus.OK);
 	}
 }

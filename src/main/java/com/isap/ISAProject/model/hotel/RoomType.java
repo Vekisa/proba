@@ -12,7 +12,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -36,79 +35,38 @@ public class RoomType {
 	
 	@JsonIgnore
 	@OneToMany(mappedBy="roomType")
-	private List<Room> room;
+	private List<Room> rooms;
 	
 	@JsonIgnore
 	@ManyToOne
 	private Catalogue catalogue;
 	
+	@JsonIgnore
 	@Version
 	private Long version;
 	
 	public RoomType() {
-		room = new ArrayList<>();
+		rooms = new ArrayList<>();
 	}
 
-	public Long getId() {
-		return id;
-	}
+	public Long getId() { return id; }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+	public String getName() { return name; }
 
-	public String getName() {
-		return name;
-	}
+	public void setName(String name) { this.name = name; }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+	public String getDescription() { return description; }
 
-	public String getDescription() {
-		return description;
-	}
+	public void setDescription(String description) { this.description = description; }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+	public double getPricePerNight() { return pricePerNight; }
 
-	public double getPricePerNight() {
-		return pricePerNight;
-	}
+	public void setPricePerNight(double pricePerNight) { this.pricePerNight = pricePerNight; }
 
-	public void setPricePerNight(double pricePerNight) {
-		this.pricePerNight = pricePerNight;
-	}
+	public Catalogue getCatalogue() { return catalogue; }
 
-	public Catalogue getCatalogue() {
-		return catalogue;
-	}
-
-	public void setCatalogue(Catalogue catalogue) {
-		this.catalogue = catalogue;
-	}
+	public void setCatalogue(Catalogue catalogue) { this.catalogue = catalogue; }
 	
-	public List<Room> getRoom() {
-		return room;
-	}
-
-	public void setRoom(List<Room> room) {
-		this.room = room;
-	}
-
-	public Long getVersion() {
-		return version;
-	}
-
-	public void setVersion(Long version) {
-		this.version = version;
-	}
-
-	public void copyFieldsFrom(@Valid RoomType newRoomType) {
-		this.setName(newRoomType.getName());
-		this.setDescription(newRoomType.getDescription());
-		this.setPricePerNight(newRoomType.getPricePerNight());
-	}
+	public List<Room> getRooms() { return rooms; }
 
 }

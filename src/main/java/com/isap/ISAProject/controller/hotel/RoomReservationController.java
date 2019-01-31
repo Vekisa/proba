@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.hotel.ExtraOption;
@@ -134,4 +135,16 @@ public class RoomReservationController {
 	public ResponseEntity<Resource<Room>> getRoomForRoomReservationWithId(@PathVariable("id") Long roomReservationId) {
 				return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(roomReservationService.getRoom(roomReservationId)), HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/{id}/options", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<ExtraOption>> addExtraOptionToRoomReservationWithId(@PathVariable("id") Long id, @RequestParam("option") Long optionId) {
+		return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(roomReservationService.addExtraOption(id, optionId)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/options", method = RequestMethod.DELETE)
+	public ResponseEntity<?> removeExtraOptionFromRoomReservation(@PathVariable("id") Long id, @RequestParam("option") Long optionId) {
+		roomReservationService.removeExtraOption(id, optionId);
+		return ResponseEntity.ok().build();
+	}
+	
 }

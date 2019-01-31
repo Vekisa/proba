@@ -70,7 +70,9 @@ public class RoomTypeService {
 	public RoomType updateRoomTypeById(Long roomTypeId, RoomType newRoomType) {
 		logger.info("> Room-Type update");
 		RoomType oldRoomType = this.findById(roomTypeId);
-		oldRoomType.copyFieldsFrom(newRoomType);
+		oldRoomType.setName(newRoomType.getName());
+		oldRoomType.setDescription(newRoomType.getDescription());
+		oldRoomType.setPricePerNight(newRoomType.getPricePerNight());
 		roomTypeRepository.save(oldRoomType);
 		logger.info("< Room-type update");
 		return oldRoomType;

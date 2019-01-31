@@ -53,15 +53,15 @@ public class HotelController {
 	
 	//Kreiranje hotela
 	@RequestMapping(method=RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Kreira i memoriše avio kompaniju.", notes = "Povratna vrednost servisa je sačuvan hotel.",
+	@ApiOperation(value = "Kreira i memoriše hotel.", notes = "Povratna vrednost servisa je sačuvan hotel.",
 			httpMethod = "POST", consumes = "application/json", produces = "application/json")
 	@ApiResponses(value = { 
 			@ApiResponse(code = 200, message = "OK", response = Hotel.class),
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
-	public ResponseEntity<Resource<Hotel>> createHotel(@Valid @RequestBody Hotel hotel) {
-		return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(hotelService.save(hotel)), HttpStatus.CREATED);
+	public ResponseEntity<Resource<Hotel>> createHotel(@Valid @RequestBody Hotel hotel, @RequestParam("location") Long id) {
+		return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(hotelService.saveWithLocation(hotel, id)), HttpStatus.CREATED);
 	}
 	
 	//Vraca hotel sa zadatim ID-em
@@ -184,17 +184,16 @@ public class HotelController {
 	}
 	
 	//Kreira cenovnik u hotelu
-	@RequestMapping(value = "/{id}/catalogue", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/{id}/catalogue", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Kreira cenovnik u okviru zadatog hotela", notes = "Povratna vrednost metode je kreiran cenovnik.",
-			httpMethod = "POST", produces = "application/json", consumes = "application/json")
+			httpMethod = "POST", produces = "application/json")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "OK", response = Hotel.class),
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
-	public ResponseEntity<Resource<Catalogue>> createCatalogueForHotelWithId(@PathVariable(value = "id") Long hotelId,
-			@Valid @RequestBody Catalogue catalogue) {
-			return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(hotelService.createCatalogue(hotelId, catalogue)), HttpStatus.CREATED);
+	public ResponseEntity<Resource<Catalogue>> setCatalogueForHotelWithId(@PathVariable(value = "id") Long hotelId, @RequestParam("catalogue") Long catalogueId) {
+			return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(hotelService.createCatalogue(hotelId, catalogueId)), HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/{id}/location", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)

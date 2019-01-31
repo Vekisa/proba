@@ -22,6 +22,8 @@ import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.repository.airline.LocationRepository;
+import com.isap.ISAProject.repository.hotel.CatalogueRepository;
+import com.isap.ISAProject.repository.hotel.FloorRepository;
 import com.isap.ISAProject.repository.hotel.HotelRepository;
 
 @Service
@@ -35,6 +37,12 @@ public class HotelService {
 
 	@Autowired
 	private LocationRepository destinationRepository;
+	
+	@Autowired
+	private CatalogueRepository catalogueRepository;
+	
+	@Autowired
+	private FloorRepository floorRepository;
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Hotel findById(long id) {
@@ -59,11 +67,21 @@ public class HotelService {
 	}
 	
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
-	public Hotel save(Hotel hotel) {
+	public Hotel saveWithLocation(Hotel hotel, Long id) {
 		logger.info("> Hotel create");
-		Hotel savedHotel = hotelRepository.save(hotel);
+		Location location = this.findDestination(id);
+		hotel.setLocation(location);
+		hotel.setRating(0);
+		this.save(hotel);
 		logger.info("< Hotel create");
-		return savedHotel;
+		return hotel;
+	}
+	
+	public Hotel save(Hotel hotel) {
+		logger.info("> saving hotel");
+		hotelRepository.save(hotel);
+		logger.info("< hotel saved");
+		return hotel;
 	}
 	
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
@@ -78,7 +96,9 @@ public class HotelService {
 	public Hotel updateHotelById(Long hotelId, Hotel newHotel) {
 		logger.info("> Hotel update");
 		Hotel oldHotel = this.findById(hotelId);
-		oldHotel.copyFieldsFrom(newHotel);
+		oldHotel.setAddress(newHotel.getAddress());
+		oldHotel.setDescription(newHotel.getDescription());
+		oldHotel.setName(newHotel.getName());
 		this.save(oldHotel);
 		logger.info("< Hotel update");
 		return oldHotel;
@@ -88,7 +108,7 @@ public class HotelService {
 	public List<Floor> getFloors(Long id){
 		logger.info("> get floors for hotel");
 		Hotel hotel = this.findById(id);
-		List<Floor> floorList = hotel.getFloor();
+		List<Floor> floorList = hotel.getFloors();
 		logger.info("< get floors for hotel");
 		if(!floorList.isEmpty())
 			return floorList ;
@@ -100,9 +120,8 @@ public class HotelService {
 	public Floor createFloor(Long hotelId, Floor floor){
 		logger.info("> create floor for hotel");
 		Hotel hotel = this.findById(hotelId);
-		hotel.getFloor().add(floor);
 		floor.setHotel(hotel);
-		this.save(hotel);
+		floorRepository.save(floor);
 		logger.info("< create floor for hotel");
 		return floor;
 	}
@@ -111,7 +130,7 @@ public class HotelService {
 	public List<ExtraOption> getExtraOptions(Long id){
 		logger.info("> get extra-options for hotel");
 		Hotel hotel = this.findById(id);
-		List<ExtraOption> extraOptionList = hotel.getExtraOption();
+		List<ExtraOption> extraOptionList = hotel.getExtraOptions();
 		logger.info("< get extra-options for hotel");
 		if(!extraOptionList.isEmpty())
 			return extraOptionList ;
@@ -123,7 +142,7 @@ public class HotelService {
 	public ExtraOption createExtraOption(Long hotelId, ExtraOption extraOption){
 		logger.info("> create extra-option for hotel");
 		Hotel hotel = this.findById(hotelId);
-		hotel.getExtraOption().add(extraOption);
+		hotel.getExtraOptions().add(extraOption);
 		extraOption.setHotel(hotel);
 		this.save(hotel);
 		logger.info("< create extra-option for hotel");
@@ -143,16 +162,24 @@ public class HotelService {
 	}
 	
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
-	public Catalogue createCatalogue(Long hotelId, Catalogue catalogue){
+	public Catalogue createCatalogue(Long hotelId, Long catalogueId){
 		logger.info("> create catalogue for hotel");
 		Hotel hotel = this.findById(hotelId);
+		Catalogue catalogue = this.findCatalogue(catalogueId);
 		hotel.setCatalogue(catalogue);
-		catalogue.setHotel(hotel);
 		this.save(hotel);
 		logger.info("< create catalogue for hotel");
 		return catalogue;
 	}
 	
+	private Catalogue findCatalogue(Long catalogueId) {
+		logger.info("fetching catalogue with id {}", catalogueId);
+		Optional<Catalogue> catalogue = catalogueRepository.findById(catalogueId);
+		logger.info("< catalogue fetched");
+		if(catalogue.isPresent()) return catalogue.get();
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested catalogue doesn't exist.");
+	}
+
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public Hotel changeLocationOfHotel(Long hotelId, Long destinationId) {
 		logger.info("> changing location of hotel with id {}", hotelId);
@@ -186,7 +213,12 @@ public class HotelService {
 
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Location getLocationOfHotel(Long id) {
-		return this.findDestination(id);
+		logger.info("> fetching location of hotel with id {}", id);
+		Hotel hotel = this.findById(id);
+		Location location = hotel.getLocation();
+		logger.info("< location fetched");
+		if(location != null) return location;
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested destination doesn't exist.");
 	}
 	
 }

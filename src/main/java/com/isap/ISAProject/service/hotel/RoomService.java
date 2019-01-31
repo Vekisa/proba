@@ -3,6 +3,7 @@ package com.isap.ISAProject.service.hotel;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.repository.hotel.RoomRepository;
+import com.isap.ISAProject.repository.hotel.RoomTypeRepository;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,6 +34,9 @@ public class RoomService {
 	@Autowired
 	private RoomRepository roomRepository;
 	
+	@Autowired
+	private RoomTypeRepository roomTypeRepository;
+	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Room findById(long id) {
 		logger.info("> Room findById id:{}", id);
@@ -40,7 +45,7 @@ public class RoomService {
 		if(room.isPresent())
 			return room.get();
 		else 
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hotel sa zadatim id-em ne postoji");
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Soba sa zadatim id-em ne postoji");
 	}
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
@@ -51,7 +56,7 @@ public class RoomService {
 		if(!rooms.isEmpty())
 			return rooms.getContent();
 		else
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hoteli ne postoje");
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sobe ne postoje");
 	}
 	
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
@@ -74,7 +79,7 @@ public class RoomService {
 	public Room updateRoomById(Long roomId, Room newRoom) {
 		logger.info("> Room update");
 		Room oldRoom = this.findById(roomId);
-		oldRoom.copyFieldsFrom(newRoom);
+		oldRoom.setNumberOfBeds(newRoom.getNumberOfBeds());
 		roomRepository.save(oldRoom);
 		logger.info("< Room update");
 		return oldRoom;
@@ -84,7 +89,7 @@ public class RoomService {
 	public List<RoomReservation> getRoomReservations(Long id){
 		logger.info("> get room reservations for room");
 		Room room = this.findById(id);
-		List<RoomReservation> roomReservationList = room.getRoomReservation();
+		List<RoomReservation> roomReservationList = room.getRoomReservations();
 		logger.info("< get room reservations for room");
 		if(!roomReservationList.isEmpty())
 			return roomReservationList;
@@ -100,8 +105,11 @@ public class RoomService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datum rezervacije je lose unesen");
 		if(!checkIfRoomIsFree(roomReservation.getBeginDate(), roomReservation.getEndDate(), room))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba nije slobodna u tom periodu");
-		room.getRoomReservation().add(roomReservation);
+		room.getRoomReservations().add(roomReservation);
 		roomReservation.setRoom(room);
+		Long difference = roomReservation.getEndDate().getTime() - roomReservation.getBeginDate().getTime();
+		roomReservation.setNumberOfNights((int) TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS));
+		roomReservation.setPrice(room.getRoomType().getPricePerNight() * roomReservation.getNumberOfNights());
 		this.save(room);
 		logger.info("< create room reservation for room");
 		return roomReservation;
@@ -151,13 +159,34 @@ public class RoomService {
 	public boolean checkIfRoomIsFree(Date start, Date end, Room room) {
 		Date reservedStart = null;
 		Date reservedEnd = null;
-		for(RoomReservation roomReservation :room.getRoomReservation()) {
+		for(RoomReservation roomReservation :room.getRoomReservations()) {
 			reservedStart = roomReservation.getBeginDate();
 			reservedEnd = roomReservation.getEndDate();
 			if((start.after(reservedStart) && start.before(reservedEnd)) || (end.after(reservedStart) && end.before(reservedEnd)))
 				return false;
 		}
 		return true;
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	public Room setRoomTypeForRoom(Long roomTypeId, Long id) {
+		logger.info("> setting room type for room {}", id);
+		Room room = this.findById(id);
+		RoomType type = this.findRoomType(roomTypeId);
+		if(!type.getCatalogue().getHotels().contains(room.getFloor().getHotel()))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Room and type don't belong to the same hotel.");
+		room.setRoomType(type);
+		this.save(room);
+		logger.info("< room type set");
+		return room;
+	}
+
+	private RoomType findRoomType(Long roomTypeId) {
+		logger.info("> fetching room type with id {}", roomTypeId);
+		Optional<RoomType> type = roomTypeRepository.findById(roomTypeId);
+		logger.info("< room type fetched");
+		if(type.isPresent()) return type.get();
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Request room type doesn't exist.");
 	}
 
 }

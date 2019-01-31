@@ -26,6 +26,8 @@ public class HATEOASImplementorHotel {
 		resource.add(linkTo(methodOn(HotelController.class).getFloorsForHotelWithId(hotel.getId())).withRel("hotel-floors"));
 		resource.add(linkTo(methodOn(HotelController.class).getExtraOptionsForHotelWithId(hotel.getId())).withRel("hotel-extra-options"));
 		resource.add(linkTo(methodOn(HotelController.class).getCatalogueForHotelWithId(hotel.getId())).withRel("hotel-catalogue"));
+		resource.add(linkTo(methodOn(HotelController.class).getAdminsOfHotel(hotel.getId())).withRel("hotel-admins"));
+		resource.add(linkTo(methodOn(HotelController.class).getLocationOfHotel(hotel.getId())).withRel("hotel-location"));
 		return resource;
 	}
 	
@@ -76,7 +78,7 @@ public class HATEOASImplementorHotel {
 		resource.add(linkTo(methodOn(CatalogueController.class).getCatalogueById(catalogue.getId())).withRel("self"));
 		resource.add(linkTo(methodOn(CatalogueController.class).getAllCatalogues(null)).slash("?page=0&size=5").withRel("all-catalogues"));
 		resource.add(linkTo(methodOn(CatalogueController.class).getRoomTypesForCatalogueWithId(catalogue.getId())).withRel("catalogue-room-types"));
-		resource.add(linkTo(methodOn(CatalogueController.class).getHotelForCatalogueWithId(catalogue.getId())).withRel("hotel"));
+		resource.add(linkTo(methodOn(CatalogueController.class).getHotelsForCatalogueWithId(catalogue.getId())).withRel("hotels"));
 		return resource;
 	}
 	
