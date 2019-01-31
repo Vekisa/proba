@@ -19,9 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.controller.user.HATEOASImplementorUsers;
 import com.isap.ISAProject.model.airline.Airline;
-import com.isap.ISAProject.model.airline.Location;
+import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSeatCategory;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.LuggageInfo;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.service.airline.AirlineService;
@@ -175,7 +176,7 @@ public class AirlineController {
 	}
 	
 	@RequestMapping(value = "/{id}/categories", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Kreira kategorija sedišta za datu avio kompaniju.", notes = "Povratna vrednost servisa je kreirana kategorija sedišta.", httpMethod = "GET", produces = "application/json", consumes = "application/json")
+	@ApiOperation(value = "Kreira kategorija sedišta za datu avio kompaniju.", notes = "Povratna vrednost servisa je kreirana kategorija sedišta.", httpMethod = "POST", produces = "application/json", consumes = "application/json")
 	@ApiResponses(value = {
 			@ApiResponse(code = 201, message = "Created", response = FlightSeatCategory.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili kategorija sedišta nisu validni."),
@@ -207,6 +208,18 @@ public class AirlineController {
 	})
 	public ResponseEntity<Resource<Location>> getLocationOfAirlineWithId(@PathVariable("id") Long id) {
 		return new ResponseEntity<Resource<Location>>(HATEOASImplementorAirline.createDestination(service.getLocationOfAirline(id)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/flights", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća letove za datu avio kompaniju.", notes = "Povratna vrednost servisa je lista resursa letova kompanije.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content. Ne postoje letovi za datu avio kompaniju."),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
+	})
+	public ResponseEntity<List<Resource<Flight>>> getFlightsOfAirline(@PathVariable("id") Long id) {
+		return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementorAirline.createFlightsList(service.getFlightsOfAirline(id)), HttpStatus.OK);
 	}
 	
 }

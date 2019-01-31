@@ -47,5 +47,7 @@ public interface AirlineServiceInterface {
 	Location getLocationOfAirline(Long id);
 	
 	List<CompanyAdmin> getAdminsOfAirline(Long id);
+
+	List<Flight> getFlightsOfAirline(Long id);
 	
 }

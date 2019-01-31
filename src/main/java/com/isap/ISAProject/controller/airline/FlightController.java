@@ -56,6 +56,17 @@ public class FlightController {
 	public ResponseEntity<Resource<Flight>> getFlightById(@PathVariable("id") Long flightId) {
 		return new ResponseEntity<Resource<Flight>>(HATEOASImplementorAirline.createFlight(service.findById(flightId)), HttpStatus.OK);
 	}
+	
+	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća let sa ID.", notes = "Povratna vrednost servisa je let koji ima traženi ID.", httpMethod = "POST", consumes = "application/json", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 201, message = "Created.", response = Flight.class),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili let nisu validni."),
+			@ApiResponse(code = 404, message = "Not Found. Let sa traženim ID ne postoji.")
+	})
+	public ResponseEntity<Resource<Flight>> createFlightForAirline(@RequestBody @Valid Flight flight, @RequestParam("airline") Long id) {
+		return new ResponseEntity<Resource<Flight>>(HATEOASImplementorAirline.createFlight(service.createFlight(id, flight)), HttpStatus.CREATED);
+	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Ažurira let.", notes = "Ažurira let sa prosleđenim ID na osnovu prosleđenog leta. Kolekcije originalnog leta ostaju netaknute.", httpMethod = "PUT", consumes = "application/json", produces = "application/json")

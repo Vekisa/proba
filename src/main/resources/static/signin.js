@@ -1,6 +1,3 @@
-function load(){
-}
-
 $(document).on('submit','.form-signin',function(e){
 	e.preventDefault();
 	$.ajax({
@@ -18,8 +15,9 @@ $(document).on('submit','.form-signin',function(e){
 			}
 		},
 		error : function(xhr, status, error) {
+			alert(JSON.parse(xhr.responseText));
 			$("#error").html(JSON.parse(xhr.responseText).message);
-		      $('#myModal').modal("show");
+		    $('#myModal').modal("show");
 		}
 	});
 });

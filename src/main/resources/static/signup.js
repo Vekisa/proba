@@ -1,9 +1,3 @@
-function load(){
-	if(localStorage.token != undefined){
-		window.location.href = 'home.html';
-	}
-}
-
 $(document).on('submit','.form-signup',function(e){
 	alert("Saljem serveru");
 	e.preventDefault();

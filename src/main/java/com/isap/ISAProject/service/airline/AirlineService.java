@@ -45,7 +45,8 @@ public class AirlineService implements AirlineServiceInterface {
 		logger.info("> fetch airlines at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<Airline> airlines = repository.findAll(pageable);
 		logger.info("< airlines fetched");
-		return airlines.getContent();
+		if(airlines.hasContent()) return airlines.getContent();
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested airlines don't exist.");
 	}
 
 	@Override
@@ -71,9 +72,11 @@ public class AirlineService implements AirlineServiceInterface {
 	public Airline saveAirline(Airline airline, Long id) {
 		logger.info("> saving airline");
 		Location location = this.findDestination(id);
+		airline.setRating(0);
 		airline.setLocation(location);
 		location.getAirlines().add(airline);
 		destinationRepository.save(location);
+		repository.save(airline);
 		logger.info("< airline saved");
 		return airline;
 	}
@@ -95,7 +98,7 @@ public class AirlineService implements AirlineServiceInterface {
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void deleteAirline(Long airlineId) {
 		logger.info("> deleting airline with id {}", airlineId);
-		repository.deleteById(airlineId);
+		repository.delete(this.findById(airlineId));
 		logger.info("< airline deleted");
 	}
 
@@ -207,7 +210,23 @@ public class AirlineService implements AirlineServiceInterface {
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Location getLocationOfAirline(Long id) {
-		return this.findDestination(id);
+		logger.info("> fetching location of airline with id {}", id);
+		Airline airline = this.findById(id);
+		Location location = airline.getLocation();
+		logger.info("< location fetched");
+		if(location != null) return location;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested location doesn't exist.");
+	}
+	
+	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public List<Flight> getFlightsOfAirline(Long id) {
+		logger.info("> fetching flights of airline with id {}", id);
+		Airline airline = this.findById(id);
+		List<Flight> list = airline.getFlights();
+		logger.info("< flights fetched");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested flights do not exist.");
 	}
 
 }

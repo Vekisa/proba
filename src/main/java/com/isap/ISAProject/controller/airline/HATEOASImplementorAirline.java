@@ -23,11 +23,6 @@ import com.isap.ISAProject.model.airline.Ticket;
 
 public class HATEOASImplementorAirline {
 
-	/**
-	 * Linkovi koji će biti kreirani : na sebe, na sve aviokompanije, na svaku od svojih kolekcija
-	 * @param airline
-	 * @return Resurs koji poštuje HATEOAS princip
-	 */
 	public static Resource<Airline> createAirline(Airline airline) {
 		Resource<Airline> resource = new Resource<Airline>(airline);
 		resource.add(linkTo(methodOn(AirlineController.class).getAirlineById(airline.getId())).withRel("self"));
@@ -38,10 +33,6 @@ public class HATEOASImplementorAirline {
 		return resource;
 	}
 
-	/**
-	 * @param airlines - Lista aviona za koje se kreiraju linkovi
-	 * @return Lista resursa aviona sa kreiranim linkovima
-	 */
 	public static List<Resource<Airline>> createAirlinesList(List<Airline> airlines) {
 		List<Resource<Airline>> list = new ArrayList<Resource<Airline>>();
 		for(Airline a : airlines) {
@@ -50,11 +41,6 @@ public class HATEOASImplementorAirline {
 		return list;
 	}
 
-	/**
-	 * Linkovi koji će biti kreirani : na sebe, na sve informacije o prtljazima, na avio kompaniju koja ga poseduje
-	 * @param luggageInfo
-	 * @return Resurs koji poštuje HATEOAS princip
-	 */
 	public static Resource<LuggageInfo> createLuggageInfo(LuggageInfo luggageInfo) {
 		Resource<LuggageInfo> resource = new Resource<LuggageInfo>(luggageInfo);
 		resource.add(linkTo(methodOn(LuggageInfoController.class).getLuggageInfoWithId(luggageInfo.getId())).withRel("self"));
@@ -63,10 +49,6 @@ public class HATEOASImplementorAirline {
 		return resource;
 	}
 
-	/**
-	 * @param luggageInfos - Lista informacija o prtljagu za koje se kreiraju linkovi
-	 * @return Lista resursa informacija o prtljagu sa kreiranim linkovima
-	 */
 	public static List<Resource<LuggageInfo>> createLuggageInfosList(List<LuggageInfo> luggageInfos) {
 		List<Resource<LuggageInfo>> list = new ArrayList<Resource<LuggageInfo>>();
 		for(LuggageInfo li : luggageInfos)
@@ -74,22 +56,18 @@ public class HATEOASImplementorAirline {
 		return list;
 	}
 
-	/**
-	 * Linkovi koji će biti kreirani : na sebe, na sve destinacije, na avio kompaniju koja ga poseduje
-	 * @param destination
-	 * @return Resurs koji poštuje HATEOAS princip
-	 */
 	public static Resource<Location> createDestination(Location destination) {
 		Resource<Location> resource = new Resource<Location>(destination);
 		resource.add(linkTo(methodOn(LocationController.class).getDestinationById(destination.getId())).withRel("self"));
 		resource.add(linkTo(methodOn(LocationController.class).getAllDestinations(null)).slash("page=0&size=5").withRel("all-destinations"));
+		resource.add(linkTo(methodOn(LocationController.class).getAirlinesOnLocation(destination.getId())).withRel("airlines-on-location"));
+		resource.add(linkTo(methodOn(LocationController.class).getHotelsOnLocation(destination.getId())).withRel("hotels-on-location"));
+		resource.add(linkTo(methodOn(LocationController.class).getOfficesOnLocation(destination.getId())).withRel("offices-on-location"));
+		resource.add(linkTo(methodOn(LocationController.class).getFlightsFromDestinationWithId(destination.getId())).withRel("flights-from-location"));
+		resource.add(linkTo(methodOn(LocationController.class).getFlightsToDestinationWithId(destination.getId())).withRel("flights-to-location"));
 		return resource;
 	}
 
-	/**
-	 * @param destinations - Lista destinacija za koje se kreiraju linkovi
-	 * @return Lista resursa destinacija sa kreiranim linkovima
-	 */
 	public static List<Resource<Location>> createDestinationsList( List<Location> destinations) {
 		List<Resource<Location>> list = new ArrayList<Resource<Location>>();
 		for(Location d : destinations)

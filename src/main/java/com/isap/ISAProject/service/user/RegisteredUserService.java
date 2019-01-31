@@ -66,18 +66,12 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 		if(user.isPresent()) return user.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested user doesn't exist.");
 	}
-
-	private boolean usernameExists(String username) {
-		return repository.findByUsername(username) != null;
-	}
 	
 	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public RegisteredUser updateUser(Long oldUserId, RegisteredUser newUser) {
 		logger.info("> updating user with id {}", oldUserId);
 		RegisteredUser oldUser = this.findById(oldUserId);
-		if(usernameExists(newUser.getUsername()))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is already in use.");
 		oldUser.setBonusPoints(newUser.getBonusPoints());
 		oldUser.setCity(newUser.getCity());
 		oldUser.setFirstName(newUser.getFirstName());

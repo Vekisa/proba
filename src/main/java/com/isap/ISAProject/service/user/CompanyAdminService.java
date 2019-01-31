@@ -25,8 +25,6 @@ import com.isap.ISAProject.repository.airline.AirlineRepository;
 import com.isap.ISAProject.repository.hotel.HotelRepository;
 import com.isap.ISAProject.repository.rentacar.RentACarRepository;
 import com.isap.ISAProject.repository.user.CompanyAdminRepository;
-import com.isap.ISAProject.repository.user.RegisteredUserRepository;
-import com.isap.ISAProject.repository.user.UsersAdminRepository;
 import com.isap.ISAProject.serviceInterface.user.CompanyAdminServiceInterface;
 
 @Service
@@ -36,13 +34,7 @@ public class CompanyAdminService implements CompanyAdminServiceInterface {
 	
 	@Autowired
 	private CompanyAdminRepository companyAdminsRepository;
-	
-	@Autowired
-	private UsersAdminRepository usersAdminsRepository;
-	
-	@Autowired
-	private RegisteredUserRepository registeredUsersRepository;
-	
+
 	@Autowired
 	private AirlineRepository airlineRepository;
 
@@ -84,7 +76,6 @@ public class CompanyAdminService implements CompanyAdminServiceInterface {
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public CompanyAdmin updateAdmin(Long id, CompanyAdmin newAdmin) {
 		logger.info("> updating company admin with id {}", id);
-		checkIfUsernameExists(newAdmin.getUsername());
 		CompanyAdmin oldAdmin = this.findById(id);
 		oldAdmin.setCity(newAdmin.getCity());
 		oldAdmin.setFirstName(newAdmin.getFirstName());
@@ -94,12 +85,6 @@ public class CompanyAdminService implements CompanyAdminServiceInterface {
 		oldAdmin.setUsername(newAdmin.getUsername());
 		logger.info("< company admin updated");
 		return oldAdmin;
-	}
-
-	private void checkIfUsernameExists(String username) {
-		if(companyAdminsRepository.findByUsername(username) != null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already in use.");
-		if(usersAdminsRepository.findByUsername(username) != null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already in use.");
-		if(registeredUsersRepository.findByUsername(username) != null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already in use.");
 	}
 	
 	@Override

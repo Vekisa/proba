@@ -12,7 +12,7 @@ $(document).on('click','#logout',function(e){
 		},
 		error : function(xhr, status, error) {
 			$("#error").html(JSON.parse(xhr.responseText).message);
-		      $('#myModal').modal("show");
+		    $('#myModal').modal("show");
 		}
 	});
 });

@@ -5,20 +5,12 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,12 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.isap.ISAProject.domain.json.request.AuthenticationRequest;
-import com.isap.ISAProject.domain.json.response.AuthenticationResponse;
 import com.isap.ISAProject.model.user.FriendRequest;
 import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
-import com.isap.ISAProject.security.TokenUtils;
 import com.isap.ISAProject.service.user.RegisteredUserService;
 import com.isap.ISAProject.service.user.UserService;
 
@@ -50,47 +40,22 @@ public class RegisteredUserController {
 
 	@Autowired
 	private UserService userService;
-	
-	@Value("X-Auth-Token")
-	private String tokenHeader;
-
-	@Autowired
-	private AuthenticationManager authenticationManager;
-
-	@Autowired
-	private TokenUtils tokenUtils;
-
-	@Autowired
-	private UserDetailsService userDetailsService;
 
 	@RequestMapping(method = RequestMethod.POST, value = "/auth")
 	public ResponseEntity<?> authenticationRequest(@RequestBody AuthenticationRequest authenticationRequest/*,
 			Device device*/) throws AuthenticationException {
-
-		// Perform the authentication
-		Authentication authentication = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-				authenticationRequest.getUsername(), authenticationRequest.getPassword()));
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-
-		// Reload password post-authentication so we can generate token
-		UserDetails userDetails = this.userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
-		String token = this.tokenUtils.generateToken(userDetails/*, device*/);
-
-		// Return the token
-		return ResponseEntity.ok(new AuthenticationResponse(token));
+		return ResponseEntity.ok(userService.signin(authenticationRequest/*, device*/));
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/logout")
 	public ResponseEntity<?> logout(){
-		SecurityContextHolder.clearContext();
+		userService.signout();
 		return ResponseEntity.ok().build();
 	}
-
-	@RequestMapping(method = RequestMethod.GET, value = "/protected")
-	// @PreAuthorize("hasRole('ADMIN')")
-	@PreAuthorize("@securityService.hasProtectedAccess()")
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/currentUser")
 	public ResponseEntity<?> getDaHoney() {
-		return ResponseEntity.ok(":O");
+		return ResponseEntity.ok(userService.currentUser());
 	}
 
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

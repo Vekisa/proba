@@ -27,10 +27,11 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 	
+	@JsonIgnore
 	@Version
 	private Long version;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true, length = 30)
 	private String name;
 	
 	@JsonIgnore
@@ -54,7 +55,6 @@ public class Location {
 	private List<Hotel> hotels;
 	
 	@JsonIgnore
-	@Cascade({CascadeType.PERSIST, CascadeType.MERGE})
 	@OneToMany(mappedBy = "location")
 	private List<Airline> airlines;
 	

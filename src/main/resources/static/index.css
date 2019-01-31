@@ -1,0 +1,33 @@
+@charset "UTF-8";
+
+#tablediv{
+	 position:fixed;
+    top: 30%;
+    left: 32%;
+    width:70%;
+    height:70%;
+    margin-top: -9em; /*set to a negative number 1/2 of your height*/
+    margin-left: -15em; /*set to a negative number 1/2 of your width*/
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f3f3f3;
+    opacity: 0.9;
+}
+
+
+
+#navigation{
+	margin: 10px;
+	border-radius: 10px;
+	opacity: 0.9;
+}
+
+.hidden{
+	visibility: hidden;
+	width: 0px;
+	display: inline;
+}
+
+tr:hover{
+	cursor: pointer;
+}

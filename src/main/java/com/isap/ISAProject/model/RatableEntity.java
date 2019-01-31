@@ -21,4 +21,6 @@ public abstract class RatableEntity {
 		return (double) cumulativeRating / timesRated;
 	}
 	
+	public void setRating(double rating) { this.rating = rating; }
+	
 }
