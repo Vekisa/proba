@@ -7,10 +7,11 @@
 		<script type="text/javascript" src="index.js"></script>		
 		<link rel="stylesheet" type="text/css" href="index.css">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" 
-			integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">	
+			integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	</head>
 	
-	<body background = "backgr.jpg">
+	<body background = "backgr.jpg" onload = load()>
 	<nav class="navbar navbar-expand-lg navbar-light bg-light" id = "navigation">
   		<img src="air-plane-cartoon.png" alt="Airplane" hegiht = "100" width = "100">
   		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,21 +72,14 @@
       
     </div>
   </div>
-	<div id = "tablediv" class = "container">
-		<table class="table table-hover" id = "table">
-	  		<thead>
-	    		<tr>
-	      		  <th scope="col">#</th>
-			      <th scope="col">Name</th>
-			      <th scope="col">Address</th>
-			      <th scope="col">Description</th>
-	    		</tr>
-	  		</thead>
-	  		<tbody>
-	  		</tbody>
-		</table>
+	<div id = "tablediv" class = "container" align="center">
+
 	</div>
 	
+	<div id="myMap"><div id="mapdiv" style="height: 300px; width: 300px;"></div></div>
+ 	 <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 	</body>
 </html>

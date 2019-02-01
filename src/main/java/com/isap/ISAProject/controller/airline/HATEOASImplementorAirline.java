@@ -29,6 +29,7 @@ public class HATEOASImplementorAirline {
 		resource.add(linkTo(methodOn(AirlineController.class).getAllAirlines(null)).slash("?page=0&size=5").withRel("all-airlines"));
 		resource.add(linkTo(methodOn(AirlineController.class).getLuggageInfosForAirlineWithId(airline.getId())).withRel("airline-luggage-infos"));
 		resource.add(linkTo(methodOn(AirlineController.class).getFlightConfigurationsForAirlineWithId(airline.getId())).withRel("airline-flight-configurations"));
+		resource.add(linkTo(methodOn(AirlineController.class).getFlightsOfAirline(airline.getId())).withRel("airline-flights"));
 		// TODO : Link za brze rezervacije
 		return resource;
 	}
@@ -65,6 +66,7 @@ public class HATEOASImplementorAirline {
 		resource.add(linkTo(methodOn(LocationController.class).getOfficesOnLocation(destination.getId())).withRel("offices-on-location"));
 		resource.add(linkTo(methodOn(LocationController.class).getFlightsFromDestinationWithId(destination.getId())).withRel("flights-from-location"));
 		resource.add(linkTo(methodOn(LocationController.class).getFlightsToDestinationWithId(destination.getId())).withRel("flights-to-location"));
+		resource.add(linkTo(methodOn(LocationController.class).getLongLatForDestinationWithName(destination.getId())).withRel("long_lat"));
 		return resource;
 	}
 

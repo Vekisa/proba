@@ -30,11 +30,9 @@ public class Flight {
 	@Version
 	private Long version;
 	
-	@JsonIgnore
 	@ManyToOne
 	private Location startDestination;
 
-	@JsonIgnore
 	@ManyToOne
 	private Location finishDestination;
 

@@ -21,8 +21,8 @@ public class HATEOASImplementorRentacar {
 	 */
 	public static Resource<RentACar> rentacarLinks(RentACar rentacar){
 		Resource<RentACar> resource = new Resource<RentACar>(rentacar);
-		resource.add(linkTo(methodOn(RentACarController.class).getAllRentACars(null)).slash("?page=0&size=5").withRel("all-rentacars"));
 		resource.add(linkTo(methodOn(RentACarController.class).getRentACarById(rentacar.getId())).withRel("self"));
+		resource.add(linkTo(methodOn(RentACarController.class).getAllRentACars(null)).slash("?page=0&size=5").withRel("all-rentacars"));
 		resource.add(linkTo(methodOn(RentACarController.class).getBranchOfficesForRentACarWithId(rentacar.getId())).withRel("branch-offices"));
 		return resource;
 	}
@@ -47,8 +47,8 @@ public class HATEOASImplementorRentacar {
 	 */
 	public static Resource<BranchOffice> branchOfficeLinks(BranchOffice branch){
 		Resource<BranchOffice> resource = new Resource<BranchOffice>(branch);
-		resource.add(linkTo(methodOn(BranchOfficeController.class).getAllBranchOffices(null)).slash("?page=0&size=5").withRel("all-branch-offices"));
 		resource.add(linkTo(methodOn(BranchOfficeController.class).getBranchOfficeById(branch.getId())).withRel("self"));
+		resource.add(linkTo(methodOn(BranchOfficeController.class).getAllBranchOffices(null)).slash("?page=0&size=5").withRel("all-branch-offices"));
 		resource.add(linkTo(methodOn(BranchOfficeController.class).getVehiclesForBranchOfficeWithId(branch.getId())).withRel("vehicles"));
 		return resource;
 	}
