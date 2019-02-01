@@ -110,12 +110,14 @@ public class UserService implements UserServiceInterface {
 		// Perform the authentication
 		Authentication authentication = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
 				authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+		logger.info("> dobio {} postavio {}", authenticationRequest.getUsername(), authentication.getName());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-
+		logger.info("> u sekuriti kontekst stavio {}", SecurityContextHolder.getContext().getAuthentication().getName());
 		// Reload password post-authentication so we can generate token
 		UserDetails userDetails = this.userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+		logger.info("> userDetails je {}", userDetails.getUsername());
 		String token = this.tokenUtils.generateToken(userDetails/*, device*/);
-
+		logger.info("> 4");
 		logger.info("signed in");
 		// Return the token
 		return new AuthenticationResponse(token);
@@ -129,6 +131,7 @@ public class UserService implements UserServiceInterface {
 	@Override
 	public CerberusUser currentUser() {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		logger.info("> security context has name {}", username);
 		CerberusUser userDetails = (CerberusUser) userDetailsService.loadUserByUsername(username);
 		return userDetails;
 	}

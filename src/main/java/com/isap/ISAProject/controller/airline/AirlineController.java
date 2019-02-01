@@ -55,7 +55,7 @@ public class AirlineController {
 			@ApiResponse(code = 200, message = "OK", response = Airline.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa traženim ID ne postoji.")
-	})
+	})	
 	public ResponseEntity<Resource<Airline>> getAirlineById(@PathVariable(value = "id") Long airlineId) {
 		return new ResponseEntity<Resource<Airline>>(HATEOASImplementorAirline.createAirline(service.findById(airlineId)), HttpStatus.OK);
 	}
@@ -220,6 +220,11 @@ public class AirlineController {
 	})
 	public ResponseEntity<List<Resource<Flight>>> getFlightsOfAirline(@PathVariable("id") Long id) {
 		return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementorAirline.createFlightsList(service.getFlightsOfAirline(id)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/destinations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Resource<Location>>> getDestinationsOfAirlineWithId(@PathVariable("id") Long id) {
+		return new ResponseEntity<List<Resource<Location>>>(HATEOASImplementorAirline.createDestinationsList(service.getDestinationsOfAirline(id)), HttpStatus.OK);
 	}
 	
 }

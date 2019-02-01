@@ -8,10 +8,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.isap.ISAProject.model.user.RegisteredUser;
 
 @Entity
 @Table(name = "passenger")
@@ -22,6 +24,7 @@ public class Passenger {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@JsonIgnore
 	@Version
 	private Long version;
 	
@@ -29,6 +32,10 @@ public class Passenger {
 	@OneToMany(mappedBy = "passenger")
 	private List<FlightSeat> seats;
 
+	@JsonIgnore
+	@OneToOne
+	private RegisteredUser user;
+	
 	@Column(nullable = false)
 	private String firstName;
 
@@ -37,7 +44,7 @@ public class Passenger {
 
 	@Column(nullable = false, unique = true)
 	private Long passportNumber;
-
+	
 	public String getFirstName() { return this.firstName; }
 
 	public void setFirstName(String name) { this.firstName = name; }
@@ -53,5 +60,7 @@ public class Passenger {
 	public List<FlightSeat> getFlightSeats() { return this.seats; }
 
 	public Long getId() { return this.id; }
+
+	public void setUser(RegisteredUser user) { this.user = user; }
 
 }

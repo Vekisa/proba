@@ -89,6 +89,10 @@ public class BranchOffice {
 	public void setVersion(Long version) {
 		this.version = version;
 	}
+	
+	public Location getLocation() {
+		return location;
+	}
 
 	public void setLocation(Location location) { this.location = location; }
 }

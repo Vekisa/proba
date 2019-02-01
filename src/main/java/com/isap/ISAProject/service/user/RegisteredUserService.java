@@ -215,7 +215,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	public List<Reservation> getActiveReservationsOfUser(Long id) {
 		logger.info("> fetching active reservations of user with id {}", id);
 		RegisteredUser user = this.findById(id);
-		List<Reservation> list = filterActiveReservations(user.getReservations());
+		List<Reservation> list = filterActiveReservations(user.getConfirmedReservations());
 		logger.info("< active reservations fetched");
 		if(!list.isEmpty()) return list;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested reservations do not exist.");
@@ -226,7 +226,9 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	public List<Reservation> getReservationHistoryOfUser(Long id) {
 		logger.info("> fetching active reservations of user with id {}", id);
 		RegisteredUser user = this.findById(id);
-		List<Reservation> list = filterFinishedReservations(user.getReservations());
+		List<Reservation> reservations = user.getConfirmedReservations();
+		reservations.addAll(user.getRatedReservations());
+		List<Reservation> list = filterFinishedReservations(reservations);
 		logger.info("< active reservations fetched");
 		if(!list.isEmpty()) return list;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested reservations do not exist.");

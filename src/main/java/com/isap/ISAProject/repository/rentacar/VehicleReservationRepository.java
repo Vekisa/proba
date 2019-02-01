@@ -8,5 +8,5 @@ import com.isap.ISAProject.model.rentacar.VehicleReservation;
 
 @Repository
 public interface VehicleReservationRepository extends JpaRepository<VehicleReservation, Long> {
-
+	
 }

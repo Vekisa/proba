@@ -1,25 +1,20 @@
 function load(){
 	$("#myMap").hide();
-	setMapLocation(19.833549,45.267136);
+	map = new OpenLayers.Map("mapdiv");
+    map.addLayer(new OpenLayers.Layer.OSM());
+    var markers = new OpenLayers.Layer.Markers( "Markers" );
+    map.addLayer(markers);
+    markers.addMarker(new OpenLayers.Marker(lonLat));
+    setMapLocation(15,15);
 }
 
 function setMapLocation(long, lat){
-	map = new OpenLayers.Map("mapdiv");
-    map.addLayer(new OpenLayers.Layer.OSM());
-
     var lonLat = new OpenLayers.LonLat(long, lat)
           .transform(
-            new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-            map.getProjectionObject() // to Spherical Mercator Projection
-          );
-          
-    var zoom=12;
-
-    var markers = new OpenLayers.Layer.Markers( "Markers" );
-    map.addLayer(markers);
-    
-    markers.addMarker(new OpenLayers.Marker(lonLat));
-    
+            new OpenLayers.Projection("EPSG:4326"),
+            map.getProjectionObject()
+          ); 
+    var zoom=12;   
     map.setCenter (lonLat, zoom);
 }
 
@@ -43,6 +38,7 @@ $(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
 
 $(document).on('click','#airline',function(e){
 	e.preventDefault();
+	$("#myMap").hide();
 	$.ajax({
 		type: "GET",
 		url: "airlines?page=0&size=10",
@@ -57,6 +53,7 @@ $(document).on('click','#airline',function(e){
 
 $(document).on('click','#rentacar',function(e){
 	e.preventDefault();
+	$("#myMap").hide();
 	$.ajax({
 		type: "GET",
 		url: "rent-a-cars?page=0&size=10",
@@ -71,6 +68,7 @@ $(document).on('click','#rentacar',function(e){
 
 $(document).on('click','#hotel',function(e){
 	e.preventDefault();
+	$("#myMap").hide();
 	$.ajax({
 		type: "GET",
 		url: "hotels?page=0&size=10",
@@ -100,6 +98,21 @@ function printListOfCompanies(data){
 	  		"</thead><tbody>" + s + "</tbody></table>";
 }
 
+$(document).on('click','#tablebo tr', function() {
+	var branchOfficeLink = $(this).attr('id');
+	
+	$.ajax({
+		type: "GET",
+		url: branchOfficeLink,
+		dataType: "json",
+		async: false,
+		success: function(data){
+			if(data!=null){
+				pomData = data;
+			}
+		}
+	});
+});
 
 $(document).on('click','#table tr', function() {
 	var companyLink = $(this).attr('id');
@@ -111,8 +124,10 @@ $(document).on('click','#table tr', function() {
 			if(data!=null){
 				if(companyLink.includes("airlines")){
 					printCompany(data,"airline");
+					printFlights(data);
 				}else if(companyLink.includes("rent-a-cars")){
 					printCompany(data,"rentacar");
+					printBranchOffices(data);
 				}else if(companyLink.includes("hotels")){
 					printCompany(data,"hotel");
 					printHotelCatalogue(data);
@@ -123,25 +138,47 @@ $(document).on('click','#table tr', function() {
 });
 
 function printCompany(data, company){
-	/*$.ajax({
-		type: "GET",
-		url: data._links.location.href,
-		dataType: "json",
-		success: function(data){
-			if(data!=null){
-			}
-		}
-	});*/
+	let pomData;
 	
-	//treba pre ovoga da joj se setuju vrednosti
-	$("#myMap").show();
+	if(company!="rentacar"){
+		$.ajax({
+			type: "GET",
+			url: data._links.location.href,
+			dataType: "json",
+			async: false,
+			success: function(data){
+				if(data!=null){
+					pomData = data;
+				}
+			}
+		});
+		
+		$.ajax({
+			type: "GET",
+			url: pomData._links.long_lat.href,
+			dataType: "json",
+			success: function(data){
+				if(data!=null){
+					setMapLocation(data.lon,data.lat);
+				}
+			}
+		});
+		$("#myMap").show();
+	}
+	
+	let header = "";	
 	let image = "";
-	if(company == "airline")
+	
+	if(company == "airline"){
 		image = "air-plane-cartoon.png";
-	else if(company == "rentacar")
+		header = "Flights";
+	}else if(company == "rentacar"){
 		image = "rent-a-car-cartoon.png";
-	else if(company == "hotel")
+		header = "Branch offices";
+	}else if(company == "hotel"){
 		image = "hotel-cartoon.png";
+		header = "Catalogue";
+	}
 	
 	let code = "<div class=\"container\">" +
 					"<div class=\"row\">" + 
@@ -174,7 +211,7 @@ function printCompany(data, company){
 					"</div>" +
 				"</div>" + 
 				"<hr>" + 
-				"<strong>Catalogue</strong>" +
+				"<strong>" + header + "</strong>" +
 				"<hr>";
 	
 	
@@ -183,8 +220,7 @@ function printCompany(data, company){
 }
 
 function printHotelCatalogue(data){
-	//alert(data._links.hotelcatalogue.href);
-	let pomData;
+	var pomData;
 	let link = "";
 	$.ajax({
 		type: "GET",
@@ -220,17 +256,29 @@ function printHotelCatalogue(data){
 }
 
 function printFlights(data){
-	let list = "";
+	var pomDataFlights;
+	$.ajax({
+		type: "GET",
+		url: data._links.airline_flights.href,
+		dataType: "json",
+		async: false,
+		success: function(data){
+			if(data!=null){
+				pomDataFlights = data;
+			}
+		}
+	});
+	
+	let flights = "";
 	let s = "";
-	$.each(data, function(index, flight) {
-		s += "<tr>" + "<th scope=\"row\">"+ index +"</th>" + "<td>" + flight.startDestination.name + "</td>" + "<td>"+ flight.finishDestination.name 
+	$.each(pomDataFlights, function(index, flight) {
+		s += "<tr>" + "<td>" + flight.startDestination + "</td>" + "<td>"+ flight.finishDestination 
 		+ "</td>" + "<td>" + flight.transfers + "</td><td>" + flight.departureTime + "</td><td>" + flight.arrivalTime + "</td><td>"
 		+ flight.flightLength + "</td><td>" + flight.basePrice + "</td>" + "</tr>";
 	});
 	
-	list =  "<table id = \"table\"><thead>" +
+	flights =  "<table class=\"table table-hover\"><thead>" +
 		"<tr>" + 
-		"<th scope=\"col\">#</th>" +
 		"<th scope=\"col\">Start Destination</th>" +
 		"<th scope=\"col\">Finish Destination</th>" +
 		"<th scope=\"col\">Transfers</th>" +
@@ -241,5 +289,35 @@ function printFlights(data){
 		"</tr>" +
 		"</thead><tbody>" + s + "</tbody></table>";
 	
-	return list;
+	document.getElementById("tablediv").innerHTML += flights;
+}
+
+function printBranchOffices(data){	
+	var pomDataBranchOffices;
+	$.ajax({
+		type: "GET",
+		url: data._links.branch_offices.href,
+		dataType: "json",
+		async: false,
+		success: function(data){
+			if(data!=null){
+				pomDataBranchOffices = data;
+			}
+		}
+	});
+	
+	let branchOffices = "";
+	let s = "";
+	$.each(pomDataBranchOffices, function(index, branchOffice) {
+		s += "<tr id = \"" +branchOffice.links[0].href + "\">" + "<td>" + branchOffice.address + "</td>" + "</tr>";
+	});
+	
+	branchOffices =  "<table class=\"table table-hover\" id = \"tablebo\"><thead>" +
+		"<tr>" + 
+		"<th scope=\"col\">Address</th>" +
+		"</tr>" +
+		"</thead><tbody>" + s + "</tbody></table>";
+	
+	document.getElementById("tablediv").innerHTML += branchOffices;
+	
 }

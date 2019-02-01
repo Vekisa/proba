@@ -3,6 +3,7 @@ package com.isap.ISAProject.controller.airline;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -14,15 +15,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.controller.hotel.HATEOASImplementorHotel;
 import com.isap.ISAProject.controller.rentacar.HATEOASImplementorRentacar;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.Coordinates;
-import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Flight;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.service.airline.LocationService;
@@ -162,7 +162,7 @@ public class LocationController {
 			@ApiResponse(code = 404, message = "Not Found. Lokacija sa prosleđenim ID ne postoji."),
 			@ApiResponse(code = 500, message = "Internal Server Error. Došlo je do greške prilikom preuzimanja koordinata.")
 	})
-	public ResponseEntity<Coordinates> getLongLatForDestinationWithName(@RequestParam("id") Long id) {
+	public ResponseEntity<Coordinates> getLongLatForDestinationWithName(@PathVariable("id") Long id) {
 		return new ResponseEntity<Coordinates>(service.getCoordinatesForCity(id), HttpStatus.OK);
 	}
 

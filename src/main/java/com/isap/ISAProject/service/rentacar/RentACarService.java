@@ -1,5 +1,6 @@
 package com.isap.ISAProject.service.rentacar;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,10 +16,14 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.RentACar;
 import com.isap.ISAProject.model.user.CompanyAdmin;
+import com.isap.ISAProject.repository.airline.LocationRepository;
+import com.isap.ISAProject.repository.rentacar.BranchOfficeRepository;
 import com.isap.ISAProject.repository.rentacar.RentACarRepository;
+import com.isap.ISAProject.repository.rentacar.VehicleReservationRepository;
 import com.isap.ISAProject.serviceInterface.rentacar.RentACarServiceInterface;
 
 @Service
@@ -29,6 +34,15 @@ public class RentACarService implements RentACarServiceInterface {
 	
 	@Autowired
 	private RentACarRepository repository;
+	
+	@Autowired
+	private VehicleReservationRepository vrRepo;
+	
+	@Autowired
+	private LocationRepository lRepo;
+	
+	@Autowired
+	private BranchOfficeRepository broRepo;
 	
 	@Override
 	public List<RentACar> getAllRentACars(Pageable pageable) {
@@ -118,5 +132,83 @@ public class RentACarService implements RentACarServiceInterface {
 		if(!list.isEmpty()) return list;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested admins do not exist.");
 	}
+
+	@Override
+	public List<RentACar> search(Pageable pageable, String locationName, String rentacarName/*, Date beginDate, Date endDate*/) {
+		logger.info("> searching");
+		List<RentACar> rentacarsByName = repository.findByName(rentacarName);
+		
+		List<Location> locationsByName = lRepo.findByName(locationName);
+		List<BranchOffice> offices = new ArrayList<BranchOffice>();
+		
+		for(Location l : locationsByName) {
+			List<BranchOffice> pom = broRepo.findByLocation(l);
+			for(BranchOffice bro : pom) {
+				offices.add(bro);
+			}
+		}
+		
+		List<RentACar> ret = new ArrayList<RentACar>();
+		for(BranchOffice bro : offices) {
+			if(rentacarsByName.contains(bro.getRentACar())) {
+				ret.add(bro.getRentACar());
+			}
+		}
+		
+		//reservsBegin = vrRepo.findByBeginDate(beginDate);
+		//reservsEnd = vrRepo.findByEndDate(endDate);
+		
+		/*if(!locationName.equals("")) {
+			ret = searchByLocation(locationName, ret);
+			System.out.println("search by location");
+		}
+		if(!rentacarName.equals("")) {
+			ret = searchByName(rentacarName, ret);
+			System.out.println("search by name");
+		}
+		if(beginDate != null && endDate != null) {
+			ret = searchByDate(beginDate, endDate, ret);
+			System.out.println("search by date");
+		}*/
+		logger.info("> searching done");
+		return ret;
+	}
 	
+	/*private List<RentACar> searchByLocation(String locationName, List<RentACar> source){
+		List<RentACar> ret = new ArrayList<RentACar>();
+		for(RentACar rac : source) {
+			for(BranchOffice bro : rac.getBranchOffices()) {
+				if(bro.getLocation().getName().equals(locationName)) {
+					ret.add(rac);
+				}
+			}
+		}
+		return ret;
+	}
+	
+	private List<RentACar> searchByName(String name, List<RentACar> source){
+		ArrayList<RentACar> ret = new ArrayList<RentACar>();
+		for(RentACar rac : source) {
+			if(rac.getName().equals(name)) {
+				ret.add(rac);
+			}
+		}
+		return ret;
+	}
+	
+	private List<RentACar> searchByDate(Date beginDate, Date endDate, List<RentACar> source){
+		ArrayList<RentACar> ret = new ArrayList<RentACar>();
+		for(RentACar rac : source) {
+			for(BranchOffice bro : rac.getBranchOffices()) {
+				for(Vehicle veh : bro.getVehicles()) {
+					for(VehicleReservation res : veh.getVehicleReservations()) {
+						if(!(beginDate.after(res.getBeginDate()) && beginDate.before(res.getEndDate()) && endDate.after(res.getBeginDate()) && endDate.before(res.getEndDate()))) {
+							ret.add(rac);
+						}
+					}
+				}
+			}
+		}
+		return ret;
+	}*/
 }

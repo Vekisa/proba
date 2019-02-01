@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.isap.ISAProject.model.user.RegisteredUser;
 
-//@Transactional(propagation = Propagation.MANDATORY)
+@Transactional(propagation = Propagation.MANDATORY)
 public interface RegisteredUserRepository extends PagingAndSortingRepository<RegisteredUser, Long> {
 	
 	public RegisteredUser findByUsername(String username);
