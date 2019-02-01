@@ -26,6 +26,24 @@ public class Vehicle {
 	@Column(nullable = false)
 	private double discount;
 	
+	@Column(nullable = false)
+	private String naziv;
+	
+	@Column(nullable = false)
+	private String marka;
+	
+	@Column(nullable = false)
+	private String model;
+	
+	@Column(nullable = false)
+	private int godProizvodnje;
+	
+	@Column(nullable = false)
+	private String tip;
+	
+	@Column(nullable = false)
+	private int brojSedista;
+	
 	@ManyToOne
 	private BranchOffice branchOffice;
 	
@@ -74,6 +92,46 @@ public class Vehicle {
 
 	public void setVersion(Long version) {
 		this.version = version;
+	}
+	
+	public String getNaziv() {
+		return naziv;
+	}
+	public void setNaziv(String naziv) {
+		this.naziv = naziv;
+	}
+	public String getMarka() {
+		return marka;
+	}
+	public void setMarka(String marka) {
+		this.marka = marka;
+	}
+	public String getModel() {
+		return model;
+	}
+	public void setModel(String model) {
+		this.model = model;
+	}
+	public int getGodProizvodnje() {
+		return godProizvodnje;
+	}
+	public void setGodProizvodnje(int godProizvodnje) {
+		this.godProizvodnje = godProizvodnje;
+	}
+	public String getTip() {
+		return tip;
+	}
+	public void setTip(String tip) {
+		this.tip = tip;
+	}
+	public int getBrojSedista() {
+		return brojSedista;
+	}
+	public void setBrojSedista(int brojSedista) {
+		this.brojSedista = brojSedista;
+	}
+	public void setId(Long id) {
+		this.id = id;
 	}
 	@Override
 	public String toString() {
