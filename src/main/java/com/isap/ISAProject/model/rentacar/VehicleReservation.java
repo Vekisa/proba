@@ -93,5 +93,9 @@ public class VehicleReservation {
 	public void setReservation(Reservation reservation) {
 		this.reservation = reservation;
 	}
+	@Override
+	public String toString() {
+		return "VehicleReservation [id=" + id + "]";
+	}
 
 }

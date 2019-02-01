@@ -75,4 +75,8 @@ public class Vehicle {
 	public void setVersion(Long version) {
 		this.version = version;
 	}
+	@Override
+	public String toString() {
+		return "Vehicle [id=" + id + "]";
+	}
 }

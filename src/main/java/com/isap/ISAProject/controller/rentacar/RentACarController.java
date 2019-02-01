@@ -1,12 +1,14 @@
 package com.isap.ISAProject.controller.rentacar;
 
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -55,16 +57,12 @@ public class RentACarController {
 			@ApiResponse(code = 204, message = "No Content. Lista je prazna."),
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
-	public ResponseEntity<List<RentACar>> search(Pageable pageable, @RequestParam("locationName") String locationName, @RequestParam("name") String name/*, @PathVariable("beginDate") String begin, @PathVariable("endDate") String end*/){
-		/*Date pocetak = null;
-		Date kraj = null;
-		try {
-			pocetak = new SimpleDateFormat("dd/MM/yyyy").parse(begin);
-			kraj =  new SimpleDateFormat("dd/MM/yyyy").parse(end);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}*/
-		List<RentACar> ret = service.search(pageable, locationName, name/*, pocetak, kraj*/);
+	public ResponseEntity<List<RentACar>> search(Pageable pageable, 
+			@RequestParam(value="locationName", required=false) String locationName,
+			@RequestParam(value="name", required=false) String name,
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(value="beginDate", required=false) Date begin, 
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(value="endDate", required=false) Date end){
+		List<RentACar> ret = service.search(pageable, locationName, name, begin, end);
 		return new ResponseEntity<List<RentACar>>(ret, HttpStatus.OK);
 	}
 	
