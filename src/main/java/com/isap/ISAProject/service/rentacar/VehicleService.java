@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,6 +30,7 @@ public class VehicleService implements VehicleServiceInterface {
 	private VehicleRepository repository;
 	
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<Vehicle> getAllVehicles(Pageable pageable) {
 		logger.info("> fetch vehicles at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<Vehicle> vehicles = repository.findAll(pageable);
@@ -37,6 +39,7 @@ public class VehicleService implements VehicleServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Vehicle getVehicleById(Long id) {
 		logger.info("> fetch vehicle with id {}", id);
 		Optional<Vehicle> veh = repository.findById(id);
@@ -46,7 +49,7 @@ public class VehicleService implements VehicleServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public Vehicle saveVehicle(Vehicle vehicle) {
 		logger.info("> saving vehicle");
 		repository.save(vehicle);
@@ -55,7 +58,7 @@ public class VehicleService implements VehicleServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public Vehicle updateVehicle(Long id, Vehicle vehicle) {
 		logger.info("> updating vehicle with id {}", id);
 		Vehicle oldVeh = this.getVehicleById(id);
@@ -67,7 +70,7 @@ public class VehicleService implements VehicleServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteVehicle(Long id) {
 		logger.info("> deleting vehicle with id {}", id);
 		repository.delete(this.getVehicleById(id));
@@ -75,6 +78,7 @@ public class VehicleService implements VehicleServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<VehicleReservation> getVehicleReservations(Long id) {
 		logger.info("> fetching vehicle reservations for vehicle with id {}", id);
 		Vehicle veh = this.getVehicleById(id);
@@ -84,7 +88,7 @@ public class VehicleService implements VehicleServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public VehicleReservation addVehicleReservation(Long id, VehicleReservation vr) {
 		logger.info("> adding vehicle reservation for vehicle with id {}", id);
 		Vehicle veh = this.getVehicleById(id);
@@ -96,7 +100,7 @@ public class VehicleService implements VehicleServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteVehicleReservation(Long id, VehicleReservation vr) {
 		logger.info("> deleting vehicke reservation for vehicle with id {}", id);
 		Vehicle veh = this.getVehicleById(id);

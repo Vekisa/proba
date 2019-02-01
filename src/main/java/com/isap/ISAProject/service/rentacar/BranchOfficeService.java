@@ -35,6 +35,7 @@ public class BranchOfficeService implements BranchOfficeServiceInterface{
 	private LocationRepository locationRepository;
 	
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<BranchOffice> getAllBranchOffices(Pageable pageable) {
 		logger.info("> fetch branch offices at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<BranchOffice> branchOffices = repository.findAll(pageable);
@@ -43,6 +44,7 @@ public class BranchOfficeService implements BranchOfficeServiceInterface{
 	}
 
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public BranchOffice getBranchOfficeById(Long id) {
 		logger.info("> fetch branch office with id {}", id);
 		Optional<BranchOffice> broff = repository.findById(id);
@@ -52,7 +54,7 @@ public class BranchOfficeService implements BranchOfficeServiceInterface{
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public BranchOffice saveBranchOffice(BranchOffice branchOffice) {
 		logger.info("> saving branch office");
 		repository.save(branchOffice);
@@ -61,7 +63,7 @@ public class BranchOfficeService implements BranchOfficeServiceInterface{
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public BranchOffice updateBranchOffice(Long id, BranchOffice branchOffice) {
 		logger.info("> updating branch offices with id {}", id);
 		BranchOffice oldBrOff = this.getBranchOfficeById(id);
@@ -73,7 +75,7 @@ public class BranchOfficeService implements BranchOfficeServiceInterface{
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteBranchOfficeWithId(Long id) {
 		logger.info("> deleting branch office with id {}", id);
 		repository.delete(this.getBranchOfficeById(id));
@@ -81,6 +83,7 @@ public class BranchOfficeService implements BranchOfficeServiceInterface{
 	}
 
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<Vehicle> getVehiclesForBranchOfficeWithId(Long id) {
 		logger.info("fetching vehicles for branch office with id {}", id);
 		BranchOffice brOff = this.getBranchOfficeById(id);
@@ -90,7 +93,7 @@ public class BranchOfficeService implements BranchOfficeServiceInterface{
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public Vehicle addVehicleForBranchOfficeWithId(Long id, Vehicle vehicle) {
 		logger.info("adding vehicle for branch office with id {}", id);
 		BranchOffice brOff = this.getBranchOfficeById(id);
@@ -102,7 +105,7 @@ public class BranchOfficeService implements BranchOfficeServiceInterface{
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteVehicleForBranchOfficeWithId(Long id, Vehicle vehicle) {
 		logger.info("> deleting vehicle for branch office with id {}", id);
 		BranchOffice brOff = this.getBranchOfficeById(id);
@@ -112,30 +115,26 @@ public class BranchOfficeService implements BranchOfficeServiceInterface{
 	}
 
 	@Override
-	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public BranchOffice setLocationOfBranchOffice(Long id, Long locationId) {
 		logger.info("> changing location of branch office with id {}", id);
 		BranchOffice office = this.getBranchOfficeById(id);
-		Location location = this.getLocation(locationId);
+		Location location = this.getLocationOfRentACar(locationId);
 		location.getBranchOffices().add(office);
 		office.setLocation(location);
 		locationRepository.save(location);
 		logger.info("< changed location of branch office with id {}", id);
 		return office;
 	}
-	
-	private Location getLocation(Long id) {
+
+	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public Location getLocationOfRentACar(Long id) {
 		logger.info("> fetching location with id {}", id);
 		Optional<Location> location = locationRepository.findById(id);
 		logger.info("< location fetched");
 		if(location.isPresent()) return location.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested location doesn't exist.");
-	}
-
-	@Override
-	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	public Location getLocationOfRentACar(Long id) {
-		return this.getLocation(id);
 	}
 	
 }

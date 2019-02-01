@@ -52,5 +52,9 @@ public class RentACar extends Company {
 	}
 	
 	public List<CompanyAdmin> getAdmins() { return this.admins; }
-	
+
+	@Override
+	public String toString() {
+		return "RentACar [Id=" + getId() + "]";
+	}
 }
