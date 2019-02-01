@@ -6,15 +6,16 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 
 import com.isap.ISAProject.domain.security.CerberusUser;
-import com.isap.ISAProject.model.user.RegisteredUser;
+import com.isap.ISAProject.model.user.SystemUser;
 
 public class CerberusUserFactory {
-	public static CerberusUser create(RegisteredUser user) {
+	
+	public static CerberusUser create(SystemUser user) {
 		Collection<? extends GrantedAuthority> authorities;
 		try {
-			authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(user.getAuthority().toString());
-			
+			authorities = AuthorityUtils.createAuthorityList(user.getAuthority().toString());
 		} catch (Exception e) {
+			System.out.println("Doslo je do greske prilikom kreiranja autorizacije.");
 			authorities = null;
 		}
 		return new CerberusUser(

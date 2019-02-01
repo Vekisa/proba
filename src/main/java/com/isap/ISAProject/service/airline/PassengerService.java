@@ -53,7 +53,6 @@ public class PassengerService implements PassengerServiceInterface {
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void deletePassenger(Long passengerId) {
 		logger.info("> deleting passenger with id {}", passengerId);
-		// TODO : Kada je moguce brisati putnika?
 		repository.deleteById(passengerId);
 		logger.info("< passenger deleted");
 	}

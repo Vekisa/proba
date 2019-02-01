@@ -10,12 +10,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.Valid;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.isap.ISAProject.model.airline.Passenger;
 
 @Entity
 @Table(name = "registered_user")
@@ -32,9 +32,16 @@ public class RegisteredUser extends SystemUser {
 	private AuthorizationLevel authority;
 	
 	@JsonIgnore
-	@Cascade(CascadeType.ALL)
-	@OneToMany(mappedBy="registeredUser")
-	private List<Reservation> reservations;
+	@ManyToMany
+	private List<Reservation> confirmedReservations;
+	
+	@JsonIgnore
+	@ManyToMany
+	private List<Reservation> pendingReservations;
+	
+	@JsonIgnore
+	@ManyToMany
+	private List<Reservation> ratedReservations;
 	
 	@JsonIgnore
 	@Cascade(CascadeType.ALL)
@@ -53,6 +60,10 @@ public class RegisteredUser extends SystemUser {
 	@OneToOne
 	private ConfirmationToken confirmationToken;
 	
+	@JsonIgnore
+	@OneToOne
+	private Passenger passenger;
+	
 	public RegisteredUser() {}
 	
 	public List<Friendship> getFriendships() { return friendships; }
@@ -62,10 +73,6 @@ public class RegisteredUser extends SystemUser {
 	public int getBonusPoints() { return bonusPoints; }
 
 	public void setBonusPoints(int bonusPoints) { this.bonusPoints = bonusPoints; }
-
-	public List<Reservation> getReservations() { return reservations; }
-
-	public void setReservations(List<Reservation> reservations) { this.reservations = reservations; }
 
 	public List<FriendRequest> getSentRequests() { return sentRequests; }
 
@@ -81,16 +88,18 @@ public class RegisteredUser extends SystemUser {
 	@Override
 	public void setAuthority(AuthorizationLevel authority) { this.authority = authority; }
 	
-	public ConfirmationToken getConfirmationToken() {
-		return confirmationToken;
-	}
+	public ConfirmationToken getConfirmationToken() { return confirmationToken; }
 
-	public void setConfirmationToken(ConfirmationToken confirmationToken) {
-		this.confirmationToken = confirmationToken;
-	}
+	public void setConfirmationToken(ConfirmationToken confirmationToken) { this.confirmationToken = confirmationToken; }
 
-	public void add(@Valid Reservation reservation) {
-		this.getReservations().add(reservation);
-		reservation.setRegisteredUser(this);
-	}
+	public List<Reservation> getConfirmedReservations() { return confirmedReservations; }
+
+	public List<Reservation> getPendingReservations() { return pendingReservations; }
+
+	public List<Reservation> getRatedReservations() { return ratedReservations; }
+
+	public Passenger getPassenger() { return passenger; }
+
+	public void setPassenger(Passenger passenger) { this.passenger = passenger; }
+
 }

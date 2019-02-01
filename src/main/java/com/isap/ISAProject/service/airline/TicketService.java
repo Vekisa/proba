@@ -1,5 +1,6 @@
 package com.isap.ISAProject.service.airline;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,9 @@ import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightSeat;
 import com.isap.ISAProject.model.airline.SeatState;
 import com.isap.ISAProject.model.airline.Ticket;
+import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.repository.airline.TicketRepository;
+import com.isap.ISAProject.repository.user.ReservationRepository;
 import com.isap.ISAProject.serviceInterface.airline.TicketServiceInterface;
 
 @Service
@@ -29,6 +32,9 @@ public class TicketService implements TicketServiceInterface {
 
 	@Autowired
 	private TicketRepository repository;
+	
+	@Autowired
+	private ReservationRepository reservationRepository;
 	
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -53,7 +59,13 @@ public class TicketService implements TicketServiceInterface {
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Ticket saveTicket(Ticket ticket) {
 		logger.info("> saving ticket");
+		Reservation reservation = new Reservation();
+		reservation.setTicket(ticket);
+		reservation.setBeginDate(new Date());
+		reservation.setEndDate(new Date());
+		reservation.setPrice(0);
 		repository.save(ticket);
+		reservationRepository.save(reservation);
 		logger.info("< ticket saved");
 		return ticket;
 	}
@@ -62,7 +74,6 @@ public class TicketService implements TicketServiceInterface {
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void deleteTicket(Long ticketId) {
 		logger.info("> deleting ticket with id {}", ticketId);
-		// TODO : Kada je moguce obrisati kartu?
 		repository.deleteById(ticketId);
 		logger.info("< ticket deleted");
 	}
@@ -76,8 +87,12 @@ public class TicketService implements TicketServiceInterface {
 		if(seat.isTaken()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested seat is taken.");
 		ticket.getSeats().add(seat);
 		ticket.setPrice(ticket.getPrice() + seat.getPrice());
+		ticket.setNumberOfSeats(ticket.getNumberOfSeats() + 1);
 		seat.setTicket(ticket);
 		seat.setState(SeatState.TAKEN);
+		Reservation reservation = ticket.getReservation();
+		if(reservation != null)
+			reservation.setPrice(reservation.getPrice() + seat.getPrice());
 		logger.info("< seat added");
 		return seat;
 	}

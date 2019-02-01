@@ -129,6 +129,7 @@ public class TokenUtils {
     Map<String, Object> claims = new HashMap<String, Object>();
     claims.put("sub", userDetails.getUsername());
     //claims.put("audience", this.generateAudience(device));
+    System.out.println("Neki claims u generate token je : " + claims.get("sub"));
     claims.put("created", this.generateCurrentDate());
     return this.generateToken(claims);
   }

@@ -1,5 +1,6 @@
 package com.isap.ISAProject.service.airline;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class AirlineService implements AirlineServiceInterface {
 
 	@Autowired
 	private LocationRepository destinationRepository;
-	
+
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Airline> findAll(Pageable pageable) {
@@ -66,7 +67,7 @@ public class AirlineService implements AirlineServiceInterface {
 		if(destination.isPresent()) return destination.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested destination doesn't exist.");
 	}
-	
+
 	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Airline saveAirline(Airline airline, Long id) {
@@ -173,13 +174,13 @@ public class AirlineService implements AirlineServiceInterface {
 
 	@Override
 	public Map<Location, Integer> getGraphForDestinations(Date beginDate, Date endDate) {
-		// TODO : implement
+		// TODO : Videti da li je neophodno
 		return null;
 	}
 
 	@Override
 	public Map<Flight, Integer> getGraphForFlights(Date beginDate, Date endDate) {
-		// TODO : implement
+		// TODO : Videti da li je neophodno
 		return null;
 	}
 
@@ -217,7 +218,7 @@ public class AirlineService implements AirlineServiceInterface {
 		if(location != null) return location;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested location doesn't exist.");
 	}
-	
+
 	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Flight> getFlightsOfAirline(Long id) {
@@ -227,6 +228,19 @@ public class AirlineService implements AirlineServiceInterface {
 		logger.info("< flights fetched");
 		if(!list.isEmpty()) return list;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested flights do not exist.");
+	}
+
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public List<Location> getDestinationsOfAirline(Long id) {
+		logger.info("> fetching destinations of airline with id {}", id);
+		Airline airline = this.findById(id);
+		List<Location> destinations = new ArrayList<>();
+		for(Flight f : airline.getFlights())
+			if(!destinations.contains(f.getFinishDestination()))
+				destinations.add(f.getFinishDestination());
+		logger.info("< destinations fetched");
+		if(!destinations.isEmpty()) return destinations;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested destinations do not exist.");
 	}
 
 }

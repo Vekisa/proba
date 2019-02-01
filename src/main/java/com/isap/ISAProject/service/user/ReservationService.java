@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +19,17 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.model.airline.FlightSeat;
+import com.isap.ISAProject.model.airline.Passenger;
 import com.isap.ISAProject.model.airline.Ticket;
+import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
+import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
+import com.isap.ISAProject.repository.airline.PassengerRepository;
+import com.isap.ISAProject.repository.hotel.RoomRepository;
+import com.isap.ISAProject.repository.user.RegisteredUserRepository;
 import com.isap.ISAProject.repository.user.ReservationRepository;
 import com.isap.ISAProject.service.airline.TicketService;
 import com.isap.ISAProject.service.hotel.RoomReservationService;
@@ -43,6 +52,15 @@ public class ReservationService {
 	
 	@Autowired
 	private RoomReservationService roomReservationService;
+	
+	@Autowired
+	private RoomRepository roomRepository;
+	
+	@Autowired
+	private RegisteredUserRepository usersRepository;
+	
+	@Autowired
+	private PassengerRepository passengersRepository;
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Reservation findById(long id) {
@@ -111,6 +129,186 @@ public class ReservationService {
 	public static long getDifferenceDays(Date d1, Date d2) {
 	    long diff = d2.getTime() - d1.getTime();
 	    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	public Reservation addUserToReservation(Long id, Long userId) {
+		logger.info("> adding user to reservation with id {}", id);
+		Reservation reservation = this.findById(id);
+		RegisteredUser user = this.findRegisteredUser(userId);
+		reservation.getConfirmedUsers().add(user);
+		reservationRepository.save(reservation);
+		logger.info("< user added");
+		return reservation;
+	}
+	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	private RegisteredUser findRegisteredUser(Long id) {
+		logger.info("> fetching registered user with id {}", id);
+		Optional<RegisteredUser> user = usersRepository.findById(id);
+		logger.info("< user fetched");
+		if(user.isPresent()) return user.get();
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested user doesn't exist.");
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	public Reservation inviteUsersToReservation(Long id, List<Long> users) {
+		logger.info("> inviting users to reservation with id {}", id);
+		Reservation reservation = this.findById(id);
+		if(users.size() > reservation.getTicket().getNumberOfSeats())
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Too many friends invited.");
+		RegisteredUser owner = reservation.getConfirmedUsers().get(0);
+		if(owner == null) 
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This reservation is unassigned.");
+		List<RegisteredUser> friends = usersRepository.findFriendsOfUser(owner.getId());
+		for(Long userId : users)
+			this.inviteUserToReservation(userId, friends, reservation);
+		reservationRepository.save(reservation);
+		logger.info("< users invited");
+		return reservation;
+	}
+
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	private void inviteUserToReservation(Long userId, List<RegisteredUser> friends, Reservation reservation) {
+		RegisteredUser user = this.findRegisteredUser(userId);
+		// TODO : Istek za pozivnicu
+		if(friends.contains(user))
+			reservation.getInvitedUsers().add(user);
+		else
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Owner is not friend with user with id " + userId);
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	public Reservation declineInvitation(Long id, Long userId) {
+		logger.info("> declining invitation of reservation with id {}", id);
+		Reservation reservation = this.findById(id);
+		RegisteredUser user = this.findRegisteredUser(userId);
+		if(!reservation.getInvitedUsers().remove(user))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with id " + userId + " isn't invited.");
+		reservationRepository.save(reservation);
+		logger.info("< invitation declined");
+		return reservation;
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	public Reservation acceptInvitation(Long id, Long userId) {
+		logger.info("> accepting invitation of reservation with id {}", id);
+		Reservation reservation = this.findById(id);
+		RegisteredUser user = this.findRegisteredUser(userId);
+		if(!reservation.getInvitedUsers().remove(user))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with id " + userId + " isn't invited.");
+		FlightSeat seat = getFreeSeat(reservation.getTicket());
+		if(user.getPassenger() == null)
+			user.setPassenger(this.createNewPassenger(user));
+		seat.setPassenger(user.getPassenger());
+		reservation.getConfirmedUsers().add(user);
+		passengersRepository.save(user.getPassenger());
+		usersRepository.save(user);
+		reservationRepository.save(reservation);
+		logger.info("< accepted invitation");
+		return reservation;
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	private Passenger createNewPassenger(RegisteredUser user) {
+		logger.info("> creating passenger for user with id {}", user.getId());
+		Passenger passenger = new Passenger();
+		passenger.setFirstName(user.getFirstName());
+		passenger.setLastName(user.getLastName());
+		// TODO : Videti sta sa brojem pasosa
+		passenger.setPassportNumber(user.getId());
+		passenger.setUser(user);
+		logger.info("< created passenger");
+		return passenger;
+	}
+
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	private FlightSeat getFreeSeat(Ticket ticket) {
+		for(FlightSeat fs : ticket.getSeats())
+			if(fs.getPassenger() == null)
+				return fs;
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There are no free seats on the ticket.");
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	public Reservation cancelReservation(Long id, Long userId) {
+		logger.info("> cancelling reservation with id {}", id);
+		Reservation reservation = this.findById(id);
+		RegisteredUser user = this.findRegisteredUser(userId);
+		// TODO : Vremensa provera ogranicenja
+		// TODO : Ako je poslednji korisnik otkazao, rezervacija se u celosti brise
+		if(!reservation.getConfirmedUsers().remove(user))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with id " + userId + " isn't on the reservation.");
+		this.removeUserFromSeat(reservation.getTicket(), user.getPassenger());
+		reservationRepository.save(reservation);
+		logger.info("< reservation cancelled");
+		return reservation;
+	}
+	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	private void removeUserFromSeat(Ticket ticket, Passenger passenger) {
+		for(FlightSeat fs : ticket.getSeats())
+			if(fs.getPassenger().equals(passenger)) {
+				fs.setPassenger(null);
+				return;
+			}
+		throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Passenger is not on any seat, but should be.");
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	public Reservation addRoomReservationToReservation(Long id, Long roomId, @Valid RoomReservation roomReservation) {
+		logger.info("> adding room reservation to room with id {}", id);
+		Reservation reservation = this.findById(id);
+		Room room = this.findRoom(roomId);
+		if(roomReservation.getBeginDate().after(roomReservation.getEndDate()))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datum rezervacije je lose unesen");
+		if(roomReservation.getBeginDate().before(reservation.getBeginDate()))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba se moze iznajmiti samo nakon sletanja!");
+		if(!checkIfRoomIsFree(roomReservation.getBeginDate(), roomReservation.getEndDate(), room))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba nije slobodna u tom periodu");
+		room.getRoomReservations().add(roomReservation);
+		roomReservation.setRoom(room);
+		Long difference = roomReservation.getEndDate().getTime() - roomReservation.getBeginDate().getTime();
+		roomReservation.setNumberOfNights((int) TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS));
+		roomReservation.setPrice(room.getRoomType().getPricePerNight() * roomReservation.getNumberOfNights());
+		reservation.setRoomReservation(roomReservation);
+		reservation.setPrice(reservation.getPrice() + roomReservation.getPrice());
+		reservationRepository.save(reservation);
+		logger.info("< room reservation added");
+		return reservation;
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	public Reservation removeRoomReservation(Long id) {
+		logger.info("> removing room reservation from reservation with id {}", id);
+		Reservation reservation = this.findById(id);
+		RoomReservation roomReservation = reservation.getRoomReservation();
+		reservation.setRoomReservation(null);
+		reservation.setPrice(reservation.getPrice() - roomReservation.getPrice());
+		reservationRepository.save(reservation);
+		logger.info("< room reservation removed");
+		return reservation;
+	}
+	
+	public boolean checkIfRoomIsFree(Date start, Date end, Room room) {
+		Date reservedStart = null;
+		Date reservedEnd = null;
+		for(RoomReservation roomReservation :room.getRoomReservations()) {
+			reservedStart = roomReservation.getBeginDate();
+			reservedEnd = roomReservation.getEndDate();
+			if((start.after(reservedStart) && start.before(reservedEnd)) || (end.after(reservedStart) && end.before(reservedEnd)))
+				return false;
+		}
+		return true;
+	}
+
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	private Room findRoom(Long roomId) {
+		logger.info("> fethcing room with id {}", roomId);
+		Optional<Room> room = roomRepository.findById(roomId);
+		logger.info("< room fetched");
+		if(room.isPresent()) return room.get();
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested room doesn't exist.");
 	}
 	
 }

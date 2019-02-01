@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 
 public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -35,7 +34,6 @@ public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFil
     HttpServletRequest httpRequest = (HttpServletRequest) request;
     String authToken = httpRequest.getHeader(this.tokenHeader);
     String username = this.tokenUtils.getUsernameFromToken(authToken);
-
     if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
       UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
       if (this.tokenUtils.validateToken(authToken, userDetails)) {
@@ -44,7 +42,6 @@ public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFil
         SecurityContextHolder.getContext().setAuthentication(authentication);
       }
     }
-
     chain.doFilter(request, response);
   }
 

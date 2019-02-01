@@ -1,7 +1,6 @@
 package com.isap.ISAProject.controller.user;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.isap.ISAProject.model.airline.Ticket;
@@ -87,5 +87,39 @@ public class ReservationController {
 		reservationService.deleteById(reservationId);
 		return ResponseEntity.ok().build();
 	}	
+	
+	@RequestMapping(value = "/{id}/room-reservation", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<Reservation>> addRoomReservation(@PathVariable("id") Long id, @RequestParam("room") Long roomId, @Valid @RequestBody RoomReservation roomReservation) {
+		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.addRoomReservationToReservation(id, roomId, roomReservation)), HttpStatus.CREATED);
+	}
+	
+	public ResponseEntity<Resource<Reservation>> removeRoomReservation(@PathVariable("id") Long id) {
+		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.removeRoomReservation(id)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/user", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<Reservation>> addUserToReservation(@PathVariable(value = "id") Long id, @RequestParam("user") Long userId) {
+		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.addUserToReservation(id, userId)), HttpStatus.CREATED);
+	}
+	
+	@RequestMapping(value = "/{id}/invite", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<Reservation>> inviteUserToReservation(@PathVariable(value = "id") Long id, @RequestBody List<Long> users) {
+		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.inviteUsersToReservation(id, users)), HttpStatus.CREATED);
+	}
+	
+	@RequestMapping(value = "/{id}/decline", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<Reservation>> declineReservationInvite(@PathVariable(value = "id") Long id, @RequestParam("user") Long userId) {
+		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.declineInvitation(id, userId)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/accept", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<Reservation>> acceptInvite(@PathVariable(value = "id") Long id, @RequestParam("user") Long userId) {
+		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.acceptInvitation(id, userId)), HttpStatus.CREATED);
+	}
+	
+	@RequestMapping(value = "/{id}/cancel", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<Reservation>> cancelReservation(@PathVariable(value = "id") Long id, @RequestParam("user") Long userId) {
+		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.cancelReservation(id, userId)), HttpStatus.OK);
+	}
 	
 }
