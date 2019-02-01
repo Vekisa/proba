@@ -1,6 +1,7 @@
 package com.isap.ISAProject.model.rentacar;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -62,7 +63,7 @@ public class VehicleReservation {
 		this.endDate = endDate;
 	}
 	public double getPrice() {
-		return price;
+		return TimeUnit.DAYS.convert(this.getEndDate().getTime() - this.getBeginDate().getTime(), TimeUnit.MILLISECONDS) * this.vehicle.getPricePerDay();
 	}
 	public void setPrice(double price) {
 		this.price = price;

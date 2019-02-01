@@ -12,9 +12,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
+
+import com.isap.ISAProject.model.RatableEntity;
 @Entity
 @Table(name = "vehicle")
-public class Vehicle {
+public class Vehicle extends RatableEntity{
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
