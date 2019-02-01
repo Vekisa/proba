@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -45,6 +46,26 @@ public class RentACarController {
 	})
 	public ResponseEntity<List<Resource<RentACar>>> getAllRentACars(Pageable pageable){
 		return new ResponseEntity<List<Resource<RentACar>>>(HATEOASImplementorRentacar.rentacarLinksList(service.getAllRentACars(pageable)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/search", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Pretraga rent-a-car servisa", responseContainer = "List", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = { 
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content. Lista je prazna."),
+			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
+	})
+	public ResponseEntity<List<RentACar>> search(Pageable pageable, @RequestParam("locationName") String locationName, @RequestParam("name") String name/*, @PathVariable("beginDate") String begin, @PathVariable("endDate") String end*/){
+		/*Date pocetak = null;
+		Date kraj = null;
+		try {
+			pocetak = new SimpleDateFormat("dd/MM/yyyy").parse(begin);
+			kraj =  new SimpleDateFormat("dd/MM/yyyy").parse(end);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}*/
+		List<RentACar> ret = service.search(pageable, locationName, name/*, pocetak, kraj*/);
+		return new ResponseEntity<List<RentACar>>(ret, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

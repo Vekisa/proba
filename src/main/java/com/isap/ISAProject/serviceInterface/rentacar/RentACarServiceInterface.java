@@ -1,5 +1,6 @@
 package com.isap.ISAProject.serviceInterface.rentacar;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -26,4 +27,6 @@ public interface RentACarServiceInterface {
 	void deleteBranchOffice(Long id, BranchOffice brOff);
 
 	List<CompanyAdmin> getAdminsOfRentACar(Long id);
+	
+	List<RentACar> search(Pageable p, String locationName, String rentacarName/*, Date beginDate, Date endDate*/);
 }

@@ -1,5 +1,7 @@
 package com.isap.ISAProject.repository.airline;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +25,5 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 	@Query(value = "update isap.hotel set location_id = null where location_id = ?1", nativeQuery = true)
 	public void removeSelfFromHotels(Long destinationId);
 	
+	List<Location> findByName(String name);
 }
