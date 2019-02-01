@@ -70,7 +70,9 @@ public class RoomService {
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteById(long id) {
 		logger.info("> Room delete");
-		this.findById(id);
+		Room room = this.findById(id);
+		if(!this.checkIfRoomIsReserved(room))
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Soba je rezervisana i ne moze se brisat.");
 		roomRepository.deleteById(id);
 		logger.info("< Room delete");
 	}
@@ -79,12 +81,23 @@ public class RoomService {
 	public Room updateRoomById(Long roomId, Room newRoom) {
 		logger.info("> Room update");
 		Room oldRoom = this.findById(roomId);
+		if(!this.checkIfRoomIsReserved(oldRoom))
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Soba je rezervisana i ne moze se menjati.");
 		oldRoom.setNumberOfBeds(newRoom.getNumberOfBeds());
 		roomRepository.save(oldRoom);
 		logger.info("< Room update");
 		return oldRoom;
 	}
 	
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	private boolean checkIfRoomIsReserved(Room oldRoom) {
+		Date current = new Date();
+		for(RoomReservation r : oldRoom.getRoomReservations())
+			if(r.getBeginDate().after(current) || r.getEndDate().after(current))
+				return true;
+		return false;
+	}
+
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<RoomReservation> getRoomReservations(Long id){
 		logger.info("> get room reservations for room");

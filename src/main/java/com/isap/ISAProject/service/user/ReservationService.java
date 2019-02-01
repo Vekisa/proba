@@ -31,6 +31,7 @@ import com.isap.ISAProject.repository.airline.PassengerRepository;
 import com.isap.ISAProject.repository.hotel.RoomRepository;
 import com.isap.ISAProject.repository.user.RegisteredUserRepository;
 import com.isap.ISAProject.repository.user.ReservationRepository;
+import com.isap.ISAProject.service.EmailSenderService;
 import com.isap.ISAProject.service.airline.TicketService;
 import com.isap.ISAProject.service.hotel.RoomReservationService;
 import com.isap.ISAProject.service.rentacar.VehicleReservationService;
@@ -61,6 +62,9 @@ public class ReservationService {
 	
 	@Autowired
 	private PassengerRepository passengersRepository;
+	
+	@Autowired
+	private EmailSenderService emailService;
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Reservation findById(long id) {
@@ -138,6 +142,7 @@ public class ReservationService {
 		RegisteredUser user = this.findRegisteredUser(userId);
 		reservation.getConfirmedUsers().add(user);
 		reservationRepository.save(reservation);
+		emailService.sendReservationInfo(user, reservation);
 		logger.info("< user added");
 		return reservation;
 	}
@@ -161,21 +166,23 @@ public class ReservationService {
 		if(owner == null) 
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This reservation is unassigned.");
 		List<RegisteredUser> friends = usersRepository.findFriendsOfUser(owner.getId());
-		for(Long userId : users)
-			this.inviteUserToReservation(userId, friends, reservation);
+		for(Long userId : users) {
+			RegisteredUser user = this.findRegisteredUser(userId);
+			this.inviteUserToReservation(user, friends, reservation);
+			emailService.sendInvitation(user, reservation, owner);
+		}
 		reservationRepository.save(reservation);
 		logger.info("< users invited");
 		return reservation;
 	}
 
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-	private void inviteUserToReservation(Long userId, List<RegisteredUser> friends, Reservation reservation) {
-		RegisteredUser user = this.findRegisteredUser(userId);
+	private void inviteUserToReservation(RegisteredUser user, List<RegisteredUser> friends, Reservation reservation) {
 		// TODO : Istek za pozivnicu
 		if(friends.contains(user))
 			reservation.getInvitedUsers().add(user);
 		else
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Owner is not friend with user with id " + userId);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Owner is not friend with user with id " + user.getId());
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
@@ -205,6 +212,7 @@ public class ReservationService {
 		passengersRepository.save(user.getPassenger());
 		usersRepository.save(user);
 		reservationRepository.save(reservation);
+		emailService.sendReservationInfo(user, reservation);
 		logger.info("< accepted invitation");
 		return reservation;
 	}
@@ -261,11 +269,13 @@ public class ReservationService {
 		Reservation reservation = this.findById(id);
 		Room room = this.findRoom(roomId);
 		if(roomReservation.getBeginDate().after(roomReservation.getEndDate()))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datum rezervacije je lose unesen");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datum rezervacije je lose unesen!");
 		if(roomReservation.getBeginDate().before(reservation.getBeginDate()))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba se moze iznajmiti samo nakon sletanja!");
-		if(!checkIfRoomIsFree(roomReservation.getBeginDate(), roomReservation.getEndDate(), room))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba nije slobodna u tom periodu");
+		if(!this.checkIfRoomIsFree(roomReservation.getBeginDate(), roomReservation.getEndDate(), room))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba nije slobodna u tom periodu!");
+		if(reservation.getTicket().getNumberOfSeats() < roomReservation.getNumberOfRooms())
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Niste zauzeli sobe za sve putnike.!");
 		room.getRoomReservations().add(roomReservation);
 		roomReservation.setRoom(room);
 		Long difference = roomReservation.getEndDate().getTime() - roomReservation.getBeginDate().getTime();

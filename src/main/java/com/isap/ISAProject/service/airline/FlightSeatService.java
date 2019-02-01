@@ -55,8 +55,10 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void deleteSeat(Long flightSeatId) {
 		logger.info("> deleting seat with id {}", flightSeatId);
-		// TODO : Kada je moguce brisati sediste?
-		repository.deleteById(flightSeatId);
+		FlightSeat seat = this.findById(flightSeatId);
+		if(seat.isTaken())
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested seat is taken and can't be deleted.");
+		repository.delete(seat);
 		logger.info("< seat deleted");
 	}
 
