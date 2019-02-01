@@ -10,8 +10,9 @@ $(document).on('click','#logout',function(e){
 			localStorage.token = null;
 			window.location.href = 'index.html';		
 		},
-		fail : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("Error");
+		error : function(xhr, status, error) {
+			$("#error").html(JSON.parse(xhr.responseText).message);
+		    $('#myModal').modal("show");
 		}
 	});
 });

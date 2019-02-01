@@ -1,6 +1,7 @@
 package com.isap.ISAProject.model.rentacar;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -43,8 +44,9 @@ public class VehicleReservation {
 	@ManyToOne
 	private Vehicle vehicle;
 	
-	@OneToOne
-	private Reservation reservation;
+	//TODO: otkomentarisati
+	//@OneToOne
+	//private Reservation reservation;
 	
 	@Version
 	private Long version;
@@ -62,7 +64,7 @@ public class VehicleReservation {
 		this.endDate = endDate;
 	}
 	public double getPrice() {
-		return price;
+		return TimeUnit.DAYS.convert(this.getEndDate().getTime() - this.getBeginDate().getTime(), TimeUnit.MILLISECONDS) * this.vehicle.getPricePerDay();
 	}
 	public void setPrice(double price) {
 		this.price = price;
@@ -87,11 +89,16 @@ public class VehicleReservation {
 	public void setVersion(Long version) {
 		this.version = version;
 	}
-	public Reservation getReservation() {
+	//TODO: otkomentarisati
+	/*public Reservation getReservation() {
 		return reservation;
 	}
 	public void setReservation(Reservation reservation) {
 		this.reservation = reservation;
+	}*/
+	@Override
+	public String toString() {
+		return "VehicleReservation [id=" + id + "]";
 	}
 
 }

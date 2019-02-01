@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -28,6 +29,7 @@ public class VehicleReservationService implements VehicleReservationServiceInter
 	private VehicleReservationRepository repository;
 	
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<VehicleReservation> getAllVehicleReservation(Pageable pageable) {
 		logger.info("> fetch vehicle reservations at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<VehicleReservation> vrs = repository.findAll(pageable);
@@ -36,6 +38,7 @@ public class VehicleReservationService implements VehicleReservationServiceInter
 	}
 
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public VehicleReservation getVehicleReservationById(Long id) {
 		logger.info("> fetch vehicle reservation with id {}", id);
 		Optional<VehicleReservation> vr = repository.findById(id);
@@ -45,7 +48,7 @@ public class VehicleReservationService implements VehicleReservationServiceInter
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public VehicleReservation saveVehicleReservation(VehicleReservation vr) {
 		logger.info("> saving vehicle reservation");
 		repository.save(vr);
@@ -54,7 +57,7 @@ public class VehicleReservationService implements VehicleReservationServiceInter
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public VehicleReservation updateVehicleReservation(Long id, VehicleReservation vr) {
 		logger.info("> updating vehicle reservation with id {}", id);
 		VehicleReservation oldVr = this.getVehicleReservationById(id);
@@ -67,11 +70,10 @@ public class VehicleReservationService implements VehicleReservationServiceInter
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteVehicleReservation(Long id) {
 		logger.info("> deleting vehicle reservation with id {}", id);
 		repository.delete(this.getVehicleReservationById(id));
 		logger.info("< vehicle reservation deleted");
 	}
-
 }

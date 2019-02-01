@@ -28,5 +28,5 @@ public interface RentACarServiceInterface {
 
 	List<CompanyAdmin> getAdminsOfRentACar(Long id);
 	
-	List<RentACar> search(Pageable p, String locationName, String rentacarName/*, Date beginDate, Date endDate*/);
+	List<RentACar> search(Pageable p, String locationName, String rentacarName, Date beginDate, Date endDate);
 }

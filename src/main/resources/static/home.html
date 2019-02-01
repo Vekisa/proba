@@ -7,7 +7,7 @@
 		<script type="text/javascript" src="jquery.min.js"></script>
 		<script type="text/javascript" src="home.js"></script>
 	</head>
-	<body>
+	<body background = "backgr.jpg">
 		<nav class="navbar navbar-expand-lg navbar-light bg-light">
   		<img src="air-plane-cartoon.png" alt="Airplane" hegiht = "100" width = "100">
   		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,8 +48,27 @@
       			<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
     		</form>
   		</div>
-	</nav>	
+	</nav>
 		Welcome
+		
+	<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Error</h4>
+        </div>
+        <div class="modal-body">
+          <p id="error"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 	</body>
 </html>

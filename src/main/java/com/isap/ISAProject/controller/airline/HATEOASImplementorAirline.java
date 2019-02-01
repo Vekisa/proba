@@ -10,6 +10,7 @@ import javax.validation.Valid;
 
 import org.springframework.hateoas.Resource;
 
+import com.isap.ISAProject.controller.hotel.HotelController;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Flight;
@@ -26,9 +27,11 @@ public class HATEOASImplementorAirline {
 	public static Resource<Airline> createAirline(Airline airline) {
 		Resource<Airline> resource = new Resource<Airline>(airline);
 		resource.add(linkTo(methodOn(AirlineController.class).getAirlineById(airline.getId())).withRel("self"));
-		resource.add(linkTo(methodOn(AirlineController.class).getAllAirlines(null)).slash("?page=0&size=5").withRel("all-airlines"));
+		resource.add(linkTo(methodOn(AirlineController.class).getAllAirlines(null)).slash("?page=0&size=5").withRel("all_airlines"));
 		resource.add(linkTo(methodOn(AirlineController.class).getLuggageInfosForAirlineWithId(airline.getId())).withRel("airline-luggage-infos"));
-		resource.add(linkTo(methodOn(AirlineController.class).getFlightConfigurationsForAirlineWithId(airline.getId())).withRel("airline-flight-configurations"));
+		resource.add(linkTo(methodOn(AirlineController.class).getFlightConfigurationsForAirlineWithId(airline.getId())).withRel("airline_flight_configurations"));
+		resource.add(linkTo(methodOn(AirlineController.class).getFlightsOfAirline(airline.getId())).withRel("airline_flights"));
+		resource.add(linkTo(methodOn(AirlineController.class).getLocationOfAirlineWithId(airline.getId())).withRel("location"));
 		// TODO : Link za brze rezervacije
 		return resource;
 	}
@@ -65,6 +68,7 @@ public class HATEOASImplementorAirline {
 		resource.add(linkTo(methodOn(LocationController.class).getOfficesOnLocation(destination.getId())).withRel("offices-on-location"));
 		resource.add(linkTo(methodOn(LocationController.class).getFlightsFromDestinationWithId(destination.getId())).withRel("flights-from-location"));
 		resource.add(linkTo(methodOn(LocationController.class).getFlightsToDestinationWithId(destination.getId())).withRel("flights-to-location"));
+		resource.add(linkTo(methodOn(LocationController.class).getLongLatForDestinationWithName(destination.getId())).withRel("long_lat"));
 		return resource;
 	}
 

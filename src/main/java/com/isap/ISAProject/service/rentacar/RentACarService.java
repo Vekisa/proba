@@ -1,6 +1,7 @@
 package com.isap.ISAProject.service.rentacar;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.RentACar;
+import com.isap.ISAProject.model.rentacar.VehicleReservation;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.repository.airline.LocationRepository;
 import com.isap.ISAProject.repository.rentacar.BranchOfficeRepository;
@@ -45,6 +47,7 @@ public class RentACarService implements RentACarServiceInterface {
 	private BranchOfficeRepository broRepo;
 	
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<RentACar> getAllRentACars(Pageable pageable) {
 		logger.info("> fetch rent-a-cars at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<RentACar> rentacars = repository.findAll(pageable);
@@ -53,6 +56,7 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public RentACar getRentACarById(Long id) {
 		logger.info("> fetch rent-a-car with id {}", id);
 		Optional<RentACar> rcar = repository.findById(id);
@@ -62,7 +66,7 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public RentACar saveRentACar(RentACar rentacar) {
 		logger.info("> saving rent-a-car");
 		repository.save(rentacar);
@@ -71,7 +75,7 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public RentACar updateRentACar(Long id, RentACar rentacar) {
 		logger.info("> updating rent-a-car with id {}", id);
 		RentACar oldRcar = this.getRentACarById(id);
@@ -84,7 +88,7 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteRentACar(Long id) {
 		logger.info("> deleting rent-a-car with id {}", id);
 		repository.delete(this.getRentACarById(id));
@@ -92,6 +96,7 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<BranchOffice> getBranchOffices(Long id) {
 		logger.info("> fetching branch offices for rent-a-car with id {}", id);
 		RentACar rcar = this.getRentACarById(id);
@@ -101,7 +106,7 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public BranchOffice addBranchOffice(Long id, BranchOffice brOff) {
 		logger.info("> adding branch office for rent-a-car with id {}", id);
 		RentACar rcar = this.getRentACarById(id);
@@ -113,7 +118,7 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteBranchOffice(Long id, BranchOffice brOff) {
 		logger.info("> deleting branch office for rent-a-car with id {}", id);
 		RentACar rcar = this.getRentACarById(id);
@@ -134,8 +139,9 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
-	public List<RentACar> search(Pageable pageable, String locationName, String rentacarName/*, Date beginDate, Date endDate*/) {
+	public List<RentACar> search(Pageable pageable, String locationName, String rentacarName, Date beginDate, Date endDate) {
 		logger.info("> searching");
+		
 		List<RentACar> rentacarsByName = repository.findByName(rentacarName);
 		
 		List<Location> locationsByName = lRepo.findByName(locationName);
@@ -144,71 +150,48 @@ public class RentACarService implements RentACarServiceInterface {
 		for(Location l : locationsByName) {
 			List<BranchOffice> pom = broRepo.findByLocation(l);
 			for(BranchOffice bro : pom) {
-				offices.add(bro);
+				if(!offices.contains(bro)) offices.add(bro);
 			}
 		}
 		
 		List<RentACar> ret = new ArrayList<RentACar>();
 		for(BranchOffice bro : offices) {
 			if(rentacarsByName.contains(bro.getRentACar())) {
-				ret.add(bro.getRentACar());
+				if(!ret.contains(bro.getRentACar())) ret.add(bro.getRentACar());
 			}
 		}
+		logger.info("ret: " + ret);
 		
-		//reservsBegin = vrRepo.findByBeginDate(beginDate);
-		//reservsEnd = vrRepo.findByEndDate(endDate);
+		List<VehicleReservation> sadrzePocetak = vrRepo.findAllByBeginDateBetween(beginDate, endDate);
+		logger.info("sadrzePocetak: " + sadrzePocetak);
+		List<VehicleReservation> sadrzeKraj = vrRepo.findAllByEndDateBetween(beginDate, endDate);
+		logger.info("sadrzeKraj: " + sadrzeKraj);
+		List<VehicleReservation> sve = vrRepo.findAll();
+		logger.info("sve: " + sve);
+		List<VehicleReservation> meniTrebaju = new ArrayList<VehicleReservation>();
 		
-		/*if(!locationName.equals("")) {
-			ret = searchByLocation(locationName, ret);
-			System.out.println("search by location");
+		for(VehicleReservation vr : sve) {
+			if(!sadrzePocetak.contains(vr) && !sadrzeKraj.contains(vr)) {
+				if(!meniTrebaju.contains(vr)) meniTrebaju.add(vr);
+			}
 		}
-		if(!rentacarName.equals("")) {
-			ret = searchByName(rentacarName, ret);
-			System.out.println("search by name");
+		logger.info("meniTrebaju: " + meniTrebaju);
+		
+		List<RentACar> ret1 = new ArrayList<>();
+		for(VehicleReservation vr : meniTrebaju) {
+			if(!ret1.contains(vr.getVehicle().getBranchOffice().getRentACar())) ret1.add(vr.getVehicle().getBranchOffice().getRentACar());
 		}
-		if(beginDate != null && endDate != null) {
-			ret = searchByDate(beginDate, endDate, ret);
-			System.out.println("search by date");
-		}*/
+		logger.info("ret1: " + ret1);
+		
+		List<RentACar> retKonacno = new ArrayList<RentACar>();
+		for(RentACar rc : ret1) {
+			if(ret1.contains(rc)) {
+				if(!retKonacno.contains(rc)) retKonacno.add(rc);
+			}
+		}
+		logger.info("retKonacno: " + retKonacno);
+		
 		logger.info("> searching done");
-		return ret;
+		return retKonacno;
 	}
-	
-	/*private List<RentACar> searchByLocation(String locationName, List<RentACar> source){
-		List<RentACar> ret = new ArrayList<RentACar>();
-		for(RentACar rac : source) {
-			for(BranchOffice bro : rac.getBranchOffices()) {
-				if(bro.getLocation().getName().equals(locationName)) {
-					ret.add(rac);
-				}
-			}
-		}
-		return ret;
-	}
-	
-	private List<RentACar> searchByName(String name, List<RentACar> source){
-		ArrayList<RentACar> ret = new ArrayList<RentACar>();
-		for(RentACar rac : source) {
-			if(rac.getName().equals(name)) {
-				ret.add(rac);
-			}
-		}
-		return ret;
-	}
-	
-	private List<RentACar> searchByDate(Date beginDate, Date endDate, List<RentACar> source){
-		ArrayList<RentACar> ret = new ArrayList<RentACar>();
-		for(RentACar rac : source) {
-			for(BranchOffice bro : rac.getBranchOffices()) {
-				for(Vehicle veh : bro.getVehicles()) {
-					for(VehicleReservation res : veh.getVehicleReservations()) {
-						if(!(beginDate.after(res.getBeginDate()) && beginDate.before(res.getEndDate()) && endDate.after(res.getBeginDate()) && endDate.before(res.getEndDate()))) {
-							ret.add(rac);
-						}
-					}
-				}
-			}
-		}
-		return ret;
-	}*/
 }

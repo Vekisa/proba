@@ -12,9 +12,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
+
+import com.isap.ISAProject.model.RatableEntity;
 @Entity
 @Table(name = "vehicle")
-public class Vehicle {
+public class Vehicle extends RatableEntity{
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +27,24 @@ public class Vehicle {
 	
 	@Column(nullable = false)
 	private double discount;
+	
+	@Column(nullable = false)
+	private String name;
+	
+	@Column(nullable = false)
+	private String brand;
+	
+	@Column(nullable = false)
+	private String model;
+	
+	@Column(nullable = false)
+	private int productionYear;
+	
+	@Column(nullable = false)
+	private String type;
+	
+	@Column(nullable = false)
+	private int seatsNumber;
 	
 	@ManyToOne
 	private BranchOffice branchOffice;
@@ -74,5 +94,49 @@ public class Vehicle {
 
 	public void setVersion(Long version) {
 		this.version = version;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getBrand() {
+		return brand;
+	}
+	public void setBrand(String brand) {
+		this.brand = brand;
+	}
+	public String getModel() {
+		return model;
+	}
+	public void setModel(String model) {
+		this.model = model;
+	}
+	public int getProductionYear() {
+		return productionYear;
+	}
+	public void setProductionYear(int productionYear) {
+		this.productionYear = productionYear;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public int getSeatsNumber() {
+		return seatsNumber;
+	}
+	public void setSeatsNumber(int seatsNumber) {
+		this.seatsNumber = seatsNumber;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	@Override
+	public String toString() {
+		return "Vehicle [id=" + id + "]";
 	}
 }

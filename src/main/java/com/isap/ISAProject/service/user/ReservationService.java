@@ -96,7 +96,8 @@ public class ReservationService {
 		
 		if(vehicleReservation != null) {
 			reservation.setVehicleReservation(vehicleReservation);
-			vehicleReservation.setReservation(reservation);
+			//TODO: otkomentarisati
+			//vehicleReservation.setReservation(reservation);
 			vehicleReservationService.saveVehicleReservation(vehicleReservation);
 		}
 		if(roomReservation != null) {
