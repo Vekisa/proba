@@ -47,6 +47,7 @@ public class RentACarService implements RentACarServiceInterface {
 	private BranchOfficeRepository broRepo;
 	
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<RentACar> getAllRentACars(Pageable pageable) {
 		logger.info("> fetch rent-a-cars at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<RentACar> rentacars = repository.findAll(pageable);
@@ -55,6 +56,7 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public RentACar getRentACarById(Long id) {
 		logger.info("> fetch rent-a-car with id {}", id);
 		Optional<RentACar> rcar = repository.findById(id);
@@ -64,7 +66,7 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public RentACar saveRentACar(RentACar rentacar) {
 		logger.info("> saving rent-a-car");
 		repository.save(rentacar);
@@ -73,7 +75,7 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public RentACar updateRentACar(Long id, RentACar rentacar) {
 		logger.info("> updating rent-a-car with id {}", id);
 		RentACar oldRcar = this.getRentACarById(id);
@@ -86,7 +88,7 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteRentACar(Long id) {
 		logger.info("> deleting rent-a-car with id {}", id);
 		repository.delete(this.getRentACarById(id));
@@ -94,6 +96,7 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<BranchOffice> getBranchOffices(Long id) {
 		logger.info("> fetching branch offices for rent-a-car with id {}", id);
 		RentACar rcar = this.getRentACarById(id);
@@ -103,7 +106,7 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public BranchOffice addBranchOffice(Long id, BranchOffice brOff) {
 		logger.info("> adding branch office for rent-a-car with id {}", id);
 		RentACar rcar = this.getRentACarById(id);
@@ -115,7 +118,7 @@ public class RentACarService implements RentACarServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteBranchOffice(Long id, BranchOffice brOff) {
 		logger.info("> deleting branch office for rent-a-car with id {}", id);
 		RentACar rcar = this.getRentACarById(id);
