@@ -29,22 +29,22 @@ public class Vehicle extends RatableEntity{
 	private double discount;
 	
 	@Column(nullable = false)
-	private String naziv;
+	private String name;
 	
 	@Column(nullable = false)
-	private String marka;
+	private String brand;
 	
 	@Column(nullable = false)
 	private String model;
 	
 	@Column(nullable = false)
-	private int godProizvodnje;
+	private int productionYear;
 	
 	@Column(nullable = false)
-	private String tip;
+	private String type;
 	
 	@Column(nullable = false)
-	private int brojSedista;
+	private int seatsNumber;
 	
 	@ManyToOne
 	private BranchOffice branchOffice;
@@ -96,17 +96,17 @@ public class Vehicle extends RatableEntity{
 		this.version = version;
 	}
 	
-	public String getNaziv() {
-		return naziv;
+	public String getName() {
+		return name;
 	}
-	public void setNaziv(String naziv) {
-		this.naziv = naziv;
+	public void setName(String name) {
+		this.name = name;
 	}
-	public String getMarka() {
-		return marka;
+	public String getBrand() {
+		return brand;
 	}
-	public void setMarka(String marka) {
-		this.marka = marka;
+	public void setBrand(String brand) {
+		this.brand = brand;
 	}
 	public String getModel() {
 		return model;
@@ -114,23 +114,23 @@ public class Vehicle extends RatableEntity{
 	public void setModel(String model) {
 		this.model = model;
 	}
-	public int getGodProizvodnje() {
-		return godProizvodnje;
+	public int getProductionYear() {
+		return productionYear;
 	}
-	public void setGodProizvodnje(int godProizvodnje) {
-		this.godProizvodnje = godProizvodnje;
+	public void setProductionYear(int productionYear) {
+		this.productionYear = productionYear;
 	}
-	public String getTip() {
-		return tip;
+	public String getType() {
+		return type;
 	}
-	public void setTip(String tip) {
-		this.tip = tip;
+	public void setType(String type) {
+		this.type = type;
 	}
-	public int getBrojSedista() {
-		return brojSedista;
+	public int getSeatsNumber() {
+		return seatsNumber;
 	}
-	public void setBrojSedista(int brojSedista) {
-		this.brojSedista = brojSedista;
+	public void setSeatsNumber(int seatsNumber) {
+		this.seatsNumber = seatsNumber;
 	}
 	public void setId(Long id) {
 		this.id = id;

@@ -44,8 +44,9 @@ public class VehicleReservation {
 	@ManyToOne
 	private Vehicle vehicle;
 	
-	@OneToOne
-	private Reservation reservation;
+	//TODO: otkomentarisati
+	//@OneToOne
+	//private Reservation reservation;
 	
 	@Version
 	private Long version;
@@ -88,12 +89,13 @@ public class VehicleReservation {
 	public void setVersion(Long version) {
 		this.version = version;
 	}
-	public Reservation getReservation() {
+	//TODO: otkomentarisati
+	/*public Reservation getReservation() {
 		return reservation;
 	}
 	public void setReservation(Reservation reservation) {
 		this.reservation = reservation;
-	}
+	}*/
 	@Override
 	public String toString() {
 		return "VehicleReservation [id=" + id + "]";
