@@ -10,14 +10,13 @@ import javax.validation.Valid;
 
 import org.springframework.hateoas.Resource;
 
-import com.isap.ISAProject.controller.hotel.HotelController;
 import com.isap.ISAProject.model.airline.Airline;
-import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSeat;
 import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.FlightSegment;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.LuggageInfo;
 import com.isap.ISAProject.model.airline.Passenger;
 import com.isap.ISAProject.model.airline.Ticket;

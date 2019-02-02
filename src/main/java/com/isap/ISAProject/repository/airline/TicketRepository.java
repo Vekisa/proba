@@ -1,5 +1,6 @@
 package com.isap.ISAProject.repository.airline;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -18,5 +19,13 @@ public interface TicketRepository extends PagingAndSortingRepository<Ticket, Lon
 
 	@Query("SELECT f FROM Flight f JOIN FETCH f.seats s JOIN FETCH s.ticket t WHERE t.id = :ticketId")
 	Flight findFlightForTicketWithId(@Param("ticketId") Long ticketId);
+
+	@Modifying
+	@Query(value = "update isap.airline set rating = (select avg(rating) from isap.airline_rating where rating > 0 && airline_id = ?1) where id = ?1", nativeQuery = true)
+	void updateAirlineRating(Long airlineId);
+	
+	@Modifying
+	@Query(value = "update isap.flight set rating = (select avg(rating) from isap.flight_rating where rating > 0 && flight_id = ?1) where id = ?1", nativeQuery = true)
+	void updateFlightRating(Long airlineId);
 
 }
