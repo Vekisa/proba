@@ -6,9 +6,10 @@
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">	
 		<script type="text/javascript" src="jquery.min.js"></script>
 		<script type="text/javascript" src="home.js"></script>
+		<link rel="stylesheet" type="text/css" href="home.css">
 	</head>
-	<body background = "backgr.jpg">
-		<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	<body background = "backgr.jpg" onload = load()>
+		<nav class="navbar navbar-expand-lg navbar-light bg-light" id = "navigation">
   		<img src="air-plane-cartoon.png" alt="Airplane" hegiht = "100" width = "100">
   		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
    		 	<span class="navbar-toggler-icon"></span>
@@ -38,7 +39,7 @@
    		 <form class="form-inline my-2 my-lg-0">
 	 		<ul class="navbar-nav mr-auto">
       			<li class="nav-item active">
-        			<a class="nav-link" href="">UserName<span class="sr-only">(current)</span></a>
+        			<a class="nav-link" href="" id = "user">UserName<span class="sr-only" id= "user">(current)</span></a>
       			</li>
       			<li class="nav-item active">
         			<a class="nav-link" id="logout" href="">Logout<span class="sr-only">(current)</span></a>
@@ -49,7 +50,37 @@
     		</form>
   		</div>
 	</nav>
-		Welcome
+	
+	<div id = "tablediv" class="container" align="center">
+
+	</div>
+	
+	<div id = "profile">
+	<div id = "profimg"><img src="profile.png" alt="Profile picture"></div>
+	<div class="container" id = "proftext">
+		<div class="row">
+			<div class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6">
+	    	 <div class="well profile">
+	            <div class="col-sm-12">
+	                <div class="col-xs-12 col-sm-8">
+	                    <h2>Username</h2>
+	                    <p><strong>First name: </strong> Pera </p>
+	                    <p><strong>Last name: </strong> Peric </p>
+	                    <p><strong>Email: </strong> email@gmail.com</p>
+	                    <p><strong>City: </strong> Novi Sad</p>
+	                    <p><strong>Phone number: </strong> 066666666</p>
+	                </div>     
+	             </div>
+	             <div class="col-xs-12 divider text-center">
+	                <div class="col-xs-12 col-sm-4 emphasis">
+	                    <button class="btn btn-info btn-block"><span class="fa fa-user"></span> Friends </button>
+	                </div>
+                </div>
+	          </div>
+	        </div>
+	      </div>
+      </div> 
+     </div>       
 		
 	<div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
@@ -66,9 +97,10 @@
           <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
         </div>
       </div>
-      
     </div>
   </div>
+  
+  
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 	</body>
 </html>
