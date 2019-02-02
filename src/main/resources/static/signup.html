@@ -7,8 +7,9 @@
 			integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 		<script type="text/javascript" src="jquery.min.js"></script>
 		<script type="text/javascript" src="signup.js"></script>
+		<link rel="stylesheet" type="text/css" href="signup.css">
 	</head>
-	<body background = "backgr.jpg">
+	<body background = "backgr.jpg" onload = load()>
 		<div class="container">
     <div class="row">
       <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
@@ -54,6 +55,7 @@
               <hr size="30">
 
               <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Sign up</button>
+              <div class="lds-spinner" id = "loading"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
             </form>
           </div>
         </div>

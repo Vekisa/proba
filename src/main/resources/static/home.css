@@ -46,3 +46,23 @@
 	top: 0%;
 	float: left;
 }
+
+#myMap{
+	position:fixed;
+    top: 14%;
+    left: 1%;
+	border-radius: 30px;
+	margin: 20px;
+	width: 320px;
+	height: 320px;
+	align: center;
+	background-color: #f3f3f3;
+    opacity: 0.95;
+    padding: 10px;
+}
+
+#search-panel{
+	position:fixed;
+    top: 18%;
+    left: 27%;
+}
