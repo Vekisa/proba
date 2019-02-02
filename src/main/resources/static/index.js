@@ -1,9 +1,7 @@
 var currentData;
 
 function load(){
-	$("#myMap").hide();
-	map = new OpenLayers.Map("mapdiv");
-    map.addLayer(new OpenLayers.Layer.OSM());
+		$("#myMap").hide();
 }
 
 function setMapLocation(long, lat){
@@ -180,6 +178,12 @@ $(document).on('click','#flightsbtn',function(e){
 	printFlights(currentData);
 });
 
+$(document).on('click','#cataloguebtn',function(e){
+	e.preventDefault();
+	printCompany(currentData,"hotel");
+	printHotelCatalogue(currentData);
+});
+
 $(document).on('click','#extraopt',function(e){
 	$("#myMap").hide();
 	e.preventDefault();
@@ -188,16 +192,34 @@ $(document).on('click','#extraopt',function(e){
 });
 
 function printExtraOptions(data){
-	 var pomDataExtraOptions;
 	 $.ajax({
 			type: "GET",
-			url:  data._links.destinations.href,
+			url:  data._links.hotel_extra_options.href,
 			dataType: "json",
 			async: false,
 			success: function(data){
 					pomDataExtraOptions = data;
 			}
-	});
+	 });
+	 
+	 var extraOptions = "";
+	 if(pomDataExtraOptions != null){
+		 $.each(pomDataExtraOptions, function(index, extraOption) {
+				extraOptions += "<tr><td scope=\"col\">" + extraOption.description + "</td>" + "<td>" + extraOption.pricePerDay + "</td></tr>";
+		});
+	 }
+	 
+	 var tabela = "<table class=\"table table-hover\" id = \"tableveh\"><thead>" +
+		"<tr>" + 
+	    "<th scope=\"col\">Description</th>" +
+	    "<th scope=\"col\">Price per day(&euro;)</th>" +
+		"</tr>" +
+	"</thead><tbody>" + extraOptions + "</tbody></table>";
+	 
+	 document.getElementById("tablediv").innerHTML += "<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id =\"cataloguebtn\">Catalogue</button></div></div>" +
+	 "<hr>" + 
+		"<strong>Extra Options</strong>" +
+		"<hr>" + tabela;
 }
 
 function printDestinations(data){
@@ -226,7 +248,6 @@ function printDestinations(data){
 	    "<th scope=\"col\">Model</th>" +
 	    "<th scope=\"col\">Seats number</th>" +
 	    "<th scope=\"col\">Type</th>" +
-	    "<th scope=\"col\"></th>" +
 		"</tr>" +
 	"</thead><tbody>" + destinations + "</tbody></table>";
 	 
