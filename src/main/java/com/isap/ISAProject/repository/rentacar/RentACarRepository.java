@@ -20,4 +20,5 @@ public interface RentACarRepository extends JpaRepository<RentACar, Long> {
 	@Modifying
 	@Query(value = "update isap.rent_a_car set rating = (select avg(rating) from isap.rentacar_rating where rating > 0 && rentacar_id = ?1) where id = ?1", nativeQuery = true)
 	void updateRentACarRating(Long rentACarId);
+
 }

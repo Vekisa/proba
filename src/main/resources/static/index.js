@@ -320,4 +320,35 @@ function printBranchOffices(data){
 	
 	document.getElementById("tablediv").innerHTML += branchOffices;
 	
+	
 }
+
+$(document).on('click', '#rentacar-search', function(event){
+	event.preventDefault();
+	$('#locationLabel1').text('Location');
+	$('#locationInput1').css("display", "block");
+	$('#nameLabel').text('Company name');
+	$('#nameInput').css("display", "block");
+	$('#search-title').text('Rent-a-car services');
+	$('#search-panel').css("display", "block");
+})
+
+$(document).on('click', '#hotel-search', function(event){
+	event.preventDefault();
+	$('#locationLabel1').text('Location');
+	$('#locationInput1').css("display", "block");
+	$('#nameLabel').text('Company name');
+	$('#nameInput').css("display", "block");
+	$('#search-title').text('Hotels');
+	$('#search-panel').css("display", "block");
+})
+
+$(document).on('click', '#airline-search', function(event){
+	event.preventDefault();
+	$('#locationLabel1').text('Start location');
+	$('#locationInput1').css("display", "block");
+	$('#nameLabel').text('Target location');
+	$('#nameInput').css("display", "block");
+	$('#search-title').text('Airlines');
+	$('#search-panel').css("display", "block");
+})

@@ -1,74 +1,82 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8">
-		<title>Home</title>
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">	
-		<script type="text/javascript" src="jquery.min.js"></script>
-		<script type="text/javascript" src="home.js"></script>
-	</head>
-	<body background = "backgr.jpg">
-		<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  		<img src="air-plane-cartoon.png" alt="Airplane" hegiht = "100" width = "100">
-  		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-   		 	<span class="navbar-toggler-icon"></span>
-  		</button>
+<head>
+<meta charset="UTF-8">
+<title>Home</title>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+	integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+	crossorigin="anonymous">
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="home.js"></script>
+</head>
+<body background="backgr.jpg">
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<img src="air-plane-cartoon.png" alt="Airplane" hegiht="100"
+			width="100">
+		<button class="navbar-toggler" type="button" data-toggle="collapse"
+			data-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false"
+			aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
 
-  		<div class="collapse navbar-collapse" id="navbarSupportedContent">
-    		<ul class="navbar-nav mr-auto">
-     			 <li class="nav-item active">
-        			<a class="nav-link" href="" id="home">Home <span class="sr-only">(current)</span></a>
-     			 </li>
-      			<li class="nav-item">
-       				 <a class="nav-link" href="">About</a>
-      			</li>
-      			<li class="nav-item dropdown">
-        			<a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          			Companies
-        			</a>
-        		<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          			<a class="dropdown-item" href="">Airline</a>
-          			<div class="dropdown-divider"></div>
-          			<a class="dropdown-item" href="">Rent-a-car</a>
-          			<div class="dropdown-divider"></div>
-          			<a class="dropdown-item" href="">Hotel</a>
-       			 </div>
-      		</li>
-    	</ul>
-   		 <form class="form-inline my-2 my-lg-0">
-	 		<ul class="navbar-nav mr-auto">
-      			<li class="nav-item active">
-        			<a class="nav-link" href="">UserName<span class="sr-only">(current)</span></a>
-      			</li>
-      			<li class="nav-item active">
-        			<a class="nav-link" id="logout" href="">Logout<span class="sr-only">(current)</span></a>
-      			</li>
-      			</ul>
-     			 <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-      			<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    		</form>
-  		</div>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active"><a class="nav-link" href=""
+					id="home">Home <span class="sr-only">(current)</span></a></li>
+				<li class="nav-item"><a class="nav-link" href="">About</a></li>
+				<li class="nav-item dropdown"><a
+					class="nav-link dropdown-toggle" href="" id="navbarDropdown"
+					role="button" data-toggle="dropdown" aria-haspopup="true"
+					aria-expanded="false"> Companies </a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<a class="dropdown-item" href="">Airline</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" href="">Rent-a-car</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" href="">Hotel</a>
+					</div></li>
+			</ul>
+			<form class="form-inline my-2 my-lg-0">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item active"><a class="nav-link" href="">UserName<span
+							class="sr-only">(current)</span></a></li>
+					<li class="nav-item active"><a class="nav-link" id="logout"
+						href="">Logout<span class="sr-only">(current)</span></a></li>
+				</ul>
+				<input class="form-control mr-sm-2" type="search"
+					placeholder="Search" aria-label="Search">
+				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+			</form>
+		</div>
 	</nav>
-		Welcome
-		
+	Welcome
+
 	<div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Error</h4>
-        </div>
-        <div class="modal-body">
-          <p id="error"></p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-        </div>
-      </div>
-      
-    </div>
-  </div>
-		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
-	</body>
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Error</h4>
+				</div>
+				<div class="modal-body">
+					<p id="error"></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+				</div>
+			</div>
+
+		</div>
+		
+		
+
+	</div>
+	<script
+		src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+		integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+		crossorigin="anonymous"></script>
+</body>
 </html>
