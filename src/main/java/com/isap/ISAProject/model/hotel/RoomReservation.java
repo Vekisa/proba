@@ -174,4 +174,9 @@ public class RoomReservation {
 	public void setPrice(double price) {
 		this.price = price;
 	}
+
+	@Override
+	public String toString() {
+		return "RoomReservation [id=" + id + "]";
+	}
 }
