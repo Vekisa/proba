@@ -20,30 +20,39 @@
      			 <li class="nav-item active">
         			<a class="nav-link" href="" id="home">Home <span class="sr-only">(current)</span></a>
      			 </li>
-      			<li class="nav-item">
-       				 <a class="nav-link" href="">About</a>
-      			</li>
       			<li class="nav-item dropdown">
         			<a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           			Companies
         			</a>
         		<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          			<a class="dropdown-item" href="">Airline</a>
+          			<a class="dropdown-item" href="" id = "airline">Airline</a>
           			<div class="dropdown-divider"></div>
-          			<a class="dropdown-item" href="">Rent-a-car</a>
+          			<a class="dropdown-item" href="" id = "rentacar">Rent-a-car</a>
           			<div class="dropdown-divider"></div>
-          			<a class="dropdown-item" href="">Hotel</a>
+          			<a class="dropdown-item" href="" id = "hotel">Hotel</a>
        			 </div>
       		</li>
     	</ul>
    		 <form class="form-inline my-2 my-lg-0">
 	 		<ul class="navbar-nav mr-auto">
       			<li class="nav-item active">
-        			<a class="nav-link" href="" id="userName">UserName<span class="sr-only" id= "user">(current)</span></a>
+        			<a class="nav-link" href="" id="userName">UserName</span></a>
       			</li>
       			<li class="nav-item active">
         			<a class="nav-link" id="logout" href="">Logout<span class="sr-only">(current)</span></a>
       			</li>
+      			<li class="nav-item dropdown"><a
+						class="nav-link dropdown-toggle" href="" id="navbarDropdown"
+						role="button" data-toggle="dropdown" aria-haspopup="true"
+						aria-expanded="false"> Search </a>
+						<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+							<a class="dropdown-item" href="" id="airline-search">Airlines</a>
+							<div class="dropdown-divider"></div>
+							<a class="dropdown-item" href="" id="rentacar-search">Rent-a-car services</a>
+							<div class="dropdown-divider"></div>
+							<a class="dropdown-item" href="" id="hotel-search">Hotels</a>
+						</div>
+				</li>
       			</ul>
      			 <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
       			<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
@@ -51,9 +60,11 @@
   		</div>
 	</nav>
 	
-	<div id = "tablediv" class="container" align="center">
-
-	</div>
+	<div id = "tablediv" class="container" align="center"></div>
+	
+	<div id="myMap">
+			<div id="mapdiv" style="height: 300px; width: 300px"></div>
+ 	</div>
 	
 	<div id = "profile">
 	<div id = "profimg"><img src="profile.png" alt="Profile picture"></div>
@@ -63,12 +74,12 @@
 	    	 <div class="well profile">
 	            <div class="col-sm-12">
 	                <div class="col-xs-12 col-sm-8">
-	                    <h2>Username</h2>
-	                    <p><strong>First name: </strong> Pera </p>
-	                    <p><strong>Last name: </strong> Peric </p>
-	                    <p><strong>Email: </strong> email@gmail.com</p>
-	                    <p><strong>City: </strong> Novi Sad</p>
-	                    <p><strong>Phone number: </strong> 066666666</p>
+	                    <h2 id = "usernameP">Username</h2>
+	                    <p id = "firstNameP"><strong>First name: </strong> Pera </p>
+	                    <p id = "lastNameP"><strong>Last name: </strong> Peric </p>
+	                    <p id = "emailP"><strong>Email: </strong> email@gmail.com</p>
+	                    <p id = "cityP"><strong>City: </strong> Novi Sad</p>
+	                    <p id = "phoneNumberP"><strong>Phone number: </strong> 066666666</p>
 	                </div>     
 	             </div>
 	             <div class="col-xs-12 divider text-center">
@@ -100,7 +111,69 @@
     </div>
   </div>
   
+  		<div>
+		<div id="search-panel"
+			style="height: 100px; width: 550px; margin: -70px 900px; display: none;>
+			<div class="row">
+			<div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+				<div class="card card-signin my-5"
+					style="background-color: #f3f3f3; opacity: 0.95; border-radius: 10px;">
+					<div class="card-body">
+						<h5 id="search-title" class="card-title text-center"></h5>
+						<form class="form-search">
+							<div class="form-label-group">
+								<label id="locationLabel1"></label> <input style="display: none" id="locationInput1" type="text" id="rcar-location"
+									class="form-control" autofocus>
+									
+									<label id="nameLabel"></label> <input style="display: none" id="nameInput"
+									class="form-control">
+							</div>
+							<form>
+								<table>
+								<tbody>
+								<tr><td><label style="font-size: 11px">Choose a start date</label></td></tr>
+								<tr><td><input class="form-control" style="width: 155px" type="date" id="start-date"></td></tr>
+								<tr><td><label style="font-size: 11px">Choose an end date</label></td></tr>
+								<tr><td><input class="form-control" style="width: 155px" type="date" id="end-date"></td></tr>
+								</tbody>
+								</table>
+							</form>
+							<div class="form-label-group">
+								<label id="locationLabel1"></label> <input style="display: none" id="locationInput1" type="text" id="rcar-location"
+									class="form-control" autofocus>
+									
+									<label id="nameLabel"></label> <input style="display: none" id="nameInput"
+									class="form-control">
+							</div>
+							<button class="btn btn-lg btn-primary btn-block text-uppercase"
+								style="margin-top: 20px;" type="button">Go</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
   
+  		<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+ 		 <script>
+		    map = new OpenLayers.Map("mapdiv");
+		    map.addLayer(new OpenLayers.Layer.OSM());
+		
+		    var lonLat = new OpenLayers.LonLat(77.5912997, 12.9791198)
+		          .transform(
+		            new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+		            map.getProjectionObject() // to Spherical Mercator Projection
+		          );
+		          
+		    var zoom=12;
+		
+		    var markers = new OpenLayers.Layer.Markers( "Markers" );
+		    map.addLayer(markers);
+		    
+		    markers.addMarker(new OpenLayers.Marker(lonLat));
+		    
+		    map.setCenter (lonLat, zoom);
+		  </script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 	</body>
 </html>

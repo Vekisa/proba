@@ -1,3 +1,6 @@
+function load(){
+}
+
 $(document).on('submit','.form-signin',function(e){
 	e.preventDefault();
 	$.ajax({
