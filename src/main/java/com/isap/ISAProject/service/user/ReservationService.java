@@ -124,6 +124,7 @@ public class ReservationService {
 	public void deleteById(long id) {
 		logger.info("> Reservation delete");
 		Reservation reservation = this.findById(id);
+		checkIfReservationCanBeCancelled(reservation.getTicket().getSeats().get(0).getFlight().getDepartureTime());
 		ticketService.deleteTicket(reservation.getTicket().getId());
 		vehicleReservationService.deleteVehicleReservation(reservation.getVehicleReservation().getId());
 		roomReservationService.deleteById(reservation.getRoomReservation().getId());
@@ -131,6 +132,15 @@ public class ReservationService {
 		logger.info("< Reservation delete");
 	}
 	
+	private void checkIfReservationCanBeCancelled(Date departureTime) {
+		logger.info("> checking if ticket (reservation) can be cancelled");
+		Date time = new Date();
+		Long difference = departureTime.getTime() - time.getTime();
+		if(((int) TimeUnit.HOURS.convert(difference, TimeUnit.MILLISECONDS)) < 3)
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are too late, reservation can't be cancelled!");
+		logger.info("< ticket (reservation) can be cancelled");
+	}
+
 	public static long getDifferenceDays(Date d1, Date d2) {
 	    long diff = d2.getTime() - d1.getTime();
 	    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
@@ -294,6 +304,7 @@ public class ReservationService {
 		logger.info("> removing room reservation from reservation with id {}", id);
 		Reservation reservation = this.findById(id);
 		RoomReservation roomReservation = reservation.getRoomReservation();
+		checkIfRoomReservationCanBeCancelled(roomReservation.getBeginDate());
 		reservation.setRoomReservation(null);
 		reservation.setPrice(reservation.getPrice() - roomReservation.getPrice());
 		reservationRepository.save(reservation);
@@ -301,6 +312,15 @@ public class ReservationService {
 		return reservation;
 	}
 	
+	private void checkIfRoomReservationCanBeCancelled(Date beginDate) {
+		logger.info("> checking if room reservation can be cancelled");
+		Date time = new Date();
+		Long difference = beginDate.getTime() - time.getTime();
+		if(((int) TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS)) < 2)
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are too late, reservation can't be cancelled!");
+		logger.info("< room reservation can be cancelled");
+	}
+
 	public boolean checkIfRoomIsFree(Date start, Date end, Room room) {
 		Date reservedStart = null;
 		Date reservedEnd = null;

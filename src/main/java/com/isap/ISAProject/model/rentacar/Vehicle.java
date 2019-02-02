@@ -13,7 +13,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.RatableEntity;
+import com.isap.ISAProject.model.rating.VehicleRating;
 @Entity
 @Table(name = "vehicle")
 public class Vehicle extends RatableEntity{
@@ -51,6 +53,10 @@ public class Vehicle extends RatableEntity{
 	
 	@OneToMany(mappedBy="vehicle")
 	private List<VehicleReservation> vehicleReservations = new ArrayList<>();
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "vehicle")
+	private List<VehicleRating> ratings;
 	
 	@Version
 	private Long version;

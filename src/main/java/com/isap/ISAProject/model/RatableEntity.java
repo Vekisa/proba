@@ -8,18 +8,8 @@ public abstract class RatableEntity {
 	
 	@Column(nullable = false)
 	private double rating;
-
-	private long timesRated;
-	private long cumulativeRating;
 	
-	public void addRating(int rating) {
-		this.timesRated++;
-		this.cumulativeRating += rating;
-	}
-	
-	public double getRating() {
-		return (double) cumulativeRating / timesRated;
-	}
+	public double getRating() { return rating; }
 	
 	public void setRating(double rating) { this.rating = rating; }
 	

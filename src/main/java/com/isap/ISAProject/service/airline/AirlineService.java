@@ -2,6 +2,7 @@ package com.isap.ISAProject.service.airline;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
+import com.isap.ISAProject.model.airline.FlightSeat;
 import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.LuggageInfo;
@@ -178,18 +180,6 @@ public class AirlineService implements AirlineServiceInterface {
 	}
 
 	@Override
-	public Map<Location, Integer> getGraphForDestinations(Date beginDate, Date endDate) {
-		// TODO : Videti da li je neophodno
-		return null;
-	}
-
-	@Override
-	public Map<Flight, Integer> getGraphForFlights(Date beginDate, Date endDate) {
-		// TODO : Videti da li je neophodno
-		return null;
-	}
-
-	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Airline changeLocationOfAirline(Long airlineId, Long id) {
 		logger.info("> changing location of airline with id {}", airlineId);
@@ -252,9 +242,30 @@ public class AirlineService implements AirlineServiceInterface {
 	public List<Flight> filterFlights(String startingLocationName, String finishLocationName) {
 		logger.info("> fetching flights for the search query");
 		List<Flight> flights =	flightRepository.findAll(FlightSpecifications.withStartingLocation(startingLocationName)
-												.and(FlightSpecifications.withFinishLocation(finishLocationName)));
+				.and(FlightSpecifications.withFinishLocation(finishLocationName)));
 		logger.info("< flights fetched");
 		return flights;
+	}
+
+	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public Map<Long, Double> getIncomeFor(Long id, Date beginDate, Date endDate) {
+		logger.info("> calculating income");
+		Airline airline = this.findById(id);
+		Map<Long, Double> incomeMap = new HashMap<Long, Double>();
+		for(Flight f : airline.getFlights())
+			if(f.getDepartureTime().after(beginDate) && f.getDepartureTime().before(endDate)) {
+				for(FlightSeat fs : f.getSeats())
+					if(fs.isTaken()) {
+						if(incomeMap.containsKey(f.getDepartureTime().getTime())) {
+							incomeMap.put(f.getDepartureTime().getTime(), incomeMap.get(f.getDepartureTime().getTime()) + fs.getPrice());
+						} else {
+							incomeMap.put(f.getDepartureTime().getTime(), fs.getPrice());
+						}
+					}
+			}
+		logger.info("< income calculated");
+		return incomeMap;
 	}
 
 }

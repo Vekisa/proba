@@ -2,7 +2,9 @@ package com.isap.ISAProject.service.rentacar;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -20,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.RentACar;
+import com.isap.ISAProject.model.rentacar.Vehicle;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.repository.airline.LocationRepository;
@@ -194,4 +197,23 @@ public class RentACarService implements RentACarServiceInterface {
 		logger.info("> searching done");
 		return retKonacno;
 	}
+	
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public Map<Long, Double> getIncomeFor(Long id, Date beginDate, Date endDate) {
+		logger.info("> calculating income");
+		RentACar rents = this.getRentACarById(id);
+		Map<Long, Double> incomeMap = new HashMap<Long, Double>();
+		for(BranchOffice bo : rents.getBranchOffices())
+			for(Vehicle v : bo.getVehicles())
+				for(VehicleReservation reservation : v.getVehicleReservations())
+					if(reservation.getBeginDate().after(beginDate) && reservation.getBeginDate().before(endDate))
+						if(incomeMap.containsKey(reservation.getBeginDate().getTime())) {
+							incomeMap.put(reservation.getBeginDate().getTime(), incomeMap.get(reservation.getBeginDate().getTime()) + reservation.getPrice());
+						} else {
+							incomeMap.put(reservation.getBeginDate().getTime(), reservation.getPrice());
+						}
+		logger.info("< income calculated");
+		return incomeMap;
+	}
+	
 }

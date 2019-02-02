@@ -11,18 +11,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.model.airline.Airline;
+import com.isap.ISAProject.model.airline.Flight;
+import com.isap.ISAProject.model.hotel.Hotel;
+import com.isap.ISAProject.model.hotel.Room;
+import com.isap.ISAProject.model.rating.AirlineRating;
+import com.isap.ISAProject.model.rating.FlightRating;
+import com.isap.ISAProject.model.rating.HotelRating;
+import com.isap.ISAProject.model.rating.RentACarRating;
+import com.isap.ISAProject.model.rating.RoomRating;
+import com.isap.ISAProject.model.rating.VehicleRating;
+import com.isap.ISAProject.model.rentacar.RentACar;
+import com.isap.ISAProject.model.rentacar.Vehicle;
 import com.isap.ISAProject.model.user.AuthorizationLevel;
 import com.isap.ISAProject.model.user.ConfirmationToken;
 import com.isap.ISAProject.model.user.FriendRequest;
 import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
+import com.isap.ISAProject.repository.airline.TicketRepository;
 import com.isap.ISAProject.repository.user.ConfirmationTokenRepository;
 import com.isap.ISAProject.repository.user.FriendRequestRepository;
 import com.isap.ISAProject.repository.user.FriendshipRepository;
@@ -46,6 +60,9 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	
 	@Autowired 
 	private ConfirmationTokenRepository confirmationTokenRepository;
+	
+	@Autowired
+	private TicketRepository ticketRepository;
 	
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -227,7 +244,6 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 		logger.info("> fetching active reservations of user with id {}", id);
 		RegisteredUser user = this.findById(id);
 		List<Reservation> reservations = user.getConfirmedReservations();
-		reservations.addAll(user.getRatedReservations());
 		List<Reservation> list = filterFinishedReservations(reservations);
 		logger.info("< active reservations fetched");
 		if(!list.isEmpty()) return list;
@@ -267,6 +283,41 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 		repository.save(confTok.getUser());
 		confirmationTokenRepository.save(confTok);
 		return confTok.getUser();
+	}
+	
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	@Scheduled(fixedRate = 300000)
+	public void giveAllUsersAccessToRating() {
+		logger.info("> creating ratings for all eligible users");
+		Date time = new Date();
+		for(RegisteredUser user : repository.findAll())
+			for(Reservation reservation : user.getConfirmedReservations())
+				if(reservation.getEndDate().after(time))
+					this.giveAccessToRating(user, reservation);
+		logger.info("< ratings created");
+	}
+
+	private void giveAccessToRating(RegisteredUser user, Reservation reservation) {
+		logger.info("> giving access to user");
+		Flight flight = ticketRepository.findFlightForTicketWithId(reservation.getTicket().getId());
+		Airline airline = flight.getAirline();
+		user.getAirlineRatings().add(new AirlineRating(user, airline));
+		user.getFlightRatings().add(new FlightRating(user, flight));
+		if(reservation.getRoomReservation() != null) {
+			Room room = reservation.getRoomReservation().getRoom();
+			Hotel hotel = room.getFloor().getHotel();
+			user.getRoomRatings().add(new RoomRating(user, room));
+			user.getHotelRatings().add(new HotelRating(user, hotel));
+		}
+		if(reservation.getVehicleReservation() != null) {
+			Vehicle vehicle = reservation.getVehicleReservation().getVehicle();
+			RentACar rentACar = vehicle.getBranchOffice().getRentACar();
+			user.getVehicleRatings().add(new VehicleRating(user, vehicle));
+			user.getRentACarRatings().add(new RentACarRating(user, rentACar));
+		}
+		repository.save(user);
+		logger.info("< access given");
 	}
 	
 }
