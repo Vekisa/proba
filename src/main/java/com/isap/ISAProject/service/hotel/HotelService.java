@@ -1,5 +1,6 @@
 package com.isap.ISAProject.service.hotel;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
+import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.repository.airline.LocationRepository;
 import com.isap.ISAProject.repository.hotel.CatalogueRepository;
@@ -242,6 +244,24 @@ public class HotelService {
 						}
 		logger.info("< income calculated");
 		return incomeMap;
+	}
+
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public List<Room> getRooms(Long id) {
+		logger.info("> fetching rooms for hotel with id {}", id);
+		Hotel hotel = this.findById(id);
+		List<Room> rooms = new ArrayList<>();
+		for(Floor f : hotel.getFloors())
+			rooms.addAll(f.getRooms());
+		logger.info("< rooms fetched");
+		return rooms;
+	}
+
+	public List<RoomType> getRoomTypes(Long id) {
+		logger.info("> fetching room types for hotel with id {}", id);
+		Hotel hotel = this.findById(id);
+		logger.info("< room types fetched");
+		return hotel.getCatalogue().getRoomTypes();
 	}
 	
 }

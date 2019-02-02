@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "room_type")
 public class RoomType {
 	
-	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

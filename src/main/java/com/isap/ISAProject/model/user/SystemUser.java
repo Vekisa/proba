@@ -99,7 +99,6 @@ public abstract class SystemUser extends UserBase{
 	
 	public void setUsername(String username) { this.username = username; }
 	
-	@JsonIgnore
 	public abstract AuthorizationLevel getAuthority();
 	
 	public abstract void setAuthority(AuthorizationLevel authority);
