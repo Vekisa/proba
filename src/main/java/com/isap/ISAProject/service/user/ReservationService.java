@@ -31,6 +31,7 @@ import com.isap.ISAProject.repository.airline.PassengerRepository;
 import com.isap.ISAProject.repository.hotel.RoomRepository;
 import com.isap.ISAProject.repository.user.RegisteredUserRepository;
 import com.isap.ISAProject.repository.user.ReservationRepository;
+import com.isap.ISAProject.service.EmailSenderService;
 import com.isap.ISAProject.service.airline.TicketService;
 import com.isap.ISAProject.service.hotel.RoomReservationService;
 import com.isap.ISAProject.service.rentacar.VehicleReservationService;
@@ -61,6 +62,9 @@ public class ReservationService {
 	
 	@Autowired
 	private PassengerRepository passengersRepository;
+	
+	@Autowired
+	private EmailSenderService emailService;
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Reservation findById(long id) {
@@ -120,6 +124,7 @@ public class ReservationService {
 	public void deleteById(long id) {
 		logger.info("> Reservation delete");
 		Reservation reservation = this.findById(id);
+		checkIfReservationCanBeCancelled(reservation.getTicket().getSeats().get(0).getFlight().getDepartureTime());
 		ticketService.deleteTicket(reservation.getTicket().getId());
 		vehicleReservationService.deleteVehicleReservation(reservation.getVehicleReservation().getId());
 		roomReservationService.deleteById(reservation.getRoomReservation().getId());
@@ -127,6 +132,15 @@ public class ReservationService {
 		logger.info("< Reservation delete");
 	}
 	
+	private void checkIfReservationCanBeCancelled(Date departureTime) {
+		logger.info("> checking if ticket (reservation) can be cancelled");
+		Date time = new Date();
+		Long difference = departureTime.getTime() - time.getTime();
+		if(((int) TimeUnit.HOURS.convert(difference, TimeUnit.MILLISECONDS)) < 3)
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are too late, reservation can't be cancelled!");
+		logger.info("< ticket (reservation) can be cancelled");
+	}
+
 	public static long getDifferenceDays(Date d1, Date d2) {
 	    long diff = d2.getTime() - d1.getTime();
 	    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
@@ -139,6 +153,7 @@ public class ReservationService {
 		RegisteredUser user = this.findRegisteredUser(userId);
 		reservation.getConfirmedUsers().add(user);
 		reservationRepository.save(reservation);
+		emailService.sendReservationInfo(user, reservation);
 		logger.info("< user added");
 		return reservation;
 	}
@@ -162,21 +177,23 @@ public class ReservationService {
 		if(owner == null) 
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This reservation is unassigned.");
 		List<RegisteredUser> friends = usersRepository.findFriendsOfUser(owner.getId());
-		for(Long userId : users)
-			this.inviteUserToReservation(userId, friends, reservation);
+		for(Long userId : users) {
+			RegisteredUser user = this.findRegisteredUser(userId);
+			this.inviteUserToReservation(user, friends, reservation);
+			emailService.sendInvitation(user, reservation, owner);
+		}
 		reservationRepository.save(reservation);
 		logger.info("< users invited");
 		return reservation;
 	}
 
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-	private void inviteUserToReservation(Long userId, List<RegisteredUser> friends, Reservation reservation) {
-		RegisteredUser user = this.findRegisteredUser(userId);
+	private void inviteUserToReservation(RegisteredUser user, List<RegisteredUser> friends, Reservation reservation) {
 		// TODO : Istek za pozivnicu
 		if(friends.contains(user))
 			reservation.getInvitedUsers().add(user);
 		else
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Owner is not friend with user with id " + userId);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Owner is not friend with user with id " + user.getId());
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
@@ -206,6 +223,7 @@ public class ReservationService {
 		passengersRepository.save(user.getPassenger());
 		usersRepository.save(user);
 		reservationRepository.save(reservation);
+		emailService.sendReservationInfo(user, reservation);
 		logger.info("< accepted invitation");
 		return reservation;
 	}
@@ -262,11 +280,13 @@ public class ReservationService {
 		Reservation reservation = this.findById(id);
 		Room room = this.findRoom(roomId);
 		if(roomReservation.getBeginDate().after(roomReservation.getEndDate()))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datum rezervacije je lose unesen");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datum rezervacije je lose unesen!");
 		if(roomReservation.getBeginDate().before(reservation.getBeginDate()))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba se moze iznajmiti samo nakon sletanja!");
-		if(!checkIfRoomIsFree(roomReservation.getBeginDate(), roomReservation.getEndDate(), room))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba nije slobodna u tom periodu");
+		if(!this.checkIfRoomIsFree(roomReservation.getBeginDate(), roomReservation.getEndDate(), room))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba nije slobodna u tom periodu!");
+		if(reservation.getTicket().getNumberOfSeats() < roomReservation.getNumberOfRooms())
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Niste zauzeli sobe za sve putnike.!");
 		room.getRoomReservations().add(roomReservation);
 		roomReservation.setRoom(room);
 		Long difference = roomReservation.getEndDate().getTime() - roomReservation.getBeginDate().getTime();
@@ -284,6 +304,7 @@ public class ReservationService {
 		logger.info("> removing room reservation from reservation with id {}", id);
 		Reservation reservation = this.findById(id);
 		RoomReservation roomReservation = reservation.getRoomReservation();
+		checkIfRoomReservationCanBeCancelled(roomReservation.getBeginDate());
 		reservation.setRoomReservation(null);
 		reservation.setPrice(reservation.getPrice() - roomReservation.getPrice());
 		reservationRepository.save(reservation);
@@ -291,6 +312,15 @@ public class ReservationService {
 		return reservation;
 	}
 	
+	private void checkIfRoomReservationCanBeCancelled(Date beginDate) {
+		logger.info("> checking if room reservation can be cancelled");
+		Date time = new Date();
+		Long difference = beginDate.getTime() - time.getTime();
+		if(((int) TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS)) < 2)
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are too late, reservation can't be cancelled!");
+		logger.info("< room reservation can be cancelled");
+	}
+
 	public boolean checkIfRoomIsFree(Date start, Date end, Room room) {
 		Date reservedStart = null;
 		Date reservedEnd = null;

@@ -4,10 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Flight;
-import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSeat;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Ticket;
 
 public interface FlightServiceInterface {

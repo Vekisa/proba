@@ -35,10 +35,6 @@ public interface AirlineServiceInterface {
 	List<FlightSeatCategory> getFlightSeatCategoriesForAirline(Long airlineId);
 	
 	FlightSeatCategory addFlightSeatCategoryToAirline(Long airlineId, FlightSeatCategory flightSeatCategory);
-	
-	Map<Location, Integer> getGraphForDestinations(Date beginDate, Date endDate);
-	
-	Map<Flight, Integer> getGraphForFlights(Date beginDate, Date endDate);
 
 	Airline saveAirline(Airline airline, Long id);
 
@@ -49,5 +45,7 @@ public interface AirlineServiceInterface {
 	List<CompanyAdmin> getAdminsOfAirline(Long id);
 
 	List<Flight> getFlightsOfAirline(Long id);
+
+	Map<Long, Double> getIncomeFor(Long id, Date beginDate, Date endDate);
 	
 }

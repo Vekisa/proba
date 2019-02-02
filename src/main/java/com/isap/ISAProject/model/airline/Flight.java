@@ -17,6 +17,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.isap.ISAProject.model.rating.FlightRating;
 
 @Entity
 @Table(name = "flight")
@@ -63,6 +64,10 @@ public class Flight {
 	@ManyToOne
 	private Airline airline;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "flight")
+	List<FlightRating> ratings;
+	
 	public boolean isFinished() { return finished; }
 
 	public void setFinished(boolean finished) { this.finished = finished; }

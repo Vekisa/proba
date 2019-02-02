@@ -18,6 +18,7 @@ import org.hibernate.annotations.CascadeType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.RatableEntity;
+import com.isap.ISAProject.model.rating.RoomRating;
 
 @Entity
 @Table(name = "room")
@@ -47,6 +48,10 @@ public class Room extends RatableEntity {
 	@JsonIgnore
 	@Version
 	private Long version;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "room")
+	private List<RoomRating> ratings;
 	
 	public Room() {
 		roomReservations = new ArrayList<>();

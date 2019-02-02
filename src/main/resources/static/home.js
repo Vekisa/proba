@@ -10,7 +10,7 @@ function load(){
 	    },
 		success: function(data){
 			if(data!=null){
-				$('#user').val(data.username);
+				$('#userName').text(data.username);
 			}
 		}
 	});

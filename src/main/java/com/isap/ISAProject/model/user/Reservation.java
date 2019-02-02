@@ -108,5 +108,7 @@ public class Reservation {
 	public List<RegisteredUser> getUsersThatRated() { return usersThatRated; }
 	
 	public List<RegisteredUser> getInvitedUsers() { return invitedUsers; }
+
+	public Long getId() { return this.id; }
 	
 }

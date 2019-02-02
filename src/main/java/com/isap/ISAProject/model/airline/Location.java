@@ -65,8 +65,6 @@ public class Location {
 	public String getName() { return this.name; }
 	
 	public void setName(String name) { this.name = name; }
-	
-	public void setAirline(Airline airline) {  }
 
 	public Long getId() { return this.id; }
 

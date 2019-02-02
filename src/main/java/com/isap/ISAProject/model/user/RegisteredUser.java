@@ -16,6 +16,12 @@ import org.hibernate.annotations.CascadeType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.airline.Passenger;
+import com.isap.ISAProject.model.rating.AirlineRating;
+import com.isap.ISAProject.model.rating.FlightRating;
+import com.isap.ISAProject.model.rating.HotelRating;
+import com.isap.ISAProject.model.rating.RentACarRating;
+import com.isap.ISAProject.model.rating.RoomRating;
+import com.isap.ISAProject.model.rating.VehicleRating;
 
 @Entity
 @Table(name = "registered_user")
@@ -40,10 +46,6 @@ public class RegisteredUser extends SystemUser {
 	private List<Reservation> pendingReservations;
 	
 	@JsonIgnore
-	@ManyToMany
-	private List<Reservation> ratedReservations;
-	
-	@JsonIgnore
 	@Cascade(CascadeType.ALL)
 	@OneToMany(mappedBy="sender", orphanRemoval = true)
 	private List<FriendRequest> sentRequests;
@@ -63,6 +65,36 @@ public class RegisteredUser extends SystemUser {
 	@JsonIgnore
 	@OneToOne
 	private Passenger passenger;
+	
+	@JsonIgnore
+	@Cascade(CascadeType.ALL)
+	@OneToMany(mappedBy = "user")
+	private List<AirlineRating> airlineRatings;
+	
+	@JsonIgnore
+	@Cascade(CascadeType.ALL)
+	@OneToMany(mappedBy = "user")
+	private List<FlightRating> flightRatings;
+	
+	@JsonIgnore
+	@Cascade(CascadeType.ALL)
+	@OneToMany(mappedBy = "user")
+	private List<HotelRating> hotelRatings;
+	
+	@JsonIgnore
+	@Cascade(CascadeType.ALL)
+	@OneToMany(mappedBy = "user")
+	private List<RoomRating> roomRatings;
+	
+	@JsonIgnore
+	@Cascade(CascadeType.ALL)
+	@OneToMany(mappedBy = "user")
+	private List<RentACarRating> rentACarRatings;
+	
+	@JsonIgnore
+	@Cascade(CascadeType.ALL)
+	@OneToMany(mappedBy = "user")
+	private List<VehicleRating> vehicleRatings;
 	
 	public RegisteredUser() {}
 	
@@ -96,10 +128,20 @@ public class RegisteredUser extends SystemUser {
 
 	public List<Reservation> getPendingReservations() { return pendingReservations; }
 
-	public List<Reservation> getRatedReservations() { return ratedReservations; }
-
 	public Passenger getPassenger() { return passenger; }
 
 	public void setPassenger(Passenger passenger) { this.passenger = passenger; }
+
+	public List<AirlineRating> getAirlineRatings() { return airlineRatings; }
+
+	public List<FlightRating> getFlightRatings() { return flightRatings; }
+
+	public List<HotelRating> getHotelRatings() { return hotelRatings; }
+
+	public List<RoomRating> getRoomRatings() { return roomRatings; }
+
+	public List<RentACarRating> getRentACarRatings() { return rentACarRatings; }
+
+	public List<VehicleRating> getVehicleRatings() { return vehicleRatings; }
 
 }

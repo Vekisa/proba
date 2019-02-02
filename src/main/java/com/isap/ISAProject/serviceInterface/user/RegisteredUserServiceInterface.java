@@ -21,8 +21,6 @@ public interface RegisteredUserServiceInterface {
 	
 	List<Reservation> getReservationHistoryOfUser(Long id);
 	
-	Reservation createReservationForUser(Long id);
-	
 	List<FriendRequest> getReceivedFriendRequestsOfUser(Long id);
 	
 	List<FriendRequest> getSentFriendRequestOfUser(Long id);
@@ -38,5 +36,5 @@ public interface RegisteredUserServiceInterface {
 	void removeFriend(Long self, Long friend);
 
 	List<RegisteredUser> getFriends(Long id);
-
+	
 }

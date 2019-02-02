@@ -1,6 +1,9 @@
 package com.isap.ISAProject.service.hotel;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -20,6 +23,8 @@ import com.isap.ISAProject.model.hotel.Catalogue;
 import com.isap.ISAProject.model.hotel.ExtraOption;
 import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Hotel;
+import com.isap.ISAProject.model.hotel.Room;
+import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.repository.airline.LocationRepository;
 import com.isap.ISAProject.repository.hotel.CatalogueRepository;
@@ -219,6 +224,24 @@ public class HotelService {
 		logger.info("< location fetched");
 		if(location != null) return location;
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested destination doesn't exist.");
+	}
+	
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public Map<Long, Double> getIncomeFor(Long id, Date beginDate, Date endDate) {
+		logger.info("> calculating income");
+		Hotel hotel = this.findById(id);
+		Map<Long, Double> incomeMap = new HashMap<Long, Double>();
+		for(Floor floor : hotel.getFloors())
+			for(Room room : floor.getRooms())
+				for(RoomReservation reservation : room.getRoomReservations())
+					if(reservation.getBeginDate().after(beginDate) && reservation.getEndDate().before(endDate))
+						if(incomeMap.containsKey(reservation.getBeginDate().getTime())) {
+							incomeMap.put(reservation.getBeginDate().getTime(), incomeMap.get(reservation.getBeginDate().getTime()) + reservation.getPrice());
+						} else {
+							incomeMap.put(reservation.getBeginDate().getTime(), reservation.getPrice());
+						}
+		logger.info("< income calculated");
+		return incomeMap;
 	}
 	
 }

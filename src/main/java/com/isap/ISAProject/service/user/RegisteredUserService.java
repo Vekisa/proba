@@ -227,7 +227,6 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 		logger.info("> fetching active reservations of user with id {}", id);
 		RegisteredUser user = this.findById(id);
 		List<Reservation> reservations = user.getConfirmedReservations();
-		reservations.addAll(user.getRatedReservations());
 		List<Reservation> list = filterFinishedReservations(reservations);
 		logger.info("< active reservations fetched");
 		if(!list.isEmpty()) return list;
@@ -250,12 +249,6 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 			if(r.getEndDate().before(currentDate))
 				result.add(r);
 		return result;
-	}
-
-	@Override
-	public Reservation createReservationForUser(Long id) {
-		// TODO : implement
-		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Method not implemented.");
 	}
 	
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)

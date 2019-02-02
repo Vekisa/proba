@@ -15,6 +15,7 @@ import org.hibernate.annotations.CascadeType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.Company;
 import com.isap.ISAProject.model.airline.Location;
+import com.isap.ISAProject.model.rating.HotelRating;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 
 @Entity
@@ -46,6 +47,10 @@ public class Hotel extends Company {
 	@JsonIgnore
 	@OneToMany(mappedBy = "hotel")
 	private List<CompanyAdmin> admins;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "hotel")
+	private List<HotelRating> ratings;
 	
 	public Hotel() {
 		floors = new ArrayList<>();
