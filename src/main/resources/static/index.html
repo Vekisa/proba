@@ -1,57 +1,53 @@
 <!DOCTYPE html SYSTEM "about:legacy-compat">
 <html>
-<head>
-<meta charset="UTF-8">
-<title>Welcome!</title>
-<script type="text/javascript" src="jquery.min.js"></script>
-<script type="text/javascript" src="index.js"></script>
-<link rel="stylesheet" type="text/css" href="index.css">
-<link rel="stylesheet"
-	href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
-	integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
-	crossorigin="anonymous">
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-</head>
+	<head>
+		<meta charset="UTF-8">
+		<title>Welcome!</title>
+		<script type="text/javascript" src="jquery.min.js"></script>
+		<script type="text/javascript" src="index.js"></script>		
+		<link rel="stylesheet" type="text/css" href="index.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" 
+			integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	</head>
+	
+	<body background = "backgr.jpg" onload = load()>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light" id = "navigation">
+  		<img src="air-plane-cartoon.png" alt="Airplane" hegiht = "100" width = "100">
+  		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+   		 	<span class="navbar-toggler-icon"></span>
+  		</button>
 
-<body background="backgr.jpg" onload=load()>
-	<nav class="navbar navbar-expand-lg navbar-light bg-light"
-		id="navigation">
-		<img src="air-plane-cartoon.png" alt="Airplane" hegiht="100"
-			width="100">
-		<button class="navbar-toggler" type="button" data-toggle="collapse"
-			data-target="#navbarSupportedContent"
-			aria-controls="navbarSupportedContent" aria-expanded="false"
-			aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-
-		<div class="collapse navbar-collapse" id="navbarSupportedContent">
-			<ul class="navbar-nav mr-auto">
-				<li class="nav-item active"><a class="nav-link" href="#"
-					id="home">Home <span class="sr-only">(current)</span></a></li>
-				<li class="nav-item"><a class="nav-link" href="#">About</a></li>
-				<li class="nav-item dropdown"><a
-					class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-					role="button" data-toggle="dropdown" aria-haspopup="true"
-					aria-expanded="false"> Companies </a>
-					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="" id="airline">Airline</a>
-						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="" id="rentacar">Rent-a-car</a>
-						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="" id="hotel">Hotel</a>
-					</div></li>
-			</ul>
-			<form class="form-inline my-2 my-lg-0">
-				<ul class="navbar-nav mr-auto">
-					<li class="nav-item active"><a class="nav-link"
-						href="signin.html">Sign in<span class="sr-only">(current)</span></a>
-					</li>
-					<li class="nav-item active"><a class="nav-link"
-						href="signup.html">Sign up<span class="sr-only">(current)</span></a>
-					</li>
-					<li class="nav-item dropdown"><a
+  		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    		<ul class="navbar-nav mr-auto">
+     			 <li class="nav-item active">
+        			<a class="nav-link" href="" id="home">Home <span class="sr-only">(current)</span></a>
+     			 </li>
+      			<li class="nav-item">
+       				 <a class="nav-link" href="" id="about">About</a>
+      			</li>
+      			<li class="nav-item dropdown">
+        			<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          			Companies
+        			</a>
+        		<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          			<a class="dropdown-item" href="" id = "airline">Airline</a>
+          			<div class="dropdown-divider"></div>
+          			<a class="dropdown-item" href="" id = "rentacar">Rent-a-car</a>
+          			<div class="dropdown-divider"></div>
+          			<a class="dropdown-item" href="" id = "hotel">Hotel</a>
+       			 </div>
+      		</li>
+    	</ul>
+   		 <form class="form-inline my-2 my-lg-0">
+	 		<ul class="navbar-nav mr-auto">
+      			<li class="nav-item active">
+        			<a class="nav-link" href="signin.html">Sign in<span class="sr-only">(current)</span></a>
+      			</li>
+       			<li class="nav-item active">
+       				 <a class="nav-link" href="signup.html">Sign up<span class="sr-only">(current)</span></a>
+      			</li>
+      			<li class="nav-item dropdown"><a
 						class="nav-link dropdown-toggle" href="" id="navbarDropdown"
 						role="button" data-toggle="dropdown" aria-haspopup="true"
 						aria-expanded="false"> Search </a>
@@ -61,46 +57,51 @@
 							<a class="dropdown-item" href="" id="rentacar-search">Rent-a-car services</a>
 							<div class="dropdown-divider"></div>
 							<a class="dropdown-item" href="" id="hotel-search">Hotels</a>
-						</div></li>
-				</ul>
-				<input class="form-control mr-sm-2" type="search"
-					placeholder="Search" aria-label="Search">
-				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-			</form>
-		</div>
-	</nav>
-
+						</div>
+				</li>
+      			</ul>
+     			 <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      			<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    		</form>
+  		</div>
+	</nav>	
+	
 	<div class="modal fade" id="myModal" role="dialog">
-		<div class="modal-dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Message</h4>
+        </div>
+        <div class="modal-body">
+          <p id="error"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+  
+	<div id = "tablediv" class = "container" align="center">
+	
+	
 
-			<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-header">
-					<h4 class="modal-title">Message</h4>
-				</div>
-				<div class="modal-body">
-					<p id="error"></p>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-				</div>
-			</div>
-
-		</div>
 	</div>
-	<div id="tablediv" class="container" align="center"></div>
-
-	<div id="myMap">
-		<div id="mapdiv" style="height: 300px; width: 300px;"></div>
-	</div>
-
-	<div>
+		<div id="myMap">
+			<div id="mapdiv" style="height: 300px; width: 300px"></div>
+ 		</div>
+ 		
+ 	<div>
 		<div id="search-panel"
 			style="height: 100px; width: 550px; margin: -70px 900px; display: none;>
 			<div class="row">
 			<div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
 				<div class="card card-signin my-5"
-					style="background-color: transparent; opacity: inherit;">
+					style="background-color: #f3f3f3; opacity: 0.95; border-radius: 10px;">
 					<div class="card-body">
 						<h5 id="search-title" class="card-title text-center"></h5>
 						<form class="form-search">
@@ -136,17 +137,27 @@
 			</div>
 		</div>
 	</div>
-
-	</div>
-	<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
-
-	<script
-		src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
-		integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
-		crossorigin="anonymous"></script>
-	<script
-		src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
-		integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
-		crossorigin="anonymous"></script>
-</body>
+ 	
+ 		<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+ 		 <script>
+		    map = new OpenLayers.Map("mapdiv");
+		    map.addLayer(new OpenLayers.Layer.OSM());
+		
+		    var lonLat = new OpenLayers.LonLat(77.5912997, 12.9791198)
+		          .transform(
+		            new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+		            map.getProjectionObject() // to Spherical Mercator Projection
+		          );
+		          
+		    var zoom=12;
+		
+		    var markers = new OpenLayers.Layer.Markers( "Markers" );
+		    map.addLayer(markers);
+		    
+		    markers.addMarker(new OpenLayers.Marker(lonLat));
+		    
+		    map.setCenter (lonLat, zoom);
+		  </script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+	</body>
 </html>

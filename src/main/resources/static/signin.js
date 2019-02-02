@@ -10,7 +10,6 @@ $(document).on('submit','.form-signin',function(e){
 		success:function(data){
 			if(data!=null){
 				localStorage.token = data.token;
-				alert(data.token);
 				window.location.href = 'home.html';		
 			}
 		},

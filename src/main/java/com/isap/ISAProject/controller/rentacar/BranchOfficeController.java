@@ -148,7 +148,7 @@ public class BranchOfficeController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Filijala sa prosleđenim ID ne postoji.")
 	})
-	public ResponseEntity<Resource<Location>> getLocationOfHotel(@PathVariable("id") Long id) {
+	public ResponseEntity<Resource<Location>> getLocationOfBranchOffice(@PathVariable("id") Long id) {
 		return new ResponseEntity<Resource<Location>>(HATEOASImplementorAirline.createDestination(service.getLocationOfRentACar(id)), HttpStatus.OK);
 	}
 	

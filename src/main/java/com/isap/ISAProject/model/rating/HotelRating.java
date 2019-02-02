@@ -1,5 +1,6 @@
 package com.isap.ISAProject.model.rating;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,14 +31,16 @@ public class HotelRating {
 	@JsonIgnore
 	@ManyToOne
 	private RegisteredUser user;
-	
-	private int rating;
 
+	@Column(nullable = false)
+	private int rating;
+	
 	public HotelRating() { }
 	
 	public HotelRating(RegisteredUser user, Hotel hotel) {
 		this.user = user;
 		this.hotel = hotel;
+		this.setRating(0);
 	}
 
 	public Hotel getHotel() { return hotel; }
@@ -47,7 +50,7 @@ public class HotelRating {
 	public RegisteredUser getUser() { return user; }
 
 	public void setUser(RegisteredUser user) { this.user = user; }
-
-	public int getRating() { return rating; }
+	
+	public void setRating(int rating) { this.rating = rating; }
 	
 }

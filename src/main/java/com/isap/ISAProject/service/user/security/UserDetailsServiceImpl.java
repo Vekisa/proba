@@ -30,6 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		System.out.println(username+"+++++++++++++++++++");
 		SystemUser user = null;
 		if(registeredUserRepository.findByUsername(username) != null)
 			user = registeredUserRepository.findByUsername(username);

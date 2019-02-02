@@ -50,6 +50,7 @@ public class HATEOASImplementorRentacar {
 		resource.add(linkTo(methodOn(BranchOfficeController.class).getBranchOfficeById(branch.getId())).withRel("self"));
 		resource.add(linkTo(methodOn(BranchOfficeController.class).getAllBranchOffices(null)).slash("?page=0&size=5").withRel("all_branch_offices"));
 		resource.add(linkTo(methodOn(BranchOfficeController.class).getVehiclesForBranchOfficeWithId(branch.getId())).withRel("vehicles"));
+		resource.add(linkTo(methodOn(BranchOfficeController.class).getLocationOfBranchOffice(branch.getId())).withRel("location"));
 		return resource;
 	}
 	

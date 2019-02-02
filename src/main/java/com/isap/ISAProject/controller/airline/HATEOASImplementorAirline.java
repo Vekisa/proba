@@ -10,14 +10,13 @@ import javax.validation.Valid;
 
 import org.springframework.hateoas.Resource;
 
-import com.isap.ISAProject.controller.hotel.HotelController;
 import com.isap.ISAProject.model.airline.Airline;
-import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSeat;
 import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.FlightSegment;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.LuggageInfo;
 import com.isap.ISAProject.model.airline.Passenger;
 import com.isap.ISAProject.model.airline.Ticket;
@@ -32,6 +31,7 @@ public class HATEOASImplementorAirline {
 		resource.add(linkTo(methodOn(AirlineController.class).getFlightConfigurationsForAirlineWithId(airline.getId())).withRel("airline_flight_configurations"));
 		resource.add(linkTo(methodOn(AirlineController.class).getFlightsOfAirline(airline.getId())).withRel("airline_flights"));
 		resource.add(linkTo(methodOn(AirlineController.class).getLocationOfAirlineWithId(airline.getId())).withRel("location"));
+		resource.add(linkTo(methodOn(AirlineController.class).getDestinationsOfAirlineWithId(airline.getId())).withRel("destinations"));
 		// TODO : Link za brze rezervacije
 		return resource;
 	}

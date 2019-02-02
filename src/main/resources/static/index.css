@@ -52,3 +52,10 @@ tr:hover{
     padding: 10px;
 }
 
+#search-panel{
+	position:fixed;
+    top: 18%;
+    left: 27%;
+}
+
+

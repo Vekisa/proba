@@ -24,6 +24,7 @@ import com.isap.ISAProject.model.user.FriendRequest;
 import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
+import com.isap.ISAProject.service.user.RatingService;
 import com.isap.ISAProject.service.user.RegisteredUserService;
 import com.isap.ISAProject.service.user.UserService;
 
@@ -41,6 +42,9 @@ public class RegisteredUserController {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private RatingService ratingService;
+	
 	@RequestMapping(method = RequestMethod.POST, value = "/auth")
 	public ResponseEntity<?> authenticationRequest(@RequestBody AuthenticationRequest authenticationRequest/*,
 			Device device*/) throws AuthenticationException {
@@ -123,17 +127,6 @@ public class RegisteredUserController {
 	})
 	public ResponseEntity<List<Resource<Reservation>>> getReservationsHistoryForUserWithId(@PathVariable("id") Long userId) {
 				return new ResponseEntity<List<Resource<Reservation>>>(HATEOASImplementorUsers.createReservationList(service.getReservationHistoryOfUser(userId)), HttpStatus.OK);
-	}
-
-	@RequestMapping(value = "/{id}/reservations", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Kreira rezervaciju za datog korisnika.", notes = "Povratna vrednost servisa je kreirana rezervacija.", httpMethod = "POST", produces = "application/json")
-	@ApiResponses(value = {
-			@ApiResponse(code = 201, message = "Created", response = Reservation.class),
-			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
-			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
-	})
-	public ResponseEntity<Resource<Reservation>> createReservationForUserWithId(@PathVariable("id") Long userId) {
-			return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(service.createReservationForUser(userId)), HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/{id}/receivedRequests", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -252,6 +245,42 @@ public class RegisteredUserController {
 	public ModelAndView confirmAccountWithToken(@PathVariable("token") String userToken) {
 		service.confirmAccount(userToken);
 		return new ModelAndView("redirect:/signin.html");
+	}
+	
+	@RequestMapping(value = "/{id}/rate-hotel", method = RequestMethod.POST)
+	public ResponseEntity<?> rateHotel(@PathVariable("id") Long id, @RequestParam("hotel") Long hotelId, @RequestParam("rating") int rating) {
+		ratingService.rateHotel(hotelId, rating, id);
+		return ResponseEntity.ok().build();
+	}
+	
+	@RequestMapping(value = "/{id}/rate-room", method = RequestMethod.POST)
+	public ResponseEntity<?> rateRoom(@PathVariable("id") Long id, @RequestParam("room") Long roomId, @RequestParam("rating") int rating) {
+		ratingService.rateRoom(roomId, rating, id);
+		return ResponseEntity.ok().build();
+	}
+	
+	@RequestMapping(value = "/{id}/rate-airline", method = RequestMethod.POST)
+	public ResponseEntity<?> rateAirline(@PathVariable("id") Long id, @RequestParam("airline") Long airlineId, @RequestParam("rating") int rating) {
+		ratingService.rateAirline(airlineId, rating, id);
+		return ResponseEntity.ok().build();
+	}
+	
+	@RequestMapping(value = "/{id}/rate-flight", method = RequestMethod.POST)
+	public ResponseEntity<?> rateFlight(@PathVariable("id") Long id, @RequestParam("flight") Long flightId, @RequestParam("rating") int rating) {
+		ratingService.rateFlight(flightId, rating, id);
+		return ResponseEntity.ok().build();
+	}
+	
+	@RequestMapping(value = "/{id}/rate-rent-a-car", method = RequestMethod.POST)
+	public ResponseEntity<?> rateRentACar(@PathVariable("id") Long id, @RequestParam("rentACar") Long rentACarId, @RequestParam("rating") int rating) {
+		ratingService.rateRentACar(rentACarId, rating, id);
+		return ResponseEntity.ok().build();
+	}
+	
+	@RequestMapping(value = "/{id}/rate-vehicle", method = RequestMethod.POST)
+	public ResponseEntity<?> rateVehicle(@PathVariable("id") Long id, @RequestParam("hotel") Long hotelId, @RequestParam("rating") int rating) {
+		ratingService.rateVehicle(hotelId, rating, id);
+		return ResponseEntity.ok().build();
 	}
 	
 }

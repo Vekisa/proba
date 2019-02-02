@@ -1,0 +1,48 @@
+@charset "UTF-8";
+
+#navigation{
+	margin: 10px;
+	border-radius: 10px;
+	opacity: 0.9;
+	z-index:9999;
+}
+
+#tablediv{
+	position: absolute;
+    top: 30%;
+    left: 32%;
+    width:70%;
+    min-height:80%;
+    margin-top: -9em; /*set to a negative number 1/2 of your height*/
+    margin-left: -15em; /*set to a negative number 1/2 of your width*/
+    margin-bottom: 5em;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f3f3f3;
+    opacity: 0.9;
+}
+
+#profile{
+	position: absolute;
+    top: 15%;
+    left: 28%;
+    width:40%;
+    height:60%;
+	border: 1px solid #ccc;
+    border-radius: 10px;
+	background-color: #f3f3f3;
+	opacity: 0.9;
+}
+
+#profimg{
+	position:relative;
+	left: 50%;
+	top: 5%;
+}
+
+#proftext{
+	position:relative;
+	left: 2%;
+	top: 0%;
+	float: left;
+}

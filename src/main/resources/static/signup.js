@@ -10,9 +10,7 @@ $(document).on('submit','.form-signup',function(e){
 		dataType:"json",
 		success:function(data){
 			if(data!=null){
-				//sessionStorage.setItem("user",JSON.stringify(data));
-				alert("Success");
-				window.location.href = 'home.html';		
+				window.location.href = 'signin.html';		
 			}
 		},
 		error : function(xhr, status, error) {
