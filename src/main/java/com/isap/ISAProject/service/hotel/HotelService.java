@@ -32,6 +32,10 @@ import com.isap.ISAProject.repository.airline.LocationRepository;
 import com.isap.ISAProject.repository.hotel.CatalogueRepository;
 import com.isap.ISAProject.repository.hotel.FloorRepository;
 import com.isap.ISAProject.repository.hotel.HotelRepository;
+import com.isap.ISAProject.repository.hotel.HotelSpecifications;
+import com.isap.ISAProject.repository.hotel.RoomRepository;
+import com.isap.ISAProject.repository.hotel.RoomReservationRepository;
+import com.isap.ISAProject.repository.hotel.RoomReservationSpecifications;
 
 @Service
 @Transactional(readOnly = true)
@@ -50,6 +54,12 @@ public class HotelService {
 	
 	@Autowired
 	private FloorRepository floorRepository;
+	
+	@Autowired
+	private RoomReservationRepository rrRepo;
+	
+	@Autowired
+	private RoomRepository roomRepo;
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Hotel findById(long id) {
@@ -262,6 +272,36 @@ public class HotelService {
 		Hotel hotel = this.findById(id);
 		logger.info("< room types fetched");
 		return hotel.getCatalogue().getRoomTypes();
+	}
+	
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public List<Hotel> search(Pageable pageable, String locationName, String hotelName, Date beginDate, Date endDate) {
+		logger.info("> searching hotels");
+		List<Hotel> hotels = hotelRepository.findAll(HotelSpecifications.findByHotelNameLocationName(hotelName, locationName));
+		logger.info("hotels: " + hotels);
+		List<RoomReservation> reservations = new ArrayList<RoomReservation>();
+		for(Hotel h : hotels) {
+			reservations.addAll(rrRepo.findAll(RoomReservationSpecifications.findByHotelBeginDate(h.getId(), beginDate)));
+			reservations.addAll(rrRepo.findAll(RoomReservationSpecifications.findByHotelEndDate(h.getId(), endDate)));
+		}
+		logger.info("reservations: " + reservations);
+		List<Hotel> ret = new ArrayList<Hotel>();
+		for(RoomReservation rr : reservations) {
+			if(!ret.contains(rr.getRoom().getFloor().getHotel())) {
+				ret.add(rr.getRoom().getFloor().getHotel());
+			}
+		}
+		
+		for(Room r : roomRepo.findAll()) {
+			if(r.getRoomReservations().isEmpty() && hotels.contains(r.getFloor().getHotel())) {
+				if(!ret.contains(r.getFloor().getHotel())) {
+					ret.add(r.getFloor().getHotel());
+				}
+			}
+		}
+		logger.info("ret" + ret);
+		logger.info("< hotels found");
+		return ret;
 	}
 	
 }

@@ -27,7 +27,7 @@
     top: 15%;
     left: 28%;
     width:40%;
-    height:60%;
+    height:65%;
 	border: 1px solid #ccc;
     border-radius: 10px;
 	background-color: #f3f3f3;
@@ -64,5 +64,5 @@
 #search-panel{
 	position:fixed;
     top: 18%;
-    left: 27%;
+    left: -15%; /* bilo 27%*/
 }
