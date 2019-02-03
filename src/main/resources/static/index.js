@@ -1,4 +1,5 @@
 var currentData;
+var selected_search_item;
 
 function load(){
 		$("#myMap").hide();
@@ -576,6 +577,7 @@ function printBranchOffices(data){
 
 $(document).on('click', '#rentacar-search', function(event){
 	event.preventDefault();
+	selected_search_item = "rentacar";
 	$('#locationLabel1').text('Location');
 	$('#locationInput1').css("display", "block");
 	$('#nameLabel').text('Company name');
@@ -586,6 +588,7 @@ $(document).on('click', '#rentacar-search', function(event){
 
 $(document).on('click', '#hotel-search', function(event){
 	event.preventDefault();
+	selected_search_item = "hotel";
 	$('#locationLabel1').text('Location');
 	$('#locationInput1').css("display", "block");
 	$('#nameLabel').text('Company name');
@@ -595,8 +598,8 @@ $(document).on('click', '#hotel-search', function(event){
 })
 
 $(document).on('click', '#airline-search', function(event){
-	alert('tuj');
 	event.preventDefault();
+	selected_search_item = "airline";
 	$('#locationLabel1').text('Start location');
 	$('#locationInput1').css("display", "block");
 	$('#nameLabel').text('Target location');
@@ -616,10 +619,10 @@ $(document).on('click', '#goSearch', function(){
 			alert('Neispravno unet vremenski period!');
 		}
 	}
-	search_rentacars();
+	search(selected_search_item);
 })
 
-function search_rentacars(){
+function search(company){
 	let parameters = [{"key": "name", "value": $('#nameInput').val()},
 		{"key": "locationName", "value": $('#locationInput1').val()}]
 	if($('#startDateInput').val() != ""){
@@ -634,12 +637,24 @@ function search_rentacars(){
 			url += '&' + parameters[i].key + '=' + parameters[i].value;
 		}
 	}
-	$.ajax({
-		method: 'GET',
-		url: '/rent-a-cars/search?' + url,
-		contentType: 'application/json',
-		success: function(data){
-			printListOfCompanies(data);
-		}
-	})
+	if(company == "rentacar"){
+		$.ajax({
+			method: 'GET',
+			url: '/rent-a-cars/search?' + url,
+			contentType: 'application/json',
+			success: function(data){
+				printListOfCompanies(data);
+			}
+		})
+	}
+	else if(company == "hotel"){
+		$.ajax({
+			method: 'GET',
+			url: '/hotels/search?' + url,
+			contentType: 'application/json',
+			success: function(data){
+				printListOfCompanies(data);
+			}
+		})
+	}
 }

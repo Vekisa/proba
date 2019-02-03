@@ -60,13 +60,13 @@ public class HotelController {
 			@ApiResponse(code = 204, message = "No Content. Lista je prazna."),
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
-	public ResponseEntity<List<Hotel>> search(Pageable pageable, 
+	public ResponseEntity<List<Resource<Hotel>>> search(Pageable pageable, 
 			@RequestParam(value="locationName", required=false) String locationName,
 			@RequestParam(value="name", required=false) String name,
 			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(value="beginDate", required=false) Date begin, 
 			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(value="endDate", required=false) Date end){
 		List<Hotel> ret = hotelService.search(pageable, locationName, name, begin, end);
-		return new ResponseEntity<List<Hotel>>(ret, HttpStatus.OK);
+		return new ResponseEntity<List<Resource<Hotel>>>(HATEOASImplementorHotel.createHotelsList(ret), HttpStatus.OK);
 	}
 	
 	//Kreiranje hotela
