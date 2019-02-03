@@ -57,13 +57,13 @@ public class RentACarController {
 			@ApiResponse(code = 204, message = "No Content. Lista je prazna."),
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
-	public ResponseEntity<List<RentACar>> search(Pageable pageable, 
+	public ResponseEntity<List<Resource<RentACar>>> search(Pageable pageable, 
 			@RequestParam(value="locationName", required=false) String locationName,
 			@RequestParam(value="name", required=false) String name,
 			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(value="beginDate", required=false) Date begin, 
 			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(value="endDate", required=false) Date end){
 		List<RentACar> ret = service.search(pageable, locationName, name, begin, end);
-		return new ResponseEntity<List<RentACar>>(ret, HttpStatus.OK);
+		return new ResponseEntity<List<Resource<RentACar>>>(HATEOASImplementorRentacar.rentacarLinksList(ret), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

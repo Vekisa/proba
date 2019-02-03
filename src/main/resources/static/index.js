@@ -595,6 +595,7 @@ $(document).on('click', '#hotel-search', function(event){
 })
 
 $(document).on('click', '#airline-search', function(event){
+	alert('tuj');
 	event.preventDefault();
 	$('#locationLabel1').text('Start location');
 	$('#locationInput1').css("display", "block");
@@ -603,3 +604,18 @@ $(document).on('click', '#airline-search', function(event){
 	$('#search-title').text('Airlines');
 	$('#search-panel').css("display", "block");
 })
+
+$(document).on('click', '#goSearch', function(){
+	search_rentacars();
+})
+
+function search_rentacars(){
+	$.ajax({
+		method: 'GET',
+		url: '/rent-a-cars/search?name=' + $('#nameInput').val(),
+		contentType: 'application/json',
+		success: function(data){
+			printListOfCompanies(data);
+		}
+	})
+}
