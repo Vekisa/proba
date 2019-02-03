@@ -31,6 +31,7 @@ public class HATEOASImplementorAirline {
 		resource.add(linkTo(methodOn(AirlineController.class).getFlightConfigurationsForAirlineWithId(airline.getId())).withRel("airline_flight_configurations"));
 		resource.add(linkTo(methodOn(AirlineController.class).getFlightsOfAirline(airline.getId())).withRel("airline_flights"));
 		resource.add(linkTo(methodOn(AirlineController.class).getLocationOfAirlineWithId(airline.getId())).withRel("location"));
+		resource.add(linkTo(methodOn(AirlineController.class).getDestinationsOfAirlineWithId(airline.getId())).withRel("destinations"));
 		// TODO : Link za brze rezervacije
 		return resource;
 	}

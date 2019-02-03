@@ -7,9 +7,11 @@
 		<script type="text/javascript" src="jquery.min.js"></script>
 		<script type="text/javascript" src="companyadmin/companyadmin.js"></script>
 		<script type="text/javascript" src="companyadmin/addButtons.js"></script>
-		<script type="text/javascript" src="companyadmin/buttonListeners.js"></script>
+		<script type="text/javascript" src="companyadmin/hoteladmin/buttonListenersHotel.js"></script>
 		<script type="text/javascript" src="companyadmin/printCollection.js"></script>
-		<link rel="stylesheet" type="text/css" href="home.css">
+		<script type="text/javascript" src="companyadmin/generateGraph.js"></script>
+		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="companyadmin/companyAdmin.css">
 	</head>
 	<body background = "backgr.jpg" onload = load()>
 		<nav class="navbar navbar-expand-lg navbar-light bg-light" id = "navigation">
@@ -20,7 +22,7 @@
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
     			<ul class="navbar-nav mr-auto">
      				<li class="nav-item active">
-        				<a class="nav-link" id="company">Hotel<span class="sr-only">(current)</span></a>
+        				<a class="nav-link hoverable" id="company"></a>
      			 	</li>
     			</ul>
    		 		<form class="form-inline my-2 my-lg-0">
@@ -37,18 +39,19 @@
     			</form>
   			</div>
 		</nav>
-		<div id = "companyProfile" class="container" align="center">
-			<div class="row">
-				<div class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6">
-	    	 		<div class="well profile">
-	            		<div class="col-sm-12">
-	                		<div class="col-xs-12 col-sm-8">
+		<div align="center">
+		<div align="center" id="companyProfile" class="container white-background profile">
+			<div>
+				<div>
+	    	 		<div>
+	            		<div>
+	                		<div>
 	                    		<h2 id="company_name"></h2>
 	                    		<p id="company_description"></p>
 	                    		<p id="company_address"></p>
 	                		</div>
-							<div class="col-xs-12 divider text-center">
-		                		<div id="buttons" class="col-xs-12 col-sm-4 emphasis">
+							<div align="center">
+		                		<div id="buttons">
 		                		</div>
 	                		</div>	           
 	             		</div>
@@ -56,14 +59,14 @@
     			</div>
     		</div>
 		</div>
-		<div id = "profile">
-			<div id = "profimg"><img src="profile.png" alt="Profile picture"></div>
-				<div class="container" id = "proftext">
-					<div class="row">
-						<div class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6">
-			    	 		<div class="well profile">
-			            		<div class="col-sm-12">
-			                		<div class="col-xs-12 col-sm-8">
+		<div class="container white-background profile" id="profile">
+			<div><img src="profile.png" alt="Profile picture"></div>
+				<div>
+					<div>
+						<div>
+			    	 		<div align="center">
+			            		<div>
+			                		<div>
 		                    			<h2 id="username"></h2>
 			                    		<p id="first_name"></p>
 			                    		<p id="last_name"></p>
@@ -72,9 +75,9 @@
 			                    		<p id="phone"></p>
 			                		</div>     
 			             		</div>
-								<div class="col-xs-12 divider text-center">
-			                		<div class="col-xs-12 col-sm-4 emphasis">
-			                    		<button class="btn btn-info btn-block"><span class="fa fa-user"></span> Friends </button>
+								<div align="center">
+			                		<div align="center">
+			                    		<button class="btn btn-info btn-block custombutton" align="center"> Update </button>
 			                		</div>
 	                			</div>
 			          		</div>
@@ -83,7 +86,9 @@
 				</div> 
 			</div> 
 		</div>     
-		<div id="collection" class="containter" align="center"></div>
+		<br>
+		<br>
+		<div id="collection" align="center" class="container white-background"></div><br><br>
 		<div class="modal fade" id="myModal" role="dialog">
 	    	<div class="modal-dialog">
 				<div class="modal-content">
@@ -98,6 +103,7 @@
 					</div>
 				</div>
 			</div>
+		</div>
 		</div>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 	</body>

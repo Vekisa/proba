@@ -1,21 +1,24 @@
+var currentData;
+
 function load(){
-	$("#myMap").hide();
-	map = new OpenLayers.Map("mapdiv");
-    map.addLayer(new OpenLayers.Layer.OSM());
-    var markers = new OpenLayers.Layer.Markers( "Markers" );
-    map.addLayer(markers);
-    markers.addMarker(new OpenLayers.Marker(lonLat));
-    setMapLocation(15,15);
+		$("#myMap").hide();
 }
 
 function setMapLocation(long, lat){
     var lonLat = new OpenLayers.LonLat(long, lat)
           .transform(
-            new OpenLayers.Projection("EPSG:4326"),
-            map.getProjectionObject()
-          ); 
-    var zoom=12;   
-    map.setCenter (lonLat, zoom);
+            new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+            map.getProjectionObject() // to Spherical Mercator Projection
+          );
+          
+    var zoom=12;
+
+    var markers = new OpenLayers.Layer.Markers( "Markers" );
+    map.addLayer(markers);
+    
+    markers.addMarker(new OpenLayers.Marker(lonLat));
+    
+    map.setCenter(lonLat, zoom);
 }
 
 $(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
@@ -36,7 +39,40 @@ $(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
     $('#myModal').modal("show");
 });
 
+$(document).on('click','#home',function(e){
+	e.preventDefault();
+	$("#myMap").hide();
+	document.getElementById("tablediv").innerHTML = "<img height=\"700\" width=\"700\" src=\"home.png\" alt=\"Travel\">";
+});
+
+$(document).on('click','#about',function(e){
+	e.preventDefault();
+	$("#myMap").hide();
+	document.getElementById("tablediv").innerHTML = "Ovde bi kao trebalo da pise nesto pametno o nasoj stranici";
+});
+
 $(document).on('click','#airline',function(e){
+	e.preventDefault();
+	$("#myMap").hide();
+	$.ajax({
+		type: "GET",
+		url: "airlines?page=0&size=10",
+		dataType: "json",
+		success: function(data){
+			if(data!=null){
+				printListOfCompanies(data);
+			}
+		}
+	});
+});
+
+$(document).on('click','#about',function(e){
+	e.preventDefault();
+	$("#myMap").hide();
+	document.getElementById("tablediv").innerHTML ="Ovo je nas predivni about. Samo cu reci - Napusite mi se kurca svi sa softa."
+});
+
+$(document).on('click','#airbtn',function(e){
 	e.preventDefault();
 	$("#myMap").hide();
 	$.ajax({
@@ -66,6 +102,21 @@ $(document).on('click','#rentacar',function(e){
 	});
 });
 
+$(document).on('click','#rentbtn',function(e){
+	e.preventDefault();
+	$("#myMap").hide();
+	$.ajax({
+		type: "GET",
+		url: "rent-a-cars?page=0&size=10",
+		dataType: "json",
+		success: function(data){
+			if(data!=null){
+				printListOfCompanies(data);
+			}
+		}
+	});
+});
+
 $(document).on('click','#hotel',function(e){
 	e.preventDefault();
 	$("#myMap").hide();
@@ -81,6 +132,27 @@ $(document).on('click','#hotel',function(e){
 	});
 });
 
+$(document).on('click','#hotbtn',function(e){
+	e.preventDefault();
+	$("#myMap").hide();
+	$.ajax({
+		type: "GET",
+		url: "hotels?page=0&size=10",
+		dataType: "json",
+		success: function(data){
+			if(data!=null){
+				printListOfCompanies(data);
+			}
+		}
+	});
+});
+
+$(document).on('click','#bos',function(e){
+	$("#myMap").hide();
+	e.preventDefault();
+	printCompany(currentData,"rentacar");
+	printBranchOffices(currentData);
+});
 
 function printListOfCompanies(data){
 	var s = "";
@@ -98,9 +170,105 @@ function printListOfCompanies(data){
 	  		"</thead><tbody>" + s + "</tbody></table>";
 }
 
+$(document).on('click','#destbtn',function(e){
+	$("#myMap").hide();
+	e.preventDefault();
+	printCompany(currentData,"airline");
+	printDestinations(currentData);
+});
+
+$(document).on('click','#flightsbtn',function(e){
+	$("#myMap").hide();
+	e.preventDefault();
+	printCompany(currentData,"airline");
+	printFlights(currentData);
+});
+
+$(document).on('click','#cataloguebtn',function(e){
+	e.preventDefault();
+	printCompany(currentData,"hotel");
+	printHotelCatalogue(currentData);
+});
+
+$(document).on('click','#extraopt',function(e){
+	$("#myMap").hide();
+	e.preventDefault();
+	printCompany(currentData,"hotel");
+	printExtraOptions(currentData);
+});
+
+function printExtraOptions(data){
+	 $.ajax({
+			type: "GET",
+			url:  data._links.hotel_extra_options.href,
+			dataType: "json",
+			async: false,
+			success: function(data){
+					pomDataExtraOptions = data;
+			}
+	 });
+	 
+	 var extraOptions = "";
+	 if(pomDataExtraOptions != null){
+		 $.each(pomDataExtraOptions, function(index, extraOption) {
+				extraOptions += "<tr><td scope=\"col\">" + extraOption.description + "</td>" + "<td>" + extraOption.pricePerDay + "</td></tr>";
+		});
+	 }
+	 
+	 var tabela = "<table class=\"table table-hover\" id = \"tableveh\"><thead>" +
+		"<tr>" + 
+	    "<th scope=\"col\">Description</th>" +
+	    "<th scope=\"col\">Price per day(&euro;)</th>" +
+		"</tr>" +
+	"</thead><tbody>" + extraOptions + "</tbody></table>";
+	 
+	 document.getElementById("tablediv").innerHTML += "<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id =\"cataloguebtn\">Catalogue</button></div></div>" +
+	 "<hr>" + 
+		"<strong>Extra Options</strong>" +
+		"<hr>" + tabela;
+}
+
+function printDestinations(data){
+	var pomDataDestinations;
+	 $.ajax({
+			type: "GET",
+			url:  data._links.destinations.href,
+			dataType: "json",
+			async: false,
+			success: function(data){
+					pomDataDestinations = data;
+			}
+	});
+	 
+	 let destinations = "";
+	 if(pomDataDestinations != null){
+		 $.each(pomDataDestinations, function(index, destiantion) {
+				destinations += "<tr><td scope=\"col\">" + destination.name + "</td></tr>";
+		});
+	 }
+	 
+	 var tabela = "<table class=\"table table-hover\" id = \"tableveh\"><thead>" +
+		"<tr>" + 
+	    "<th scope=\"col\">Name</th>" +
+	    "<th scope=\"col\">Brand</th>" +
+	    "<th scope=\"col\">Model</th>" +
+	    "<th scope=\"col\">Seats number</th>" +
+	    "<th scope=\"col\">Type</th>" +
+		"</tr>" +
+	"</thead><tbody>" + destinations + "</tbody></table>";
+	 
+	 document.getElementById("tablediv").innerHTML += "<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id =\"flightsbtn\">Flights</button></div></div>" +
+	 "<hr>" + 
+		"<strong>Destinations</strong>" +
+		"<hr>" + tabela;
+	 
+	 
+}
+
 $(document).on('click','#tablebo tr', function() {
 	var branchOfficeLink = $(this).attr('id');
-	
+	var pomData;
+	var pomDataVehicles;
 	$.ajax({
 		type: "GET",
 		url: branchOfficeLink,
@@ -112,6 +280,65 @@ $(document).on('click','#tablebo tr', function() {
 			}
 		}
 	});
+	
+	$.ajax({
+		type: "GET",
+		url: pomData._links.location.href,
+		dataType: "json",
+		success: function(data){
+			if(data!=null){
+				$.ajax({
+					type: "GET",
+					url: data._links.long_lat.href,
+					dataType: "json",
+					success: function(data2){
+						if(data2!=null){
+							setMapLocation(data2.lon, data2.lat);
+						}
+					}
+				});
+			}
+		}
+	});
+	
+	$.ajax({
+		type: "GET",
+		url: pomData._links.vehicles.href,
+		dataType: "json",
+		async: false,
+		success: function(data){
+			if(data!=null){
+				pomDataVehicles = data;
+			}
+		}
+	});
+	
+	$("#myMap").show();
+	
+	var vehicles = "";
+	
+	$.each(pomDataVehicles, function(index, vehicle) {
+		vehicles += "<tr><td scope=\"col\">" + vehicle.name + "</td>" + "<td scope=\"col\">"+ vehicle.brand 
+		+ "<td scope=\"col\">" + vehicle.model + "</td>"
+		+ "<td scope=\"col\">"+ vehicle.seats_number + "</td>" 
+		+ "<td scope=\"col\">"+ vehicle.type + "</td>"
+		+ "</td></tr>";
+	});
+	
+	var tabela = "<table class=\"table table-hover\" id = \"tableveh\"><thead>" +
+				"<tr>" + 
+			    "<th scope=\"col\">Name</th>" +
+			    "<th scope=\"col\">Brand</th>" +
+			    "<th scope=\"col\">Model</th>" +
+			    "<th scope=\"col\">Seats number</th>" +
+			    "<th scope=\"col\">Type</th>" +
+			    "<th scope=\"col\"></th>" +
+				"</tr>" +
+			"</thead><tbody>" + vehicles + "</tbody></table>";
+	
+	printCompany(currentData,"rentacar");
+	document.getElementById("tablediv").innerHTML +=  "<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id =\"bos\">Branch offices</button></div></div>" + 
+		"<hr>" + "<strong>Vehicles of branch office on address \"" + pomData.address + "\"</strong>" + "<hr>" + tabela;
 });
 
 $(document).on('click','#table tr', function() {
@@ -122,6 +349,7 @@ $(document).on('click','#table tr', function() {
 		dataType: "json",
 		success: function(data){
 			if(data!=null){
+				currentData = data;
 				if(companyLink.includes("airlines")){
 					printCompany(data,"airline");
 					printFlights(data);
@@ -168,16 +396,31 @@ function printCompany(data, company){
 	
 	let header = "";	
 	let image = "";
+	let buttonTitle = "";
+	let buttonTitle2= "";
+	let buttonId = "";
 	
 	if(company == "airline"){
 		image = "air-plane-cartoon.png";
 		header = "Flights";
+		buttonTitle = "Airlines";
+		buttonTitle2 = "Destinations";
+		buttonId = "airbtn";
+		buttonId2 = "destbtn";
 	}else if(company == "rentacar"){
 		image = "rent-a-car-cartoon.png";
 		header = "Branch offices";
+		buttonTitle = "Rent a cars"
+		buttonTitle2 = "Nesto";
+		buttonId = "rentbtn";
+		buttonId2 = "nesto";
 	}else if(company == "hotel"){
 		image = "hotel-cartoon.png";
 		header = "Catalogue";
+		buttonTitle = "Hotels"
+		buttonTitle2 = "Nesto";
+		buttonId = "hotbtn";
+		buttonId2 = "nesto";
 	}
 	
 	let code = "<div class=\"container\">" +
@@ -208,11 +451,9 @@ function printCompany(data, company){
 						"<span class=\"fa fa-star checked\"></span>" + 
 						"<span class=\"fa fa-star checked\"></span>" + 
 						"<span class=\"fa fa-star\"></span>" + 
+						"</div>" +
 					"</div>" +
-				"</div>" + 
-				"<hr>" + 
-				"<strong>" + header + "</strong>" +
-				"<hr>";
+					"<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id =\"" + buttonId + "\">" + buttonTitle + "</button></div></div>";
 	
 	
 						
@@ -252,7 +493,10 @@ function printHotelCatalogue(data){
 		+ "</td>" + "<td scope=\"col\">" + roomType.pricePerNight + "</td></tr>";
 	});
 	
-	document.getElementById("tablediv").innerHTML += "<table class=\"table table-hover\"><thead><tr><th scope=\"col\">Type</th><th scope=\"col\">Description</th><th scope=\"col\">Price per night(&euro;)</th></tr></thead><tbody>" + catalogue + "</tbody></table>" ;
+	document.getElementById("tablediv").innerHTML += "<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id =\"extraopt\">Extra Options</button></div></div>" + "<div>" + 
+	"<hr>" + 
+	"<strong>Catalogue</strong>" +
+	"<hr>" + "<table class=\"table table-hover\"><thead><tr><th scope=\"col\">Type</th><th scope=\"col\">Description</th><th scope=\"col\">Price per night(&euro;)</th></tr></thead><tbody>" + catalogue + "</tbody></table>" ;
 }
 
 function printFlights(data){
@@ -262,22 +506,25 @@ function printFlights(data){
 		url: data._links.airline_flights.href,
 		dataType: "json",
 		async: false,
-		success: function(data){
-			if(data!=null){
+		success: function(data){			
 				pomDataFlights = data;
-			}
 		}
 	});
 	
 	let flights = "";
 	let s = "";
-	$.each(pomDataFlights, function(index, flight) {
-		s += "<tr>" + "<td>" + flight.startDestination + "</td>" + "<td>"+ flight.finishDestination 
-		+ "</td>" + "<td>" + flight.transfers + "</td><td>" + flight.departureTime + "</td><td>" + flight.arrivalTime + "</td><td>"
-		+ flight.flightLength + "</td><td>" + flight.basePrice + "</td>" + "</tr>";
-	});
+	if(pomDataFlights!=null){
+		$.each(pomDataFlights, function(index, flight) {
+			s += "<tr>" + "<td>" + flight.startDestination + "</td>" + "<td>"+ flight.finishDestination 
+			+ "</td>" + "<td>" + flight.transfers + "</td><td>" + flight.departureTime + "</td><td>" + flight.arrivalTime + "</td><td>"
+			+ flight.flightLength + "</td><td>" + flight.basePrice + "</td>" + "</tr>";
+		});
+	}
 	
-	flights =  "<table class=\"table table-hover\"><thead>" +
+	flights ="<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id =\"destbtn\">Destinations</button></div></div>" + "<div>" + 
+	"<hr>" + 
+	"<strong>Flights</strong>" +
+	"<hr>" +  "<table class=\"table table-hover\"><thead>" +
 		"<tr>" + 
 		"<th scope=\"col\">Start Destination</th>" +
 		"<th scope=\"col\">Finish Destination</th>" +
@@ -309,12 +556,16 @@ function printBranchOffices(data){
 	let branchOffices = "";
 	let s = "";
 	$.each(pomDataBranchOffices, function(index, branchOffice) {
-		s += "<tr id = \"" +branchOffice.links[0].href + "\">" + "<td>" + branchOffice.address + "</td>" + "</tr>";
+		s += "<tr id = \"" +branchOffice.links[0].href + "\">" + "<td>" + branchOffice.address + "</td>" + "<td>" + branchOffice.location.name + "</td>"+ "</tr>";
 	});
 	
-	branchOffices =  "<table class=\"table table-hover\" id = \"tablebo\"><thead>" +
+	branchOffices ="</div>" + 
+	"<hr>" + 
+	"<strong>Branch officess</strong>" +
+	"<hr>" + "<table class=\"table table-hover\" id = \"tablebo\"><thead>" +
 		"<tr>" + 
 		"<th scope=\"col\">Address</th>" +
+		"<th scope=\"col\">Location</th>" +
 		"</tr>" +
 		"</thead><tbody>" + s + "</tbody></table>";
 	

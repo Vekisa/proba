@@ -35,7 +35,6 @@ public class BranchOffice {
 	@ManyToOne
 	private RentACar rentACar;
 	
-	@JsonIgnore
 	@ManyToOne
 	private Location location;
 	

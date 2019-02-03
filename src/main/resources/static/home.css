@@ -1,5 +1,12 @@
 @charset "UTF-8";
 
+#navigation{
+	margin: 10px;
+	border-radius: 10px;
+	opacity: 0.9;
+	z-index:9999;
+}
+
 #tablediv{
 	position: absolute;
     top: 30%;
@@ -15,27 +22,29 @@
     opacity: 0.9;
 }
 
-
-
-#navigation{
-	margin: 10px;
-	border-radius: 10px;
+#profile{
+	position: absolute;
+    top: 15%;
+    left: 28%;
+    width:40%;
+    height:60%;
+	border: 1px solid #ccc;
+    border-radius: 10px;
+	background-color: #f3f3f3;
 	opacity: 0.9;
-	z-index:9999;
 }
 
-.hidden{
-	visibility: hidden;
-	width: 0px;
-	display: inline;
+#profimg{
+	position:relative;
+	left: 50%;
+	top: 5%;
 }
 
-tr:hover{
-	cursor: pointer;
-}
-
-.profimg{
-	border-radis : 50%;
+#proftext{
+	position:relative;
+	left: 2%;
+	top: 0%;
+	float: left;
 }
 
 #myMap{
@@ -57,5 +66,3 @@ tr:hover{
     top: 18%;
     left: 27%;
 }
-
-

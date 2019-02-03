@@ -22,6 +22,7 @@ import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.hotel.RoomType;
+import com.isap.ISAProject.repository.hotel.FloorRepository;
 import com.isap.ISAProject.repository.hotel.RoomRepository;
 import com.isap.ISAProject.repository.hotel.RoomTypeRepository;
 
@@ -36,6 +37,9 @@ public class RoomService {
 	
 	@Autowired
 	private RoomTypeRepository roomTypeRepository;
+	
+	@Autowired
+	private FloorRepository floorRepository;
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Room findById(long id) {
@@ -71,7 +75,7 @@ public class RoomService {
 	public void deleteById(long id) {
 		logger.info("> Room delete");
 		Room room = this.findById(id);
-		if(!this.checkIfRoomIsReserved(room))
+		if(this.checkIfRoomIsReserved(room))
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Soba je rezervisana i ne moze se brisat.");
 		roomRepository.deleteById(id);
 		logger.info("< Room delete");
@@ -81,7 +85,7 @@ public class RoomService {
 	public Room updateRoomById(Long roomId, Room newRoom) {
 		logger.info("> Room update");
 		Room oldRoom = this.findById(roomId);
-		if(!this.checkIfRoomIsReserved(oldRoom))
+		if(this.checkIfRoomIsReserved(oldRoom))
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Soba je rezervisana i ne moze se menjati.");
 		oldRoom.setNumberOfBeds(newRoom.getNumberOfBeds());
 		roomRepository.save(oldRoom);
@@ -186,6 +190,8 @@ public class RoomService {
 		logger.info("> setting room type for room {}", id);
 		Room room = this.findById(id);
 		RoomType type = this.findRoomType(roomTypeId);
+		if(this.checkIfRoomIsReserved(room))
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Soba je rezervisana i ne moze se menjati.");
 		if(!type.getCatalogue().getHotels().contains(room.getFloor().getHotel()))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Room and type don't belong to the same hotel.");
 		room.setRoomType(type);
@@ -200,6 +206,22 @@ public class RoomService {
 		logger.info("< room type fetched");
 		if(type.isPresent()) return type.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Request room type doesn't exist.");
+	}
+
+	@Transactional(readOnly = false)
+	public Room setFloor(Long roomId, Long floorId) {
+		logger.info("> setting floor to room with id {}", roomId);
+		Room room = this.findById(roomId);
+		if(this.checkIfRoomIsReserved(room))
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Soba je rezervisana i ne moze se menjati.");
+		Optional<Floor> floor = floorRepository.findById(floorId);
+		if(floor.isPresent()) {
+			room.setFloor(floor.get());
+			logger.info("< floor set");
+			this.save(room);
+			return room;
+		}
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Request floor doesn't exist.");
 	}
 
 }

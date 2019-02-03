@@ -4,6 +4,7 @@ var companyId;
 
 function load(){
 	$("#companyProfile").hide();
+	$("#collection").hide();
 	$.ajax({
 		type: "GET",
 		url: "/users/registered/currentUser",
@@ -26,6 +27,15 @@ function load(){
 				$("#phone").append("<strong>Phone number:</strong> " + data.phoneNumber);
 				$("#username").text("Profile of user: " + data.username);
 				authority = data.authorities[0].authority;
+				if(authority == "HOTEL_ADMIN") {
+					document.getElementById("company").innerHTML = "Hotel";
+				}
+				if(authority == "AIRLINE_ADMIN") {
+				    document.getElementById("company").innerHTML = "Airline";
+				}
+				if(authority == "RENT_A_CAR_ADMIN") {
+				    document.getElementById("company").innerHTML = "Rent-a-Car";
+				}				
 				adminId = data.id;
 			}
 		},
@@ -55,17 +65,24 @@ function load(){
 }
 
 $(document).on('click','#company',function(e){
+	loadCollection();
+});
+
+function loadCollection() {
 	let url1 = "";
 	let url2 = "";
 	if(authority == "HOTEL_ADMIN") {
+		$("#company").val("Hotel");
 		url1 = "/hotels/" + companyId;
 		url2 = url1 + "/rooms";
 	}
 	if(authority == "AIRLINE_ADMIN") {
+	    $("#company").val("Airline");
 		url1 = "/airlines/" + companyId;
 		url2 = url1 + "/flights";
 	}
 	if(authority == "RENT_A_CAR_ADMIN") {
+	    $("#company").val("Rent-a-car");
 		url1 = "/rent-a-cars" + companyId;
 		url2 = url1 + "/vehicles";
 	}
@@ -103,5 +120,18 @@ $(document).on('click','#company',function(e){
 				printCollection(data, authority);
 			}
 		}		
+	});	
+}
+
+$(document).on('click', '#logout', function(e) {
+	$.ajax({
+		type: "POST",
+		url: "/users/registered/logout",
+		beforeSend: function(request) {
+			request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
+		},
+		success: function() {
+			window.location.href = "index.html";
+		}
 	});
 });

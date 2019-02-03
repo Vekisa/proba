@@ -18,7 +18,7 @@ public class CompanyAdmin extends SystemUser {
 	private static final long serialVersionUID = 6802189965555660737L;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private AuthorizationLevel authority;
 	
 	@ManyToOne

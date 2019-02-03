@@ -1,3 +1,6 @@
+function load(){
+}
+
 $(document).on('submit','.form-signin',function(e){
 	e.preventDefault();
 	$.ajax({
@@ -8,10 +11,24 @@ $(document).on('submit','.form-signin',function(e){
 		contentType:"application/json",
 		dataType:"json",
 		success:function(data){
-			if(data!=null){
+			if(data!=null) {
 				localStorage.token = data.token;
-				alert(data.token);
-				window.location.href = 'home.html';		
+				$.ajax({
+				type: "GET",
+				url: "/users/registered/currentUser",
+				async: false,			
+				beforeSend: function(request) {
+	    			request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
+	  			},
+	  			success: function(data) {
+	  				if(data.authorities[0].authority == "HOTEL_ADMIN" ||
+	  				   data.authorities[0].authority == "AIRLINE_ADMIN" ||
+	  				   data.authorities[0].authority == "RENT_A_CAR_ADMIN")
+	  				   window.location.href = "companyadmin.html";
+	  				else
+	  			       window.location.href = "home.html";
+	  			}
+				});	
 			}
 		},
 		error : function(xhr, status, error) {

@@ -171,4 +171,9 @@ public class RoomController {
 				return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(roomService.getRoomType(roomId)), HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/{id}/floor", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<Room>> setFloorForRoomWithId(@PathVariable("id") Long roomId, @RequestParam("floor") Long floorId) {
+		return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(roomService.setFloor(roomId, floorId)), HttpStatus.OK);
+	}
+	
 }

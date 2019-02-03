@@ -1,6 +1,8 @@
 package com.isap.ISAProject.controller.hotel;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -241,6 +243,11 @@ public class HotelController {
 	@RequestMapping(value = "/{id}/roomtypes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<Resource<RoomType>>> getRoomType(@PathVariable("id") Long id) {
 		return new ResponseEntity<List<Resource<RoomType>>>(HATEOASImplementorHotel.createRoomTypeList(hotelService.getRoomTypes(id)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/income", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<Long, Double>> getIncomeForHotel(@PathVariable("id") Long id, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
+		return new ResponseEntity<Map<Long,Double>>(hotelService.getIncomeFor(id, new Date(begin), new Date(end)), HttpStatus.OK);
 	}
 	
 }

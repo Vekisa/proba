@@ -1,0 +1,49 @@
+@charset "UTF-8";
+
+#navigation {
+	margin: 10px;
+	border-radius: 10px;
+	opacity: 0.9;
+	z-index:9999;
+}
+
+.white-background {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f3f3f3;
+    opacity: 0.9;
+    padding-top: 5px;
+    padding-bottom: 5px;	
+}
+
+.custombutton {
+    max-width: 150px;
+}
+
+.hoverable {
+    cursor: pointer;
+}
+
+.profile {
+    width: 30%;
+}
+
+#myMap {
+	position:fixed;
+    top: 14%;
+    left: 1%;
+	border-radius: 30px;
+	margin: 20px;
+	width: 320px;
+	height: 320px;
+	align: center;
+	background-color: #f3f3f3;
+    opacity: 0.95;
+    padding: 10px;
+}
+
+#search-panel {
+	position:fixed;
+    top: 18%;
+    left: 27%;
+}

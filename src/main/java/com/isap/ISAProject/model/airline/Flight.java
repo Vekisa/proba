@@ -23,7 +23,6 @@ import com.isap.ISAProject.model.rating.FlightRating;
 @Table(name = "flight")
 public class Flight {
 
-	@JsonIgnore
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -42,9 +41,12 @@ public class Flight {
 	@Cascade(CascadeType.ALL)
 	private List<FlightSeat> seats;
 
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private String transfers;
 
+	@Column(nullable = false)
+	private int numberOfTransfers;
+	
 	@Column(nullable = false)
 	private boolean finished;
 
