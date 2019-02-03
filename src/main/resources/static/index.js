@@ -608,7 +608,7 @@ $(document).on('click', '#airline-search', function(event){
 $(document).on('click', '#goSearch', function(){
 	let startDate = new Date($('#startDateInput').val());
 	let endDate = new Date($('#endDateInput').val());
-	if(startDate != null && endDate != null){
+	if($('#startDateInput').val() != "" && $('#endDateInput').val() != ""){
 		if(startDate < endDate){
 			search_rentacars();
 		}
@@ -616,20 +616,24 @@ $(document).on('click', '#goSearch', function(){
 			alert('Neispravno unet vremenski period!');
 		}
 	}
+	search_rentacars();
 })
 
 function search_rentacars(){
 	let parameters = [{"key": "name", "value": $('#nameInput').val()},
-		{"key": "locationName", "value": $('#locationInput1').val()},
-		{"key": "beginDate", "value": new Date($('#startDateInput').val()).toISOString()},
-		{"key": "endDate", "value": new Date($('#endDateInput').val()).toISOString()}];
+		{"key": "locationName", "value": $('#locationInput1').val()}]
+	if($('#startDateInput').val() != ""){
+		parameters[2] = {"key": "startDate", "value": new Date($('#startDateInput').val()).toISOString()};
+	}
+	if($('#endDateInput').val() != ""){
+		parameters[3] = {"key": "endDate", "value": new Date($('#endDateInput').val()).toISOString()};
+	}
 	let url;
 	for(i = 0; i < parameters.length; i++){
 		if(parameters[i].value != "" && parameters[i].value != undefined){
 			url += '&' + parameters[i].key + '=' + parameters[i].value;
 		}
 	}
-	url = url.replace('undefined&', '');
 	$.ajax({
 		method: 'GET',
 		url: '/rent-a-cars/search?' + url,
