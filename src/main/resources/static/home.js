@@ -1,5 +1,6 @@
 var currentData;
 var currentUser;
+
 function load(){
 		$.ajax({
 			type: "GET",
@@ -18,6 +19,24 @@ function load(){
 			}
 		});
 	$('#profile').hide();
+	$("#myMap").hide();
+}
+
+function setMapLocation(long, lat){
+    var lonLat = new OpenLayers.LonLat(long, lat)
+          .transform(
+            new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+            map.getProjectionObject() // to Spherical Mercator Projection
+          );
+          
+    var zoom=12;
+
+    var markers = new OpenLayers.Layer.Markers( "Markers" );
+    map.addLayer(markers);
+    
+    markers.addMarker(new OpenLayers.Marker(lonLat));
+    
+    map.setCenter(lonLat, zoom);
 }
 
 $(document).on('click','#userName',function(e){
@@ -26,12 +45,21 @@ $(document).on('click','#userName',function(e){
 	$("#tablediv").hide();
 	
 	$('#usernameP').text(currentUser.username);
-	$('#firstNameP').innerHTML = "<strong>First name: </strong>" + currentUser.firstName;
+	$('#firstNameP').text(currentUser.firstName);
+	$('#lastNameP').text(currentUser.lastName);
+	$('#emailP').text(currentUser.email);
+	$('#cityP').text(currentUser.city);
+	$('#phoneNumberP').text(currentUser.phoneNumber);
 	
 	$("#profile").show();
-	
-	
-	
+});
+
+$(document).on('click','#shoppingcart',function(e){
+	e.preventDefault();
+	$("#tablediv").show();
+	$("#profile").hide();
+	$("#myMap").hide();
+	document.getElementById("tablediv").innerHTML = "<h1><strong>Shopping Cart</strong></h1>";
 });
 
 $(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
@@ -72,12 +100,16 @@ $(document).on('click','#logout',function(e){
 $(document).on('click','#home',function(e){
 	e.preventDefault();
 	$("#myMap").hide();
+	$("#tablediv").show();
+	$("#profile").hide();
 	document.getElementById("tablediv").innerHTML = "<img height=\"700\" width=\"700\" src=\"home.png\" alt=\"Travel\">";
 });
 
 $(document).on('click','#airline',function(e){
 	e.preventDefault();
+	$("#tablediv").show();
 	$("#myMap").hide();
+	$("#profile").hide();
 	$.ajax({
 		type: "GET",
 		url: "airlines?page=0&size=10",
@@ -88,12 +120,6 @@ $(document).on('click','#airline',function(e){
 			}
 		}
 	});
-});
-
-$(document).on('click','#about',function(e){
-	e.preventDefault();
-	$("#myMap").hide();
-	document.getElementById("tablediv").innerHTML ="Ovo je nas predivni about. Samo cu reci - Napusite mi se kurca svi sa softa."
 });
 
 $(document).on('click','#airbtn',function(e){
@@ -114,6 +140,8 @@ $(document).on('click','#airbtn',function(e){
 $(document).on('click','#rentacar',function(e){
 	e.preventDefault();
 	$("#myMap").hide();
+	$("#tablediv").show();
+	$("#profile").hide();
 	$.ajax({
 		type: "GET",
 		url: "rent-a-cars?page=0&size=10",
@@ -144,6 +172,8 @@ $(document).on('click','#rentbtn',function(e){
 $(document).on('click','#hotel',function(e){
 	e.preventDefault();
 	$("#myMap").hide();
+	$("#tablediv").show();
+	$("#profile").hide();
 	$.ajax({
 		type: "GET",
 		url: "hotels?page=0&size=10",
