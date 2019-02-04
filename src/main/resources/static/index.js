@@ -29,7 +29,7 @@ $(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
 	    	 $("#error").html("Not found");
 	      break;
 	    case 204:
-	    	$("#error").html("Not found");
+	    	$("#error").html("No content");
 	      break;
 	    case 400:
 	    	$("#error").html("Bad request");

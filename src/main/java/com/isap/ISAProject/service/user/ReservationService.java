@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightSeat;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Passenger;
 import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.hotel.Room;
@@ -340,6 +342,27 @@ public class ReservationService {
 		logger.info("< room fetched");
 		if(room.isPresent()) return room.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested room doesn't exist.");
+	}
+	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	public Location getLocation(Long reservationId) {
+		logger.info("> fethcing location with id {}", reservationId);
+		Reservation reservation = this.findById(reservationId);
+		Ticket ticket = reservation.getTicket();
+		if(ticket == null)
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Greska prilikom dobavljanja lokacije");
+		FlightSeat flightSeat = ticket.getSeats().get(0);
+		if(flightSeat == null)
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Greska prilikom dobavljanja lokacije");
+		Flight flight = flightSeat.getFlight();
+		if(flight == null)
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Greska prilikom dobavljanja lokacije");
+		Location location = flight.getFinishDestination();
+		logger.info("< location fetched");
+		
+		if(location != null) 
+			return location;
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lokacija ne postoji");
 	}
 	
 }
