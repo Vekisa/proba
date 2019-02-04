@@ -24,7 +24,6 @@ import com.isap.ISAProject.model.rating.RoomRating;
 @Table(name = "room")
 public class Room extends RatableEntity {
 	
-	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -72,5 +71,10 @@ public class Room extends RatableEntity {
 	public void setRoomType(RoomType roomType) { this.roomType = roomType; }
 
 	public List<RoomReservation> getRoomReservations() { return roomReservations; }
+
+	@Override
+	public String toString() {
+		return "Room [id=" + id + "]";
+	}
 	
 }

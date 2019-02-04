@@ -70,4 +70,9 @@ public class Hotel extends Company {
 	public List<CompanyAdmin> getAdmins() { return this.admins; }
 
 	public Location getLocation() { return this.location; }
+
+	@Override
+	public String toString() {
+		return "Hotel [id=" + this.getId() + "]";
+	}
 }

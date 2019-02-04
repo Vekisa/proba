@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Hotel admin home</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">	
+		<script type="text/javascript" src="jquery.min.js"></script>
+		<script type="text/javascript" src="companyadmin/companyadmin.js"></script>
+		<script type="text/javascript" src="companyadmin/addButtons.js"></script>
+		<script type="text/javascript" src="companyadmin/hoteladmin/buttonListenersHotel.js"></script>
+		<script type="text/javascript" src="companyadmin/printCollection.js"></script>
+		<script type="text/javascript" src="companyadmin/generateGraph.js"></script>
+		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="companyadmin/companyAdmin.css">
+	</head>
+	<body background = "backgr.jpg" onload = load()>
+		<nav class="navbar navbar-expand-lg navbar-light bg-light" id = "navigation">
+  			<img src="air-plane-cartoon.png" alt="Airplane" hegiht = "100" width = "100">
+  			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+   		 		<span class="navbar-toggler-icon"></span>
+  			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    			<ul class="navbar-nav mr-auto">
+     				<li class="nav-item active">
+        				<a class="nav-link hoverable" id="company"></a>
+     			 	</li>
+    			</ul>
+   		 		<form class="form-inline my-2 my-lg-0">
+	 				<ul class="navbar-nav mr-auto">
+      					<li class="nav-item active">
+        					<a class="nav-link" href="" id = "user">UserName<span class="sr-only" id= "user">(current)</span></a>
+      					</li>
+      					<li class="nav-item active">
+        					<a class="nav-link" id="logout" href="">Logout<span class="sr-only">(current)</span></a>
+      					</li>
+      				</ul>
+ 			 		<input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    			</form>
+  			</div>
+		</nav>
+		<div align="center">
+		<div align="center" id="companyProfile" class="container white-background profile">
+			<div>
+				<div>
+	    	 		<div>
+	            		<div>
+	                		<div>
+	                    		<h2 id="company_name"></h2>
+	                    		<p id="company_description"></p>
+	                    		<p id="company_address"></p>
+	                		</div>
+							<div align="center">
+		                		<div id="buttons">
+		                		</div>
+	                		</div>	           
+	             		</div>
+          			</div>
+    			</div>
+    		</div>
+		</div>
+		<div class="container white-background profile" id="profile">
+			<div><img src="profile.png" alt="Profile picture"></div>
+				<div>
+					<div>
+						<div>
+			    	 		<div align="center">
+			            		<div>
+			                		<div>
+		                    			<h2 id="username"></h2>
+			                    		<p id="first_name"></p>
+			                    		<p id="last_name"></p>
+			                    		<p id="email"></p>
+			                    		<p id="city"></p>
+			                    		<p id="phone"></p>
+			                		</div>     
+			             		</div>
+								<div align="center">
+			                		<div align="center">
+			                    		<button class="btn btn-info btn-block custombutton" align="center"> Update </button>
+			                		</div>
+	                			</div>
+			          		</div>
+		    			</div>
+					</div>
+				</div> 
+			</div> 
+		</div>     
+		<br>
+		<br>
+		<div id="collection" align="center" class="container white-background"></div><br><br>
+		<div class="modal fade" id="myModal" role="dialog">
+	    	<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">Error</h4>
+					</div>
+					<div class="modal-body">
+		  				<p id="error"></p>
+					</div>
+					<div class="modal-footer">
+		  				<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+	</body>
+</html>

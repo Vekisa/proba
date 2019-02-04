@@ -1,13 +1,14 @@
 package com.isap.ISAProject.model.user;
 
 import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.user.base.UserBase;
 
 @MappedSuperclass
@@ -43,6 +44,10 @@ public abstract class SystemUser extends UserBase{
 	@Column(nullable = false)
 	private String phoneNumber;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = true)
+	private UserState state;
+	
 	public SystemUser() {
 		super();
 	}
@@ -98,7 +103,6 @@ public abstract class SystemUser extends UserBase{
 	
 	public void setUsername(String username) { this.username = username; }
 	
-	@JsonIgnore
 	public abstract AuthorizationLevel getAuthority();
 	
 	public abstract void setAuthority(AuthorizationLevel authority);
