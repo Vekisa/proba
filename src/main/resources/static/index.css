@@ -1,14 +1,14 @@
 @charset "UTF-8";
 
 #tablediv{
-	position: absolute;
-    top: 30%;
-    left: 32%;
+	position: relative;
+    /*top: 30%;*/
+    left: 12%;
     width:70%;
     min-height:80%;
-    margin-top: -9em; /*set to a negative number 1/2 of your height*/
-    margin-left: -15em; /*set to a negative number 1/2 of your width*/
-    margin-bottom: 5em;
+    /*margin-top: -9em; /*set to a negative number 1/2 of your height*/
+    /*margin-left: -15em; /*set to a negative number 1/2 of your width*/
+    /*margin-bottom: 5em;*/
     border: 1px solid #ccc;
     border-radius: 10px;
     background-color: #f3f3f3;
@@ -39,14 +39,16 @@ tr:hover{
 }
 
 #myMap{
-	position:fixed;
+	/*position:fixed;
     top: 14%;
-    left: 1%;
+    left: 1%;*/
+    position: absolute;
+    top: 90px;
 	border-radius: 30px;
-	margin: 20px;
+	/*margin: 20px;*/
 	width: 320px;
 	height: 320px;
-	align: center;
+	align: left;
 	background-color: #f3f3f3;
     opacity: 0.95;
     padding: 10px;
@@ -54,9 +56,9 @@ tr:hover{
 
 #search-panel{
 	width: 50%;
-	position: relative;
-	bottom: 34%;
-    left: 65%; /* bilo 27%*/
+	position: absolute;
+    left: 1050px; /* bilo 27%*/
+    top: 40px;
 }
 
 
