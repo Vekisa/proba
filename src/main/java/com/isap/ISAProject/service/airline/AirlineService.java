@@ -28,8 +28,6 @@ import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.LuggageInfo;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.repository.airline.AirlineRepository;
-import com.isap.ISAProject.repository.airline.FlightRepository;
-import com.isap.ISAProject.repository.airline.FlightSpecifications;
 import com.isap.ISAProject.repository.airline.LocationRepository;
 import com.isap.ISAProject.serviceInterface.airline.AirlineServiceInterface;
 
@@ -43,9 +41,6 @@ public class AirlineService implements AirlineServiceInterface {
 
 	@Autowired
 	private LocationRepository destinationRepository;
-
-	@Autowired
-	private FlightRepository flightRepository;
 
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -237,15 +232,6 @@ public class AirlineService implements AirlineServiceInterface {
 		if(!destinations.isEmpty()) return destinations;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested destinations do not exist.");
 	}
-
-	/*@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	public List<Flight> filterFlights(String startingLocationName, String finishLocationName) {
-		logger.info("> fetching flights for the search query");
-		List<Flight> flights =	flightRepository.findAll(FlightSpecifications.withStartingLocation(startingLocationName)
-				.and(FlightSpecifications.withFinishLocation(finishLocationName)));
-		logger.info("< flights fetched");
-		return flights;
-	}*/
 
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)

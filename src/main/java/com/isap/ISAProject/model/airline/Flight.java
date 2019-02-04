@@ -1,5 +1,6 @@
 package com.isap.ISAProject.model.airline;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -85,7 +86,11 @@ public class Flight {
 
 	public void setArrivalTime(Date arrivalTime) { this.arrivalTime = arrivalTime; }
 
-	public double getFlightLength() { return flightLength; }
+	public double getFlightLength() {
+		double length = this.getArrivalTime().getTime() - this.getDepartureTime().getTime();
+		DecimalFormat df = new DecimalFormat("#.##");
+		return Double.valueOf(df.format(length/1000/60/60));
+	}
 
 	public void setFlightLength(double flightLength) { this.flightLength = flightLength; }
 
@@ -112,5 +117,9 @@ public class Flight {
 	public void setAirline(Airline airline) { this.airline = airline;}
 	
 	public Airline getAirline() { return this.airline; }
-	
+
+	@Override
+	public String toString() {
+		return "Flight [id=" + id + "]";
+	}
 }

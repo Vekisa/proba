@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.RentACar;
 import com.isap.ISAProject.model.rentacar.Vehicle;
@@ -47,10 +48,10 @@ public class RentACarService implements RentACarServiceInterface {
 	private VehicleReservationRepository vrRepo;
 	
 	@Autowired
-	private LocationRepository lRepo;
+	private BranchOfficeRepository broRepo;
 	
 	@Autowired
-	private BranchOfficeRepository broRepo;
+	private LocationRepository locationRepository;
 	
 	@Autowired
 	VehicleRepository vRepo;
@@ -116,14 +117,24 @@ public class RentACarService implements RentACarServiceInterface {
 
 	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
-	public BranchOffice addBranchOffice(Long id, BranchOffice brOff) {
+	public BranchOffice addBranchOffice(Long id, BranchOffice brOff, Long locationId) {
 		logger.info("> adding branch office for rent-a-car with id {}", id);
 		RentACar rcar = this.getRentACarById(id);
+		Location location = this.findLocation(locationId);
+		brOff.setLocation(location);
 		rcar.addBranchOffice(brOff);
 		brOff.setRentACar(rcar);
+		broRepo.save(brOff);
 		this.saveRentACar(rcar);
 		logger.info("< branch office added");
 		return brOff;
+	}
+
+	private Location findLocation(Long locationId) {
+		logger.info("> fetching location with id {}", locationId);
+		Optional<Location> location = locationRepository.findById(locationId);
+		if(location.isPresent()) return location.get();
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested location does not exist.");
 	}
 
 	@Override
@@ -207,6 +218,18 @@ public class RentACarService implements RentACarServiceInterface {
 						}
 		logger.info("< income calculated");
 		return incomeMap;
+	}
+
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public List<Vehicle> getAllVehicles(Long id) {
+		logger.info("> fetching vehicles of rent-a-car with id {}", id);
+		RentACar rent = this.getRentACarById(id);
+		List<Vehicle> vehicles = new ArrayList<>();
+		for(BranchOffice office : rent.getBranchOffices())
+			vehicles.addAll(office.getVehicles());
+		logger.info("< vehicles fetched");
+		if(!vehicles.isEmpty()) return vehicles;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested vehicles do not exist.");
 	}
 	
 }

@@ -38,11 +38,19 @@ public class LocationService implements LocationServiceInterface {
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Location> findAll(Pageable pageable) {
-		logger.info("> fetch destinations at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
-		Page<Location> destinations = repository.findAll(pageable);
-		logger.info("< destinations fetched");
-		if(destinations.hasContent()) return destinations.getContent();
-		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested locations do not exist.");
+		if(pageable != null) {
+			logger.info("> fetch destinations at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
+			Page<Location> destinations = repository.findAll(pageable);
+			logger.info("< destinations fetched");
+			if(destinations.hasContent()) return destinations.getContent();
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested locations do not exist.");
+		} else {
+			logger.info("> fetch all destinations");
+			List<Location> destinations = repository.findAll();
+			logger.info("< destinations fetched");
+			if(!destinations.isEmpty()) return destinations;
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested locations do not exist.");
+		}
 	}
 
 	@Override

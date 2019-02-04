@@ -164,5 +164,16 @@ public class LocationController {
 	public ResponseEntity<Coordinates> getLongLatForDestinationWithName(@PathVariable("id") Long id) {
 		return new ResponseEntity<Coordinates>(service.getCoordinatesForCity(id), HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća lokacije.", notes = "Povratna vrednost servisa je lista resursa lokacija koje pripadaju zahtevanoj strani (na osnovu paginacije).", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content. Lista je prazna."),
+			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
+	})
+	public ResponseEntity<List<Resource<Location>>> getDestinations() {
+		return new ResponseEntity<List<Resource<Location>>>(HATEOASImplementorAirline.createDestinationsList(service.findAll(null)), HttpStatus.OK);
+	}
 
 }

@@ -23,7 +23,6 @@ import com.isap.ISAProject.model.airline.Location;
 @Table(name = "branch_office")
 public class BranchOffice {
 
-	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

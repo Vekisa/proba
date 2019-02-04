@@ -57,7 +57,7 @@
 						role="button" data-toggle="dropdown" aria-haspopup="true"
 						aria-expanded="false"> Search </a>
 						<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-							<a class="dropdown-item" href="" id="airline-search">Airlines</a>
+							<a class="dropdown-item" href="" id="airline-search">Flights</a>
 							<div class="dropdown-divider"></div>
 							<a class="dropdown-item" href="" id="rentacar-search">Rent-a-car
 								services</a>
@@ -120,9 +120,9 @@
 									<table>
 										<tbody>
 											<tr><td><label style="font-size: 11px">Choose a start date</label></td></tr>
-											<tr><td><input class="form-control" type="date" id="start-date"></td></tr>
+											<tr><td><input class="form-control" type="date" id="startDateInput"></td></tr>
 											<tr><td><label style="font-size: 11px">Choose an end date</label></td></tr>
-											<tr><td><input class="form-control" type="date" id="end-date"></td></tr>
+											<tr><td><input class="form-control" type="date" id="endDateInput"></td></tr>
 										</tbody>
 									</table>
 									<div id="airline-controls" style="display: none;">
@@ -141,7 +141,7 @@
 									</div>
 							</div>
 							<button class="btn btn-lg btn-primary btn-block text-uppercase"
-								style="margin-top: 20px;" type="button">Go</button>
+								style="margin-top: 20px;" type="button" id="goSearch">Go</button>
 						</form>
 					</div>
 				</div>

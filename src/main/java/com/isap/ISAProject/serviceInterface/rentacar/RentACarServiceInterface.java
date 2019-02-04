@@ -22,11 +22,11 @@ public interface RentACarServiceInterface {
 	
 	List<BranchOffice> getBranchOffices(Long id);
 	
-	BranchOffice addBranchOffice(Long id, BranchOffice brOff);
-	
 	void deleteBranchOffice(Long id, BranchOffice brOff);
 
 	List<CompanyAdmin> getAdminsOfRentACar(Long id);
 	
 	List<RentACar> search(Pageable p, String locationName, String rentacarName, Date beginDate, Date endDate);
+
+	BranchOffice addBranchOffice(Long id, BranchOffice brOff, Long locationId);
 }

@@ -268,24 +268,29 @@ public class FlightService implements FlightServiceInterface {
 	}
 
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	public List<Flight> search(Pageable pageable, String startDest, String finishDest, Date depTime, Date arrTime, TripType tripType, 
-			String category, Double weight, int personsNum, String airlaneName,
+	public List<Flight> search(Pageable pageable, String startDest, String finishDest, 
+			Date depTime, Date arrTime, TripType tripType, 
+			String category, Double weight, Integer personsNum, String airlaneName,
 			Double priceBegin, Double priceEnd, Long durationBegin, Long durationEnd) {
 		logger.info("> searching flights");
 		List<Flight> flights = repository.findAll(FlightSpecifications.findByStartDestFinishDestDepTimeArrTimeTripType(startDest, finishDest, depTime, arrTime, tripType, category, airlaneName));
 		logger.info("flights: " + flights);
 		List<FlightSeat> seats = new ArrayList<FlightSeat>();  
-		List<Flight> flights1 = new ArrayList<>();
+		List<Flight> flights1 = flights;
+		Integer num = personsNum;
 		for(Flight f : flights) {
 			seats = fsRepo.findAll(FlightSeatSpecifications.findByStateFlightLuggage(f.getId(), weight));
-			if(seats.size() >= personsNum) {
-				flights1.add(f);
+			if(personsNum != null) {
+				if(seats.size() < num) {
+					flights1.remove(f);
+				}
 			}
 		}
 		List<Flight> ret = new ArrayList<>();
 		for(Flight f : flights1) {
 			ret.addAll(repository.findAll(FlightSpecifications.findByIdPrice(f.getId(), priceBegin, priceEnd)));
 		}
+		logger.info("ret: " + ret);
 		List<Flight> konacna = ret;
 		if(durationBegin != null && durationEnd != null) {
 			for(Flight f : ret) {
@@ -295,6 +300,7 @@ public class FlightService implements FlightServiceInterface {
 				}
 			}
 		}
+		logger.info("konacna: " + konacna);
 		logger.info("< flights found");
 		return konacna;
 	}

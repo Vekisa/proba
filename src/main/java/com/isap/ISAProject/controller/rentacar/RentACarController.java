@@ -3,6 +3,7 @@ package com.isap.ISAProject.controller.rentacar;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -25,6 +26,7 @@ import com.isap.ISAProject.controller.user.HATEOASImplementorUsers;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.RentACar;
+import com.isap.ISAProject.model.rentacar.Vehicle;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.service.rentacar.RentACarService;
 
@@ -133,8 +135,8 @@ public class RentACarController {
 			@ApiResponse(code = 404, message = "Not Found. Rent-a-car kompanija sa prosleđenim ID-em ne postoji.")
 	})
 	public ResponseEntity<Resource<BranchOffice>> addBranchOfficeForRentACarWithId(@PathVariable(value = "id") Long racId,
-			@Valid @RequestBody BranchOffice branch) {
-		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(service.addBranchOffice(racId, branch)), HttpStatus.CREATED);
+			@Valid @RequestBody BranchOffice branch, @RequestParam("location") Long locationId) {
+		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(service.addBranchOffice(racId, branch, locationId)), HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/{racId}/branch_offices/")
@@ -159,6 +161,22 @@ public class RentACarController {
 	})
 	public ResponseEntity<List<Resource<CompanyAdmin>>> getAdminsOfAirlineWithId(@PathVariable("id") Long id) {
 		return new ResponseEntity<List<Resource<CompanyAdmin>>>(HATEOASImplementorUsers.createCompanyAdminsList(service.getAdminsOfRentACar(id)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/vehicles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Pruža uvid u sva registrovana vozila ove kompanije.", responseContainer = "List", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = { 
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content. Lista je prazna."),
+			@ApiResponse(code = 400, message = "Bad Request.")
+	})
+	public ResponseEntity<List<Resource<Vehicle>>> getAllVehicles(@PathVariable("id") Long id){
+		return new ResponseEntity<List<Resource<Vehicle>>>(HATEOASImplementorRentacar.vehicleLinksList(service.getAllVehicles(id)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/income", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<Long, Double>> getIncomeForRentACar(@PathVariable("id") Long id, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
+		return new ResponseEntity<Map<Long,Double>>(service.getIncomeFor(id, new Date(begin), new Date(end)), HttpStatus.OK);
 	}
 	
 }
