@@ -29,7 +29,7 @@ $(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
 	    	 $("#error").html("Not found");
 	      break;
 	    case 204:
-	    	$("#error").html("Not found");
+	    	$("#error").html("No content");
 	      break;
 	    case 400:
 	    	$("#error").html("Bad request");
@@ -540,6 +540,36 @@ function printFlights(data){
 	document.getElementById("tablediv").innerHTML += flights;
 }
 
+function printFlights1(data){
+	
+	let flights = "";
+	let s = "";
+	if(data!=null){
+		$.each(data, function(index, flight) {
+			s += "<tr>" + "<td>" + flight.startDestination + "</td>" + "<td>"+ flight.finishDestination 
+			+ "</td>" + "<td>" + flight.transfers + "</td><td>" + flight.departureTime + "</td><td>" + flight.arrivalTime + "</td><td>"
+			+ flight.flightLength + "</td><td>" + flight.basePrice + "</td>" + "</tr>";
+		});
+	}
+	
+	flights = 
+	"<hr>" + 
+	"<strong>Flights</strong>" +
+	"<hr>" +  "<table class=\"table table-hover\"><thead>" +
+		"<tr>" + 
+		"<th scope=\"col\">Start Destination</th>" +
+		"<th scope=\"col\">Finish Destination</th>" +
+		"<th scope=\"col\">Transfers</th>" +
+		"<th scope=\"col\">Departure Time</th>" +
+		"<th scope=\"col\">Arrival Time</th>" +
+		"<th scope=\"col\">Flight Length [h]</th>" +
+		"<th scope=\"col\">Base Price</th>" +
+		"</tr>" +
+		"</thead><tbody>" + s + "</tbody></table>";
+	
+	document.getElementById("tablediv").innerHTML = flights;
+}
+
 function printBranchOffices(data){	
 	var pomDataBranchOffices;
 	$.ajax({
@@ -583,6 +613,7 @@ $(document).on('click', '#rentacar-search', function(event){
 	$('#nameLabel').text('Company name');
 	$('#nameInput').css("display", "block");
 	$('#search-title').text('Rent-a-car services');
+	$('#airline-controls').css("display", "none");
 	$('#search-panel').css("display", "block");
 })
 
@@ -594,6 +625,7 @@ $(document).on('click', '#hotel-search', function(event){
 	$('#nameLabel').text('Company name');
 	$('#nameInput').css("display", "block");
 	$('#search-title').text('Hotels');
+	$('#airline-controls').css("display", "none");
 	$('#search-panel').css("display", "block");
 })
 
@@ -605,10 +637,12 @@ $(document).on('click', '#airline-search', function(event){
 	$('#nameLabel').text('Target location');
 	$('#nameInput').css("display", "block");
 	$('#search-title').text('Airlines');
+	$('#airline-controls').css("display", "block");
 	$('#search-panel').css("display", "block");
 })
 
-$(document).on('click', '#goSearch', function(){
+$(document).on('click', '#goSearch', function(e){
+	e.preventDefault();
 	let startDate = new Date($('#startDateInput').val());
 	let endDate = new Date($('#endDateInput').val());
 	if($('#startDateInput').val() != "" && $('#endDateInput').val() != ""){
@@ -654,6 +688,16 @@ function search(company){
 			contentType: 'application/json',
 			success: function(data){
 				printListOfCompanies(data);
+			}
+		})
+	}
+	else if(company == "airline"){
+		$.ajax({
+			method: 'GET',
+			url: '/flights/search?' + url,
+			contentType: 'application/json',
+			success: function(data){
+				printFlights1(data);
 			}
 		})
 	}

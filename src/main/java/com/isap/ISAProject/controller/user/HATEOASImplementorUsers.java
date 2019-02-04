@@ -1,10 +1,15 @@
 package com.isap.ISAProject.controller.user;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.hateoas.Resource;
 
+import com.isap.ISAProject.domain.security.CerberusUser;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.model.user.FriendRequest;
 import com.isap.ISAProject.model.user.Friendship;
@@ -16,6 +21,8 @@ public class HATEOASImplementorUsers {
 
 	public static Resource<RegisteredUser> createRegisteredUser(RegisteredUser registeredUser) {
 		Resource<RegisteredUser> resource = new Resource<RegisteredUser>(registeredUser);
+		resource.add(linkTo(methodOn(RegisteredUserController.class).getFriendsOfUser(registeredUser.getId())).withRel("friends"));
+		
 		return resource;
 	}
 	
@@ -27,8 +34,25 @@ public class HATEOASImplementorUsers {
 		return registeredUserList;
 	}
 	
+	public static Resource<CerberusUser> createCerberusUser(CerberusUser cerberusUser) {
+		Resource<CerberusUser> resource = new Resource<CerberusUser>(cerberusUser);
+		resource.add(linkTo(methodOn(RegisteredUserController.class).getFriendsOfUser(cerberusUser.getId())).withRel("friends"));
+		resource.add(linkTo(methodOn(RegisteredUserController.class).getReceivedFriendRequestsForUserWithId(cerberusUser.getId())).withRel("friend_requests"));
+		resource.add(linkTo(methodOn(RegisteredUserController.class).getReservationsHistoryForUserWithId(cerberusUser.getId())).withRel("reservations_history"));
+		resource.add(linkTo(methodOn(RegisteredUserController.class).getReservationsForUserWithId(cerberusUser.getId())).withRel("active_reservations"));
+		resource.add(linkTo(methodOn(RegisteredUserController.class).getRequestedUsersFromUser(cerberusUser.getId())).withRel("sent_friend_request"));
+		resource.add(linkTo(methodOn(RegisteredUserController.class).removeFriend(cerberusUser.getId(),0l)).withRel("remove_friend"));
+		resource.add(linkTo(methodOn(RegisteredUserController.class).cancelFriendRequest(cerberusUser.getId(),0l)).withRel("cancel_friend_request"));
+		resource.add(linkTo(methodOn(RegisteredUserController.class).sendFriendRequest(cerberusUser.getId(),0l)).withRel("send_request"));
+		resource.add(linkTo(methodOn(RegisteredUserController.class).acceptFriendRequest(cerberusUser.getId(),0l)).withRel("accept_request"));
+		resource.add(linkTo(methodOn(RegisteredUserController.class).declineFriendRequest(cerberusUser.getId(),0l)).withRel("decline_request"));
+		return resource;
+	}
+	
 	public static Resource<Reservation> createReservation(Reservation reservation) {
 		Resource<Reservation> resource = new Resource<Reservation>(reservation);
+		resource.add(linkTo(methodOn(ReservationController.class).getReservationById(reservation.getId())).withRel("self"));
+		resource.add(linkTo(methodOn(ReservationController.class).getLocationOfReservation(reservation.getId())).withRel("friends"));
 		return resource;
 	}
 	
@@ -88,5 +112,10 @@ public class HATEOASImplementorUsers {
 		for(CompanyAdmin admin : admins)
 			list.add(HATEOASImplementorUsers.createCompanyAdmin(admin));
 		return list;
+	}
+	
+	public static Resource<Location> createLocation(Location location) {
+		Resource<Location> resource = new Resource<Location>(location);
+		return resource;
 	}
 }

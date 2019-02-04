@@ -24,6 +24,7 @@ import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.repository.hotel.FloorRepository;
 import com.isap.ISAProject.repository.hotel.RoomRepository;
+import com.isap.ISAProject.repository.hotel.RoomSpecifications;
 import com.isap.ISAProject.repository.hotel.RoomTypeRepository;
 
 @Service
@@ -207,6 +208,15 @@ public class RoomService {
 		if(type.isPresent()) return type.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Request room type doesn't exist.");
 	}
+	
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public List<Room> searchWithHotelAndRoomType(Pageable pageable, Long hotelId, Long roomTypeId) {
+		logger.info("> searching rooms for specific hotel and room type");
+		List<Room> rooms = roomRepository.findAll(RoomSpecifications.findByHotelRoomType(hotelId, roomTypeId));
+		logger.info("hotels: " + rooms);
+		logger.info("< rooms found");
+		return rooms;
+	}
 
 	@Transactional(readOnly = false)
 	public Room setFloor(Long roomId, Long floorId) {
@@ -223,5 +233,4 @@ public class RoomService {
 		}
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Request floor doesn't exist.");
 	}
-
 }

@@ -229,16 +229,9 @@ public class AirlineController {
 		return new ResponseEntity<List<Resource<Location>>>(HATEOASImplementorAirline.createDestinationsList(service.getDestinationsOfAirline(id)), HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/{id}/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<Resource<Flight>>> getFlightsForSearchQury(
-			@RequestParam(value = "starting", required = false) String startingLocationName,
-			@RequestParam(value = "finish", required = false) String finishLocationName) {
-		return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementorAirline.createFlightsList(service.filterFlights(startingLocationName, finishLocationName)), HttpStatus.OK);
-	}
-	
 	@RequestMapping(value = "/{id}/income", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<Long, Double>> getIncomeForAirline(@PathVariable("id") Long id, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
 		return new ResponseEntity<Map<Long,Double>>(service.getIncomeFor(id, new Date(begin), new Date(end)), HttpStatus.OK);
 	}
-	
+
 }

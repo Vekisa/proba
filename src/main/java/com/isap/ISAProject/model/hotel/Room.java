@@ -71,5 +71,10 @@ public class Room extends RatableEntity {
 	public void setRoomType(RoomType roomType) { this.roomType = roomType; }
 
 	public List<RoomReservation> getRoomReservations() { return roomReservations; }
+
+	@Override
+	public String toString() {
+		return "Room [id=" + id + "]";
+	}
 	
 }

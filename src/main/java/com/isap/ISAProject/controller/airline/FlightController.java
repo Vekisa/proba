@@ -1,11 +1,13 @@
 package com.isap.ISAProject.controller.airline;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,6 +23,7 @@ import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightSeat;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Ticket;
+import com.isap.ISAProject.model.airline.TripType;
 import com.isap.ISAProject.service.airline.FlightService;
 
 import io.swagger.annotations.ApiOperation;
@@ -171,4 +174,29 @@ public class FlightController {
 		return new ResponseEntity<Resource<Location>>(HATEOASImplementorAirline.createDestination(service.getFinishDestinationOfFlight(id)), HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/search", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Pretraga letova", responseContainer = "List", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = { 
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content. Lista je prazna."),
+			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
+	})
+	public ResponseEntity<List<Resource<Flight>>> search(Pageable pageable, 
+			@RequestParam(value="startDest", required=false) String startDest,
+			@RequestParam(value="finishDest", required=false) String finishDest,
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(value="depTime", required=false) Date depTime, 
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(value="arrTime", required=false) Date arrTime,
+			@RequestParam(value="tripType", required=false) TripType tripType,
+			@RequestParam(value="category", required=false) String category,
+			@RequestParam(value="weight", required=false) Double weight,
+			@RequestParam(value="personNum", required=false) Integer personNum,
+			@RequestParam(value="airline", required=false) String airline,
+			@RequestParam(value="priceBegin", required=false) Double priceBegin,
+			@RequestParam(value="priceEnd", required=false) Double priceEnd,
+			@RequestParam(value="durationBegin", required=false) Long durationBegin,
+			@RequestParam(value="durationEnd", required=false) Long durationEnd){
+		List<Flight> ret = service.search(pageable, startDest, finishDest, depTime, arrTime, tripType, category, weight, personNum, airline, priceBegin, priceEnd, durationBegin, durationEnd);
+		return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementorAirline.createFlightsList(ret), HttpStatus.OK);
+	}
+	
 }

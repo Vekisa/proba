@@ -31,6 +31,9 @@
           			<div class="dropdown-divider"></div>
           			<a class="dropdown-item" href="" id = "hotel">Hotel</a>
        			 </div>
+       			 <li class="nav-item active">
+        			<a class="nav-link" href="" id="allUsers">Users<span class="sr-only">(current)</span></a>
+     			 </li>
       		</li>
     	</ul>
    		 <form class="form-inline my-2 my-lg-0">
@@ -66,42 +69,58 @@
 	</nav>
 	
 	<div id = "tablediv" class="container" align="center"></div>
+	<div id = "profdiv" class="container" align="center"></div>
 	
 	<div id="myMap">
 			<div id="mapdiv" style="height: 300px; width: 300px"></div>
  	</div>
-	
-	<div id = "profile">
-	<div id = "profimg"><img src="profile.png" alt="Profile picture"></div>
-	<div class="container" id = "proftext">
-		<div class="row">
-			<div class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6">
-	    	 <div class="well profile">
-	            <div class="col-sm-12">
-	                <div class="col-xs-12 col-sm-8">
-	                    <h2 id = "usernameP">Username</h2>
-	                    <strong>First name: </strong>
-	                    <p id = "firstNameP"> Pera </p>
-	                    <strong>Last name: </strong>
-	                    <p id = "lastNameP"> Peric </p>
-	                    <strong>Email: </strong>
-	                    <p id = "emailP"> email@gmail.com</p>
-	                    <strong>City: </strong>
-	                    <p id = "cityP"> Novi Sad</p>
-	                    <strong>Phone number: </strong>
-	                    <p id = "phoneNumberP"> 066666666</p>
-	                </div>     
-	             </div>
-	             <div class="col-xs-12 divider text-center">
-	                <div class="col-xs-12 col-sm-4 emphasis">
-	                    <button class="btn btn-info btn-block"><span class="fa fa-user"></span> Friends </button>
-	                </div>
-                </div>
-	          </div>
-	        </div>
-	      </div>
-      </div> 
-     </div>       
+ 	
+ 	<div id = "profile" align = "center">
+	 	<table id = "profiltable">
+	 		<tr>
+	 			<td colspan = "4" align="center"><img src="profile.png" alt="Profile picture"></td>
+	 		</tr>
+	 		<tr>
+	 			<td colspan = "4" align="center"><h1 id = "usernameP">Username</h1></td>
+	 		</tr>
+	 		<tr>
+	 			<td align="center"><button id = "friendsBtn" class="btn btn-info btn-block"><span class="fa fa-user"></span> Friends </button></td>
+	 			<td align="center"><button id = "friendsReqBtn" class="btn btn-info btn-block"><span class="fa fa-user"></span> Friend Requests </button></td>
+	 			<td align="center"><button id = "reservationHisBtn" class="btn btn-info btn-block"><span class="fa fa-user"></span> Reservation History </button></td>
+	 			<td align="center"><button id = "activeResBtn" class="btn btn-info btn-block"><span class="fa fa-user"></span> Active Reservations </button></td>
+	 		</tr>
+	 		<tr>
+	 			<td></td>
+	 			<td align = "center"><strong>First name: </strong></td>
+	 			<td align = "center"><p id = "firstNameP"> Pera </p></td>
+	 			<td></td>
+	 		</tr>
+	 		<tr>
+	 			<td></td>
+	 			<td align = "center"><strong>Last name: </strong></td>
+	 			<td align = "center"><p id = "lastNameP"> Peric </p></td>
+	 			<td></td>
+	 		</tr>
+	 		<tr>
+	 			<td></td>
+	 			<td align = "center"><strong>Email: </strong></td>
+	 			<td align = "center"><p id = "emailP"> email@gmail.com</p></td>
+	 			<td></td>
+	 		</tr>
+	 		<tr>
+	 			<td></td>
+	 			<td align = "center"><strong>City: </strong></td>
+	 			<td align = "center"><p id = "cityP"> Novi Sad</p></td>
+	 			<td></td>
+	 		</tr>
+	 		<tr>
+	 			<td></td>
+	 			<td align = "center"><strong>Phone number: </strong></td>
+	 			<td align = "center"><p id = "phoneNumberP"> 066666666</p></td>
+	 			<td></td>
+	 		</tr> 				
+	 	</table>
+ 	</div> 
 		
 	<div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
@@ -132,28 +151,30 @@
 						<h5 id="search-title" class="card-title text-center"></h5>
 						<form class="form-search">
 							<div class="form-label-group">
-								<label id="locationLabel1"></label> <input style="display: none" id="locationInput1" type="text" id="rcar-location"
+								<label id="locationLabel1"></label> <input style="display: none" id="locationInput1" type="text"
 									class="form-control" autofocus>
 									
 									<label id="nameLabel"></label> <input style="display: none" id="nameInput"
 									class="form-control">
-							</div>
-							<form>
-								<table>
-								<tbody>
-								<tr><td><label style="font-size: 11px">Choose a start date</label></td></tr>
-								<tr><td><input class="form-control" style="width: 155px" type="date" id="start-date"></td></tr>
-								<tr><td><label style="font-size: 11px">Choose an end date</label></td></tr>
-								<tr><td><input class="form-control" style="width: 155px" type="date" id="end-date"></td></tr>
-								</tbody>
-								</table>
-							</form>
-							<div class="form-label-group">
-								<label id="locationLabel1"></label> <input style="display: none" id="locationInput1" type="text" id="rcar-location"
-									class="form-control" autofocus>
-									
-									<label id="nameLabel"></label> <input style="display: none" id="nameInput"
-									class="form-control">
+							
+									<table>
+										<tbody>
+											<tr><td><label style="font-size: 11px">Choose a start date</label></td></tr>
+											<tr><td><input class="form-control" style="width: 155px" type="date" id="start-date"></td></tr>
+											<tr><td><label style="font-size: 11px">Choose an end date</label></td></tr>
+											<tr><td><input class="form-control" style="width: 155px" type="date" id="end-date"></td></tr>
+										</tbody>
+									</table>
+									<label>Trip type</label>
+									<select id="tripTypeSelect">
+										<option>round trip</option>
+										<option>one-way</option>
+										<option>multi-city</option>
+									</select>
+									<label>Number of rooms</label>
+									<input id="roomsNumberInput" class="form-control" type="number">
+									<label>Lugagge weight</label>
+									<input id="luggageWeightInput" class="form-control" type="text">
 							</div>
 							<button class="btn btn-lg btn-primary btn-block text-uppercase"
 								style="margin-top: 20px;" type="button">Go</button>
