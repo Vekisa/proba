@@ -7,7 +7,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.rentacar.RentACar;
@@ -18,20 +17,16 @@ public class CompanyAdmin extends SystemUser {
 
 	private static final long serialVersionUID = 6802189965555660737L;
 
-	@JsonIgnore
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = true)
+	@Column(nullable = false)
 	private AuthorizationLevel authority;
 	
-	@JsonIgnore
 	@ManyToOne
 	private Hotel hotel;
 
-	@JsonIgnore
 	@ManyToOne
 	private RentACar rentACar;
 	
-	@JsonIgnore
 	@ManyToOne
 	private Airline airline;
 

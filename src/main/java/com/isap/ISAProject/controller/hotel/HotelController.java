@@ -2,6 +2,7 @@ package com.isap.ISAProject.controller.hotel;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -26,6 +27,8 @@ import com.isap.ISAProject.model.hotel.Catalogue;
 import com.isap.ISAProject.model.hotel.ExtraOption;
 import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Hotel;
+import com.isap.ISAProject.model.hotel.Room;
+import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.service.hotel.HotelService;
 
@@ -247,6 +250,21 @@ public class HotelController {
 	})
 	public ResponseEntity<List<Resource<CompanyAdmin>>> getAdminsOfHotel(@PathVariable("id") Long id) {
 		return new ResponseEntity<List<Resource<CompanyAdmin>>>(HATEOASImplementorUsers.createCompanyAdminsList(hotelService.getAdminsOfHotel(id)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/rooms", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Resource<Room>>> getRoomsOfHotel(@PathVariable("id") Long id) {
+		return new ResponseEntity<List<Resource<Room>>>(HATEOASImplementorHotel.createRoomList(hotelService.getRooms(id)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/roomtypes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Resource<RoomType>>> getRoomType(@PathVariable("id") Long id) {
+		return new ResponseEntity<List<Resource<RoomType>>>(HATEOASImplementorHotel.createRoomTypeList(hotelService.getRoomTypes(id)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/income", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<Long, Double>> getIncomeForHotel(@PathVariable("id") Long id, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
+		return new ResponseEntity<Map<Long,Double>>(hotelService.getIncomeFor(id, new Date(begin), new Date(end)), HttpStatus.OK);
 	}
 	
 }
