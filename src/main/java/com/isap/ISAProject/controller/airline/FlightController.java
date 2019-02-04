@@ -182,19 +182,19 @@ public class FlightController {
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
 	public ResponseEntity<List<Resource<Flight>>> search(Pageable pageable, 
-			@RequestParam(value="startDest") String startDest,
-			@RequestParam(value="finishDest") String finishDest,
-			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(value="depTime") Date depTime, 
-			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(value="arrTime") Date arrTime,
-			@RequestParam(value="tripType") TripType tripType,
-			@RequestParam(value="category") String category,
-			@RequestParam(value="weight") Double weight,
-			@RequestParam(value="personNum") int personNum,
-			@RequestParam(value="airline") String airline,
-			@RequestParam(value="priceBegin") Double priceBegin,
-			@RequestParam(value="priceEnd") Double priceEnd,
-			@RequestParam(value="durationBegin") Long durationBegin,
-			@RequestParam(value="durationEnd") Long durationEnd){
+			@RequestParam(value="startDest", required=false) String startDest,
+			@RequestParam(value="finishDest", required=false) String finishDest,
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(value="depTime", required=false) Date depTime, 
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(value="arrTime", required=false) Date arrTime,
+			@RequestParam(value="tripType", required=false) TripType tripType,
+			@RequestParam(value="category", required=false) String category,
+			@RequestParam(value="weight", required=false) Double weight,
+			@RequestParam(value="personNum", required=false) Integer personNum,
+			@RequestParam(value="airline", required=false) String airline,
+			@RequestParam(value="priceBegin", required=false) Double priceBegin,
+			@RequestParam(value="priceEnd", required=false) Double priceEnd,
+			@RequestParam(value="durationBegin", required=false) Long durationBegin,
+			@RequestParam(value="durationEnd", required=false) Long durationEnd){
 		List<Flight> ret = service.search(pageable, startDest, finishDest, depTime, arrTime, tripType, category, weight, personNum, airline, priceBegin, priceEnd, durationBegin, durationEnd);
 		return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementorAirline.createFlightsList(ret), HttpStatus.OK);
 	}
