@@ -238,14 +238,14 @@ public class AirlineService implements AirlineServiceInterface {
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested destinations do not exist.");
 	}
 
-	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	/*@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Flight> filterFlights(String startingLocationName, String finishLocationName) {
 		logger.info("> fetching flights for the search query");
 		List<Flight> flights =	flightRepository.findAll(FlightSpecifications.withStartingLocation(startingLocationName)
 				.and(FlightSpecifications.withFinishLocation(finishLocationName)));
 		logger.info("< flights fetched");
 		return flights;
-	}
+	}*/
 
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)

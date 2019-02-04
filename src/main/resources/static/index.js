@@ -583,6 +583,7 @@ $(document).on('click', '#rentacar-search', function(event){
 	$('#nameLabel').text('Company name');
 	$('#nameInput').css("display", "block");
 	$('#search-title').text('Rent-a-car services');
+	$('#airline-controls').css("display", "none");
 	$('#search-panel').css("display", "block");
 })
 
@@ -594,6 +595,7 @@ $(document).on('click', '#hotel-search', function(event){
 	$('#nameLabel').text('Company name');
 	$('#nameInput').css("display", "block");
 	$('#search-title').text('Hotels');
+	$('#airline-controls').css("display", "none");
 	$('#search-panel').css("display", "block");
 })
 
@@ -605,6 +607,7 @@ $(document).on('click', '#airline-search', function(event){
 	$('#nameLabel').text('Target location');
 	$('#nameInput').css("display", "block");
 	$('#search-title').text('Airlines');
+	$('#airline-controls').css("display", "block");
 	$('#search-panel').css("display", "block");
 })
 

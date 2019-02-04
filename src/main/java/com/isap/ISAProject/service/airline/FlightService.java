@@ -1,5 +1,7 @@
 package com.isap.ISAProject.service.airline;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,9 +25,13 @@ import com.isap.ISAProject.model.airline.FlightSegment;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.SeatState;
 import com.isap.ISAProject.model.airline.Ticket;
+import com.isap.ISAProject.model.airline.TripType;
 import com.isap.ISAProject.repository.airline.AirlineRepository;
 import com.isap.ISAProject.repository.airline.FlightConfigurationRepository;
 import com.isap.ISAProject.repository.airline.FlightRepository;
+import com.isap.ISAProject.repository.airline.FlightSeatSpecifications;
+import com.isap.ISAProject.repository.airline.FlightSeatsRepository;
+import com.isap.ISAProject.repository.airline.FlightSpecifications;
 import com.isap.ISAProject.repository.airline.LocationRepository;
 import com.isap.ISAProject.serviceInterface.airline.FlightServiceInterface;
 
@@ -45,6 +51,9 @@ public class FlightService implements FlightServiceInterface {
 
 	@Autowired
 	private AirlineRepository airlineRepository;
+	
+	@Autowired
+	private FlightSeatsRepository fsRepo;
 	
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -258,4 +267,36 @@ public class FlightService implements FlightServiceInterface {
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested destination not found.");
 	}
 
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public List<Flight> search(Pageable pageable, String startDest, String finishDest, Date depTime, Date arrTime, TripType tripType, 
+			String category, Double weight, int personsNum, String airlaneName,
+			Double priceBegin, Double priceEnd, Long durationBegin, Long durationEnd) {
+		logger.info("> searching flights");
+		List<Flight> flights = repository.findAll(FlightSpecifications.findByStartDestFinishDestDepTimeArrTimeTripType(startDest, finishDest, depTime, arrTime, tripType, category, airlaneName));
+		logger.info("flights: " + flights);
+		List<FlightSeat> seats = new ArrayList<FlightSeat>();  
+		List<Flight> flights1 = new ArrayList<>();
+		for(Flight f : flights) {
+			seats = fsRepo.findAll(FlightSeatSpecifications.findByStateFlightLuggage(f.getId(), weight));
+			if(seats.size() >= personsNum) {
+				flights1.add(f);
+			}
+		}
+		List<Flight> ret = new ArrayList<>();
+		for(Flight f : flights1) {
+			ret.addAll(repository.findAll(FlightSpecifications.findByIdPrice(f.getId(), priceBegin, priceEnd)));
+		}
+		List<Flight> konacna = ret;
+		if(durationBegin != null && durationEnd != null) {
+			for(Flight f : ret) {
+				Long duration = f.getArrivalTime().getTime() - f.getDepartureTime().getTime(); 
+				if(!(duration > durationBegin && duration < durationEnd)) {
+					konacna.remove(f);
+				}
+			}
+		}
+		logger.info("< flights found");
+		return konacna;
+	}
+	
 }

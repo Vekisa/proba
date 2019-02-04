@@ -653,5 +653,6 @@ $(document).on('click', '#airline-search', function(event){
 	$('#nameLabel').text('Target location');
 	$('#nameInput').css("display", "block");
 	$('#search-title').text('Airlines');
+	$('#airline-controls').css("display", "block");
 	$('#search-panel').css("display", "block");
 })

@@ -100,7 +100,7 @@
 	<div>
 		<div>
 		<div id="search-panel"
-			style="height: 100px; width: 550px; margin: -70px 900px; display: none;>
+			style="display: none;>
 			<div class="row">
 			<div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
 				<div class="card card-signin my-5"
@@ -109,24 +109,37 @@
 						<h5 id="search-title" class="card-title text-center"></h5>
 						<form class="form-search">
 							<div class="form-label-group">
-								<label id="locationLabel1"></label> <input style="display: none" id="locationInput1" type="text" id="rcar-location"
+								<label id="locationLabel1"></label> <input style="display: none" id="locationInput1" type="text"
 									class="form-control" autofocus>
 									
 									<label id="nameLabel"></label> <input style="display: none" id="nameInput"
 									class="form-control">
+							
+									<table>
+										<tbody>
+											<tr><td><label style="font-size: 11px">Choose a start date</label></td></tr>
+											<tr><td><input class="form-control" type="date" id="start-date"></td></tr>
+											<tr><td><label style="font-size: 11px">Choose an end date</label></td></tr>
+											<tr><td><input class="form-control" type="date" id="end-date"></td></tr>
+										</tbody>
+									</table>
+									<div id="airline-controls" style="display: none;">
+										<label>Trip type</label>
+										<select id="tripTypeSelect" class="form-control">
+											<option>round trip</option>
+											<option>one-way</option>
+											<option>multi-city</option>
+										</select>
+										<label>Number of persons</label>
+										<input id="personsNumberInput" class="form-control" type="number" min="0">
+										<label>Lugagge weight</label>
+										<input id="luggageWeightInput" class="form-control" type="text">
+										<label>Class</label>
+										<input id="flightClassInput" class="form-control" type="text">
+									</div>
 							</div>
-							<form>
-								<table>
-								<tbody>
-								<tr><td><label style="font-size: 11px">Choose a start date</label></td></tr>
-								<tr><td><input class="form-control" style="width: 155px" type="date" id="startDateInput"></td></tr>
-								<tr><td><label style="font-size: 11px">Choose an end date</label></td></tr>
-								<tr><td><input class="form-control" style="width: 155px" type="date" id="endDateInput"></td></tr>
-								</tbody>
-								</table>
-							</form>
 							<button class="btn btn-lg btn-primary btn-block text-uppercase"
-								style="margin-top: 20px;" type="button" id="goSearch">Go</button>
+								style="margin-top: 20px;" type="button">Go</button>
 						</form>
 					</div>
 				</div>

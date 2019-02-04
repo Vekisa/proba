@@ -1,11 +1,13 @@
 package com.isap.ISAProject.controller.airline;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.isap.ISAProject.controller.rentacar.HATEOASImplementorRentacar;
 import com.isap.ISAProject.controller.user.HATEOASImplementorUsers;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.Flight;
@@ -24,6 +27,8 @@ import com.isap.ISAProject.model.airline.FlightConfiguration;
 import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.LuggageInfo;
+import com.isap.ISAProject.model.airline.TripType;
+import com.isap.ISAProject.model.rentacar.RentACar;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.service.airline.AirlineService;
 
@@ -225,13 +230,6 @@ public class AirlineController {
 	@RequestMapping(value = "/{id}/destinations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<Resource<Location>>> getDestinationsOfAirlineWithId(@PathVariable("id") Long id) {
 		return new ResponseEntity<List<Resource<Location>>>(HATEOASImplementorAirline.createDestinationsList(service.getDestinationsOfAirline(id)), HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/{id}/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<Resource<Flight>>> getFlightsForSearchQury(
-			@RequestParam(value = "starting", required = false) String startingLocationName,
-			@RequestParam(value = "finish", required = false) String finishLocationName) {
-		return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementorAirline.createFlightsList(service.filterFlights(startingLocationName, finishLocationName)), HttpStatus.OK);
 	}
 	
 }

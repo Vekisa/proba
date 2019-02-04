@@ -132,28 +132,30 @@
 						<h5 id="search-title" class="card-title text-center"></h5>
 						<form class="form-search">
 							<div class="form-label-group">
-								<label id="locationLabel1"></label> <input style="display: none" id="locationInput1" type="text" id="rcar-location"
+								<label id="locationLabel1"></label> <input style="display: none" id="locationInput1" type="text"
 									class="form-control" autofocus>
 									
 									<label id="nameLabel"></label> <input style="display: none" id="nameInput"
 									class="form-control">
-							</div>
-							<form>
-								<table>
-								<tbody>
-								<tr><td><label style="font-size: 11px">Choose a start date</label></td></tr>
-								<tr><td><input class="form-control" style="width: 155px" type="date" id="start-date"></td></tr>
-								<tr><td><label style="font-size: 11px">Choose an end date</label></td></tr>
-								<tr><td><input class="form-control" style="width: 155px" type="date" id="end-date"></td></tr>
-								</tbody>
-								</table>
-							</form>
-							<div class="form-label-group">
-								<label id="locationLabel1"></label> <input style="display: none" id="locationInput1" type="text" id="rcar-location"
-									class="form-control" autofocus>
-									
-									<label id="nameLabel"></label> <input style="display: none" id="nameInput"
-									class="form-control">
+							
+									<table>
+										<tbody>
+											<tr><td><label style="font-size: 11px">Choose a start date</label></td></tr>
+											<tr><td><input class="form-control" style="width: 155px" type="date" id="start-date"></td></tr>
+											<tr><td><label style="font-size: 11px">Choose an end date</label></td></tr>
+											<tr><td><input class="form-control" style="width: 155px" type="date" id="end-date"></td></tr>
+										</tbody>
+									</table>
+									<label>Trip type</label>
+									<select id="tripTypeSelect">
+										<option>round trip</option>
+										<option>one-way</option>
+										<option>multi-city</option>
+									</select>
+									<label>Number of rooms</label>
+									<input id="roomsNumberInput" class="form-control" type="number">
+									<label>Lugagge weight</label>
+									<input id="luggageWeightInput" class="form-control" type="text">
 							</div>
 							<button class="btn btn-lg btn-primary btn-block text-uppercase"
 								style="margin-top: 20px;" type="button">Go</button>

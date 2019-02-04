@@ -13,7 +13,6 @@ import org.springframework.data.jpa.domain.Specification;
 import com.isap.ISAProject.model.hotel.Hotel;
 
 public class HotelSpecifications {
-	final Collection<Predicate> predicates = new ArrayList<>();
 	
 	public static Specification<Hotel> findByHotelNameLocationName(String name, String locationName){
 		return new Specification<Hotel>() {

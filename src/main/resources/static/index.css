@@ -53,9 +53,10 @@ tr:hover{
 }
 
 #search-panel{
-	position:fixed;
-    top: 18%;
-    left: -85%; /* bilo 27%*/
+	width: 50%;
+	position: relative;
+	bottom: 34%;
+    left: 65%; /* bilo 27%*/
 }
 
 
