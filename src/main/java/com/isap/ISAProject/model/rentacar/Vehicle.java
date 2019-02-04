@@ -30,9 +30,6 @@ public class Vehicle extends RatableEntity{
 	@Column(nullable = false)
 	private double discount;
 	
-	@Column(nullable = true)
-	private String name;
-	
 	@Column(nullable = false)
 	private String brand;
 	
@@ -102,12 +99,6 @@ public class Vehicle extends RatableEntity{
 		this.version = version;
 	}
 	
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
 	public String getBrand() {
 		return brand;
 	}

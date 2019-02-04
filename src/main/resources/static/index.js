@@ -319,16 +319,15 @@ $(document).on('click','#tablebo tr', function() {
 	var vehicles = "";
 	
 	$.each(pomDataVehicles, function(index, vehicle) {
-		vehicles += "<tr><td scope=\"col\">" + vehicle.name + "</td>" + "<td scope=\"col\">"+ vehicle.brand 
+		vehicles += "<td scope=\"col\">"+ vehicle.brand 
 		+ "<td scope=\"col\">" + vehicle.model + "</td>"
-		+ "<td scope=\"col\">"+ vehicle.seats_number + "</td>" 
+		+ "<td scope=\"col\">"+ vehicle.seatsNumber + "</td>" 
 		+ "<td scope=\"col\">"+ vehicle.type + "</td>"
 		+ "</td></tr>";
 	});
 	
 	var tabela = "<table class=\"table table-hover\" id = \"tableveh\"><thead>" +
 				"<tr>" + 
-			    "<th scope=\"col\">Name</th>" +
 			    "<th scope=\"col\">Brand</th>" +
 			    "<th scope=\"col\">Model</th>" +
 			    "<th scope=\"col\">Seats number</th>" +
