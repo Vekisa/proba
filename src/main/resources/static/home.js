@@ -69,6 +69,7 @@ $(document).on('click','#allUsers',function(e){
 	var allUsers;
 	var friends;
     var sentRequests;
+    var receivedRequests;
     
 	$.ajax({
 		url: "/users/registered",
@@ -80,10 +81,12 @@ $(document).on('click','#allUsers',function(e){
 	});
     
     var indexPom;
+    
     $.each(allUsers, function(index, user) {
         if(user.username == currentUser.username)
             indexPom = index;
     });
+    
 	allUsers.splice(indexPom, 1);
     
     
@@ -104,8 +107,17 @@ $(document).on('click','#allUsers',function(e){
             sentRequests = data;
 		}
 	});
+    
+    $.ajax({
+		url: currentUser._links.friend_requests.href,
+		type:"GET",
+		async: false,
+		success: function(data){
+            receivedRequests = data;
+		}
+	});
 	
-	printUsers(allUsers,friends,sentRequests);
+	printUsers(allUsers,friends,sentRequests, receivedRequests);
 	
 });
 
@@ -116,6 +128,21 @@ function userInList(userN,data){
             a = 1;
         }
 	});
+    
+    if(a == 1){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+function userInListFriendRequests(userN,data){
+    var a = 0;
+    $.each(data, function(index, fr) {
+        if(fr.sender.username == userN){
+            a = 1;
+        }
+    });
     
     if(a == 1){
         return true;
@@ -160,13 +187,19 @@ $(document).on('click','.cancelFr',function(e){
 	});
 });
 
-function printUsers(allUsers,friends,sentRequests){
+function printUsers(allUsers,friends,sentRequests, receivedRequests){
     var users = "";
     var button = "";
     var valueBtn ="";
     var link = "";
+    var pomButton = "";
+    var pomValueBtn = "";
+    var pomLink = "";
+    
 	if(allUsers!=null){
+       
 		$.each(allUsers, function(index, user) {
+            pomButton = "";
             if(friends != null && userInList(user.username,friends)){
                 link = currentUser._links.remove_friend.href;
                 valueBtn = link.substring(0, link.length-1) + user.id;
@@ -175,13 +208,22 @@ function printUsers(allUsers,friends,sentRequests){
                 link = currentUser._links.cancel_friend_request.href;
                 valueBtn = link.substring(0, link.length-1) + user.id;
                 button = "<button value = \"" + valueBtn +"\" type=\"button\" class=\"btn btn-warning cancelFr\">Cancel</button>";    
+            }else if(receivedRequests != null && userInListFriendRequests(user.username,receivedRequests)){
+            	alert("tu sam");
+                link = currentUser._links.accept_request.href;
+                valueBtn = link.substring(0, link.length-1) + user.id;
+                button = "<button value = \"" + valueBtn +"\" type=\"button\" class=\"btn btn-success btnAcceptReq\">Accept</button>";  
+                
+                pomLink = currentUser._links.decline_request.href;
+                pomValueBtn = pomLink.substring(0, pomLink.length-1) + user.id;
+                pomButton = "<button value = \"" + pomValueBtn +"\" type=\"button\" class=\"btn btn-danger btnDeclineReq\">Decline</button>"; 
             }else{
                 link = currentUser._links.send_request.href;
                 valueBtn = link.substring(0, link.length-1) + user.id;
                 button = "<button value = \"" + valueBtn +"\" type=\"button\" class=\"btn btn-primary addFriend\">Add Friend</button>";
             }
 			users += "<tr>" + "<td scope=\"col\">" + user.username + "</td>" + "<td scope=\"col\">"+ user.firstName + "</td>" + "<td scope=\"col\">" + user.lastName + "</td>" +
-			"<td scope=\"col\">" + user.email + "</td>" + "<td scope=\"col\">" + user.city + "</td>" + "<td scope=\"col\">" + button + "</td>" + "</tr>";
+			"<td scope=\"col\">" + user.email + "</td>" + "<td scope=\"col\">" + user.city + "</td>" + "<td scope=\"col\">" + button + pomButton + "</td>" + "</tr>";
 		});
 	}
 	
@@ -222,17 +264,21 @@ $(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
     switch(jqxhr.status) {
 	    case 404:
 	    	 $("#error").html("Not found");
+             $('#myModal').modal("show");
 	      break;
 	    case 204:
 	    	$("#error").html("No content");
+            $('#myModal').modal("show");
 	      break;
 	    case 400:
 	    	$("#error").html("Bad request");
+            $('#myModal').modal("show");
 	      break;
-	    default:
+	    case 500:
 	    	$("#error").html("Something went wrong");
+            $('#myModal').modal("show");
     }
-    $('#myModal').modal("show");
+    
 });
 
 $(document).on('click','#logout',function(e){
@@ -481,10 +527,13 @@ $(document).on('click','#activeResBtn',function(e){
 
 function printFriends(data){
 	var friends = "";
+    var link = currentUser._links.remove_friend.href;
+    var valueBtn = link.substring(0, link.length-1);
+    
 	if(data!=null){
 		$.each(data, function(index, friend) {
 			friends += "<tr>" + "<td scope=\"col\">" + friend.username + "</td>" + "<td scope=\"col\">"+ friend.firstName + "</td>" + "<td scope=\"col\">" + friend.lastName + "</td>" +
-			"<td scope=\"col\">" + friend.email + "</td>" + "</tr>";
+			"<td scope=\"col\">" + friend.email + "</td>" + "<td scope=\"col\">"  + "<button value = \"" + valueBtn + friend.id + "\" type=\"button\" class=\"btn btn-danger unFriend\">UnFriend</button>"  +"</td>" + "</tr>";
 		});
 	}
 	
@@ -499,10 +548,9 @@ function printFriends(data){
 		"</thead><tbody>" + friends + "</tbody></table>";
 }
 
-$(document).on('click','#btnAcceptReq',function(e){
+$(document).on('click','.btnAcceptReq',function(e){
     e.preventDefault();
-    $('#btnAcceptReq').prop("disabled",true);
-    $('#btnDeclineReq').prop("disabled",true);
+    $(this).prop("disabled",true);
     $.ajax({
 		type: "POST",
 		url: $(this).val(),
@@ -516,10 +564,9 @@ $(document).on('click','#btnAcceptReq',function(e){
 	});
 });
 
-$(document).on('click','#btnDeclineReq',function(e){
+$(document).on('click','.btnDeclineReq',function(e){
     e.preventDefault();
-    $('#btnAcceptReq').prop("disabled",true);
-    $('#btnDeclineReq').prop("disabled",true);
+    $(this).prop("disabled",true);
     $.ajax({
 		type: "DELETE",
 		url: $(this).val(),
@@ -549,8 +596,8 @@ function printFriendRequests(data){
             
 			friendRequests += "<tr>" + "<td scope=\"col\">" + friendRequest.sender.firstName + "</td>" + "<td scope=\"col\">" + friendRequest.sender.lastName + "</td>" +
 			"<td scope=\"col\">" + friendRequest.requestTime + "</td>"
-            + "<td scope=\"col\">" + "<button value=\"" + valueBtnAccept + "\" type=\"button\" class=\"btn btn-success\" id =\"btnAcceptReq\">Accept</button>" + "</td>"
-            + "<td scope=\"col\">" + "<button value=\"" + valueBtnDecline + "\" type=\"button\" class=\"btn btn-danger\" id =\"btnDeclineReq\">Decline</button>" + "</td>"
+            + "<td scope=\"col\">" + "<button value=\"" + valueBtnAccept + "\" type=\"button\" class=\"btn btn-success btnAcceptReq\">Accept</button>" + "</td>"
+            + "<td scope=\"col\">" + "<button value=\"" + valueBtnDecline + "\" type=\"button\" class=\"btn btn-danger btnDeclineReq\">Decline</button>" + "</td>"
                 + "</tr>";
 		});
 	}
