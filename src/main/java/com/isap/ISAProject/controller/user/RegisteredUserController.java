@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.isap.ISAProject.domain.json.request.AuthenticationRequest;
+import com.isap.ISAProject.domain.security.CerberusUser;
 import com.isap.ISAProject.model.user.FriendRequest;
 import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
@@ -58,8 +59,8 @@ public class RegisteredUserController {
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/currentUser")
-	public ResponseEntity<?> getDaHoney() {
-		return ResponseEntity.ok(userService.currentUser());
+	public ResponseEntity<Resource<CerberusUser>> getDaHoney() {
+		return new ResponseEntity<Resource<CerberusUser>>(HATEOASImplementorUsers.createCerberusUser(userService.currentUser()), HttpStatus.OK);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -199,6 +200,18 @@ public class RegisteredUserController {
 		return new ResponseEntity<List<Resource<RegisteredUser>>>(HATEOASImplementorUsers.createRegisteredUserList(service.getFriends(id)), HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/{self}/requested_users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća sve usere kojima je poslat zahtev.", notes = "Povratna vrednost servisa je lista resursa registrovanih korisnika kojima je poslao zahtev.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request"),
+			@ApiResponse(code = 404, message = "Not Found")
+	})
+	public ResponseEntity<List<Resource<RegisteredUser>>> getRequestedUsersFromUser(@PathVariable("self") Long id) {
+		return new ResponseEntity<List<Resource<RegisteredUser>>>(HATEOASImplementorUsers.createRegisteredUserList(service.getRequestedUsers(id)), HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/{self}/declineRequest", method = RequestMethod.DELETE)
 	@ApiOperation(value = "Odbija zahtev za prijateljstvo.", notes = "Ovu operaciju izvršava korisnik kome je poslat zahtev za prijateljstvo.", httpMethod = "DELETE")
 	@ApiResponses(value = {
@@ -207,7 +220,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> declineFriendRequest(@PathVariable("self") Long selfId, @RequestParam("friend") Long friendId) {
-		service.declineFriendRequest(friendId, selfId);
+		service.declineFriendRequest(selfId, friendId);
 		return ResponseEntity.ok().build();
 	}
 	
@@ -219,7 +232,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
 	public ResponseEntity<?> cancelFriendRequest(@PathVariable("self") Long selfId, @RequestParam("friend") Long friendId) {
-		service.declineFriendRequest(selfId, friendId);
+		service.declineFriendRequest(friendId, selfId);
 		return ResponseEntity.ok().build();
 	}
 	

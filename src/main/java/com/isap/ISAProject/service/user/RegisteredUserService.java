@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,9 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	
 	@Autowired 
 	private ConfirmationTokenRepository confirmationTokenRepository;
+	
+	@Autowired
+	private FriendRequestService friendRequestService;
 	
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -260,6 +264,22 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 		repository.save(confTok.getUser());
 		confirmationTokenRepository.save(confTok);
 		return confTok.getUser();
+	}
+	public List<RegisteredUser> getRequestedUsers(Long userId) {
+		logger.info("> fetching requested users of user with id {}", userId);
+		RegisteredUser user = this.findById(userId);
+		PageRequest p = new PageRequest(0, Integer.MAX_VALUE);
+		List<FriendRequest> friendRequests = friendRequestService.findAll(p);
+		List<RegisteredUser> users = new ArrayList<RegisteredUser>();
+		for(FriendRequest friendRequest : friendRequests) {
+			if(friendRequest.getSender().getUsername().equals(user.getUsername()))
+				users.add(friendRequest.getReceiver());
+		}
+		logger.info("< active requested users fetched");
+		if(!users.isEmpty())
+			return users;
+		
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Useri ne postoje");	
 	}
 	
 }

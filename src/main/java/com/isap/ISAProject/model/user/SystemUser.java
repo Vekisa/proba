@@ -15,7 +15,6 @@ public abstract class SystemUser extends UserBase{
 	
 	private static final long serialVersionUID = 689204864806648978L;
 
-	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

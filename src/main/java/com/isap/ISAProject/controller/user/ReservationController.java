@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
@@ -86,6 +87,18 @@ public class ReservationController {
 	public ResponseEntity<?> deleteReservationWithId(@PathVariable(value="id") Long reservationId){
 		reservationService.deleteById(reservationId);
 		return ResponseEntity.ok().build();
+	}
+	
+	//Vraca lokaciju za koju vazi rezervacija
+	@RequestMapping(value="/{id}/location", method=RequestMethod.GET)
+	@ApiOperation(value = "Lokacija rezervacije.", notes = "Vraca lokaciju rezervacije sa proslejenim id-em", httpMethod = "GET")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Location.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request")
+	})
+	public ResponseEntity<Resource<Location>> getLocationOfReservation(@PathVariable(value="id") Long reservationId){
+		return new ResponseEntity<Resource<Location>>(HATEOASImplementorUsers.createLocation(reservationService.getLocation(reservationId)), HttpStatus.OK);
 	}	
 	
 	@RequestMapping(value = "/{id}/room-reservation", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
