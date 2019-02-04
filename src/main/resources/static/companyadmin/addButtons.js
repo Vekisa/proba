@@ -12,6 +12,10 @@ function addButtonsForHotel() {
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addRoom\"add> Add </button>";
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"incomeHotel\"add> Income </button>";
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"graphHotel\"add> Graph </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"updateCompany\"add> Update </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addRoomType\"add> Add type </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addFloor\"add> Add floor </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addOption\"add> Add option </button><br>";
 	document.getElementById("buttons").innerHTML = buttonsHTML;
 }
 
@@ -20,8 +24,20 @@ function addButtonsForAirline() {
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addFlight\"add> Add </button>";
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"incomeAirline\"add> Income </button>";
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"graphAirline\"add> Graph </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"updateCompany\"add> Update </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addLuggage\"add> Add luggage </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addConfiguration\"add> Add configuration </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addSegment\"add> Add segment </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addCategory\"add> Add category </button><br>";
 	document.getElementById("buttons").innerHTML = buttonsHTML;
 }
 
 function addButtonsForRentACar() {
+	let buttonsHTML = "";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addVehicle\"add> Add </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"incomeRent\"add> Income </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"graphRent\"add> Graph </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"updateCompany\"add> Update </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addOffice\"add> Add office </button><br>";
+	document.getElementById("buttons").innerHTML = buttonsHTML;
 }

@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.isap.ISAProject.model.airline.Airline;
+import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.Vehicle;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
 import com.isap.ISAProject.service.rentacar.VehicleService;
@@ -124,4 +126,15 @@ public class VehicleController {
 		service.deleteVehicleReservation(vehId, vehicleRes);
 		return ResponseEntity.ok().build();
 	}
+	
+	@RequestMapping(value = "/{id}/office", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<BranchOffice>> getOfficeOfVehicle(@PathVariable("id") Long id) {
+		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(service.getBranchOfficeOfVehicle(id)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/office", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<BranchOffice>> setOfficeOfVehicle(@PathVariable("id") Long id, @RequestParam("office") Long officeId) {
+		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(service.setBranchOfficeOfVehicle(id, officeId)), HttpStatus.OK);
+	}
+	
 }

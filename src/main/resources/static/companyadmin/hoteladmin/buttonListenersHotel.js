@@ -6,21 +6,21 @@ $(document).on('click','#addRoom',function(e) {
 
 $(document).on('click','#incomeHotel',function(e){
 	document.getElementById("collection").innerHTML = "";
-	let formHTML = "<label><strong>Income by date:</strong></label><form id=\"incomehotel\" method=\"PUT\"></form>";
+	let formHTML = "<br><label><strong>Income by date:</strong></label><form id=\"incomeFormHotel\" method=\"PUT\"></form>";
 	let beginDateHTML = "<br><input type=\"date\" id=\"begin\">-";
 	let endDateHTML = "<input type=\"date\" id=\"end\"><br>";
 	document.getElementById("collection").innerHTML = formHTML;
-	$("#incomehotel").append(beginDateHTML);
-	$("#incomehotel").append(endDateHTML);
+	$("#incomeFormHotel").append(beginDateHTML);
+	$("#incomeFormHotel").append(endDateHTML);
 	let submitHTML = "<br><input type=\"submit\" value=\"Calculate\"  class=\"btn btn-info btn-block custombutton\"><br>";
-	$("#incomehotel").append(submitHTML);
+	$("#incomeFormHotel").append(submitHTML);
 })
 
 $(document).on('click','#graphHotel',function(e){
 	document.getElementById("collection").innerHTML = "";
 })
 
-$(document).on('click', '.update', function(e) {
+$(document).on('click', '.updateRoom', function(e) {
 	roomId = e.toElement.id;
 	let url = "/rooms/" + e.toElement.id;
 	createRoomForm();
@@ -73,7 +73,7 @@ $(document).on('click', '.update', function(e) {
 	});
 })
 
-$(document).on('click', '.remove', function(e) {
+$(document).on('click', '.removeRoom', function(e) {
 	let url = "/rooms/" + e.toElement.id;
 	$.ajax({
 		type: "DELETE",
@@ -89,7 +89,7 @@ $(document).on('click', '.remove', function(e) {
 	loadCollection();
 })
 
-$(document).on('submit', '#incomehotel', function(e) {
+$(document).on('submit', '#incomeFormHotel', function(e) {
     e.preventDefault();
     if(document.getElementById("chartContainer") == undefined) {
     	let chartHTML = "<br><div id=\"chartContainer\" style=\"height: 380px; width: 100%;\"></div>"
@@ -111,10 +111,6 @@ $(document).on('submit', '#incomehotel', function(e) {
   		success: function(data) {
   			if(data != null)
   				createChart(data);
-  		},
-  		error: function(data) {
-  			alert("Podaci nisu pravilno uneti!");
-  			$("#chartContainer").hide();
   		}
 	});
 })
@@ -129,9 +125,6 @@ $(document).on('submit', '#roomformupdate', function(e) {
 		async: false,
 		beforeSend: function(request) {
     		request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
-  		},
-  		error: function() {
-  			gotError = true;
   		}
 	});
 	let floorId = $("#selectedFloor option:selected").val();
@@ -141,9 +134,6 @@ $(document).on('submit', '#roomformupdate', function(e) {
 		async: false,
 		beforeSend: function(request) {
     		request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
-  		},
-  		error: function() {
-  			gotError = true;
   		}	
 	});
 	let newRoom = new Object();
@@ -158,10 +148,7 @@ $(document).on('submit', '#roomformupdate', function(e) {
 		async: false,
 		beforeSend: function(request) {
     		request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
-  		},
-  		error: function() {
-  			gotError = true;
-  		}		
+  		}	
 	});
 	if(gotError) alert("Neuspesna promena sobe!");
 	loadCollection();
@@ -205,7 +192,7 @@ $(document).on('submit', '#roomform', function(e) {
 
 function createRoomForm() {
 	document.getElementById("collection").innerHTML = "";
-	document.getElementById("collection").innerHTML = "<form id=\"roomform\" method=\"PUT\"></form>";
+	document.getElementById("collection").innerHTML = "<br><form id=\"roomform\" method=\"POST\"></form><br>";
 	let floorSelectHTML = "Floor number: <select id=\"selectedFloor\">";
 	$.ajax({
 		type: "GET",
@@ -248,4 +235,5 @@ function createRoomForm() {
 	$("#roomform").append(roomTypeSelectHTML);
 	$("#roomform").append(numberOfBedsHTML);
 	$("#roomform").append(submitHTML);	
+	$("#collection").show();
 }

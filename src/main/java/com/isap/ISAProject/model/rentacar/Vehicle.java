@@ -30,7 +30,7 @@ public class Vehicle extends RatableEntity{
 	@Column(nullable = false)
 	private double discount;
 	
-	@Column(nullable = false)
+	@Column(nullable = true)
 	private String name;
 	
 	@Column(nullable = false)

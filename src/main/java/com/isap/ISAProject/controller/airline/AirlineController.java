@@ -1,6 +1,8 @@
 package com.isap.ISAProject.controller.airline;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -232,6 +234,11 @@ public class AirlineController {
 			@RequestParam(value = "starting", required = false) String startingLocationName,
 			@RequestParam(value = "finish", required = false) String finishLocationName) {
 		return new ResponseEntity<List<Resource<Flight>>>(HATEOASImplementorAirline.createFlightsList(service.filterFlights(startingLocationName, finishLocationName)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/income", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<Long, Double>> getIncomeForAirline(@PathVariable("id") Long id, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
+		return new ResponseEntity<Map<Long,Double>>(service.getIncomeFor(id, new Date(begin), new Date(end)), HttpStatus.OK);
 	}
 	
 }

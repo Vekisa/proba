@@ -18,7 +18,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "flight_seat_category")
 public class FlightSeatCategory {
 
-	@JsonIgnore
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

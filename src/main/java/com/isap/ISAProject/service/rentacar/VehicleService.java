@@ -15,8 +15,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.Vehicle;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
+import com.isap.ISAProject.repository.rentacar.BranchOfficeRepository;
 import com.isap.ISAProject.repository.rentacar.VehicleRepository;
 import com.isap.ISAProject.serviceInterface.rentacar.VehicleServiceInterface;
 
@@ -28,6 +30,9 @@ public class VehicleService implements VehicleServiceInterface {
 	
 	@Autowired
 	private VehicleRepository repository;
+	
+	@Autowired
+	private BranchOfficeRepository officeRepository;
 	
 	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
@@ -64,6 +69,10 @@ public class VehicleService implements VehicleServiceInterface {
 		Vehicle oldVeh = this.getVehicleById(id);
 		oldVeh.setDiscount(vehicle.getDiscount());
 		oldVeh.setPricePerDay(vehicle.getPricePerDay());
+		oldVeh.setBrand(vehicle.getBrand());
+		oldVeh.setModel(vehicle.getModel());
+		oldVeh.setProductionYear(vehicle.getProductionYear());
+		oldVeh.setType(vehicle.getType());
 		this.saveVehicle(oldVeh);
 		logger.info("< vehicle updated and saved");
 		return oldVeh;
@@ -107,6 +116,28 @@ public class VehicleService implements VehicleServiceInterface {
 		veh.removeVehicleReservation(vr);
 		this.saveVehicle(veh);
 		logger.info("< vehicle reservation of vehicle with id {} deleted", id);
+	}
+
+	public BranchOffice getBranchOfficeOfVehicle(Long id) {
+		logger.info("> fetching office of vehicle with id {}", id);
+		Vehicle vehicle = this.getVehicleById(id);
+		BranchOffice office = vehicle.getBranchOffice();
+		logger.info("< vehicle fetched");
+		if(office != null) return office;
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tražena filijala nije pronađena.");
+	}
+
+	public BranchOffice setBranchOfficeOfVehicle(Long id, Long officeId) {
+		logger.info("> fetching office of vehicle with id {}", id);
+		Vehicle vehicle = this.getVehicleById(id);
+		Optional<BranchOffice> office = officeRepository.findById(officeId);
+		logger.info("< vehicle fetched");
+		if(office.isPresent()) {
+			vehicle.setBranchOffice(office.get());
+			repository.save(vehicle);
+			return office.get();
+		}
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tražena filijala nije pronađena.");
 	}
 
 }

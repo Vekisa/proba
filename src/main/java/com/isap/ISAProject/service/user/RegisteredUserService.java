@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -78,7 +79,8 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 		oldUser.setLastName(newUser.getLastName());
 		oldUser.setPhoneNumber(newUser.getPhoneNumber());
 		oldUser.setUsername(newUser.getUsername());
-		oldUser.setPassword(newUser.getPassword());
+		BCryptPasswordEncoder bc = new BCryptPasswordEncoder();
+		oldUser.setPassword(bc.encode(newUser.getPassword()));
 		logger.info("< updated user");
 		return null;
 	}

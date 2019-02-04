@@ -22,7 +22,6 @@ import com.isap.ISAProject.model.rentacar.BranchOffice;
 @Table(name = "destination")
 public class Location {
 
-	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

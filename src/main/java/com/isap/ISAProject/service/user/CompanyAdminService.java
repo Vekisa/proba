@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -80,7 +81,8 @@ public class CompanyAdminService implements CompanyAdminServiceInterface {
 		oldAdmin.setCity(newAdmin.getCity());
 		oldAdmin.setFirstName(newAdmin.getFirstName());
 		oldAdmin.setLastName(newAdmin.getLastName());
-		oldAdmin.setPassword(newAdmin.getPassword());
+		BCryptPasswordEncoder bc = new BCryptPasswordEncoder();
+		oldAdmin.setPassword(bc.encode(newAdmin.getPassword()));
 		oldAdmin.setPhoneNumber(newAdmin.getPhoneNumber());
 		oldAdmin.setUsername(newAdmin.getUsername());
 		logger.info("< company admin updated");
