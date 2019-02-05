@@ -303,5 +303,28 @@ public class HotelService {
 		logger.info("< hotels found");
 		return ret;
 	}
+
+	public Map<Long, Integer> getStatisticFor(Long id, Date beginDate, Date endDate) {
+		logger.info("> calculating statistic");
+		Hotel hotel = this.findById(id);
+		Map<Long, Integer> statisticMap = new HashMap<Long, Integer>();
+		for(Floor floor : hotel.getFloors())
+			for(Room room : floor.getRooms())
+				for(RoomReservation reservation : room.getRoomReservations())
+					if(reservation.getEndDate().after(beginDate) && reservation.getBeginDate().before(endDate)) {
+						if(statisticMap.containsKey(reservation.getBeginDate().getTime())) {
+							statisticMap.put(reservation.getBeginDate().getTime(), statisticMap.get(reservation.getBeginDate().getTime()) + reservation.getNumberOfGuests());
+						} else {
+							statisticMap.put(reservation.getBeginDate().getTime(), reservation.getNumberOfGuests());
+						}
+						if(statisticMap.containsKey(reservation.getEndDate().getTime())) {
+							statisticMap.put(reservation.getEndDate().getTime(), statisticMap.get(reservation.getEndDate().getTime()) + reservation.getNumberOfGuests());
+						} else {
+							statisticMap.put(reservation.getEndDate().getTime(), reservation.getNumberOfGuests());
+						}
+					}
+		logger.info("< statistic calculated");
+		return statisticMap;
+	}
 	
 }
