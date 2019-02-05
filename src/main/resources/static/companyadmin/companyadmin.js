@@ -58,12 +58,15 @@ function load(){
   		},
   		success: function(data) {
   			if(data != null) {
-  				if(authority == "HOTEL_ADMIN")
+  				if(authority == "HOTEL_ADMIN"){
   					companyId = data.hotel.id;
-  				if(authority == "AIRLINE_ADMIN")
+  				}
+  				if(authority == "AIRLINE_ADMIN"){
   					companyId = data.airline.id;
-  				if(authority == "RENT_A_CAR_ADMIN")
+  				}
+  				if(authority == "RENT_A_CAR_ADMIN"){
   					companyId = data.rentACar.id;
+  				}
   			}
   		}
 	});
@@ -252,7 +255,7 @@ function loadCollection() {
 				$("#collection").hide();
 			}
 		}		
-	});	
+	});
 }
 
 function loadCompanyForm() {

@@ -213,7 +213,7 @@ public class RoomService {
 	public List<Room> searchWithHotelAndRoomType(Pageable pageable, Long hotelId, Long roomTypeId) {
 		logger.info("> searching rooms for specific hotel and room type");
 		List<Room> rooms = roomRepository.findAll(RoomSpecifications.findByHotelRoomType(hotelId, roomTypeId));
-		logger.info("hotels: " + rooms);
+		logger.info("rooms: " + rooms);
 		logger.info("< rooms found");
 		return rooms;
 	}

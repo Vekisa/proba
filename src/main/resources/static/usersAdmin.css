@@ -1,0 +1,40 @@
+@charset "UTF-8";
+
+#navigation {
+	margin: 10px;
+	border-radius: 10px;
+	opacity: 0.9;
+	z-index:9999;
+}
+
+.white-background {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f3f3f3;
+    opacity: 0.9;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.custombutton {
+    max-width: 150px;
+}
+
+.hoverable {
+    cursor: pointer;
+}
+
+.profile {
+    width: 30%;
+}
+
+#tablediv{
+	border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f3f3f3;
+    opacity: 0.9;
+}
+
+#search-panel {
+	position:relative;
+}
