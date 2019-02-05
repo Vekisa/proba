@@ -81,6 +81,24 @@ $(document).on('click', '.updateFlight', function(e) {
 	let url = "/flights/" + e.toElement.id;
 	createFlightForm();
 	$("#flightform").prop("id", "flightformupdate");
+	$.ajax({
+		type: "GET",
+		url: url,
+		async: false,
+		beforeSend: function(request) {
+    		request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
+  		},
+  		success: function(data) {
+  			if(data != null) {
+				$("#basePrice").val(data.basePrice);
+				$("#transfers").val(data.transfers);
+				$("#numberOfTransfers").val(data.numberOfTransfers);
+				$("#finishDestination").val(data.finishDestination.id).prop("selected", true);
+				document.getElementById("begin1").value = data.departureTime.substring(0,23);	
+				document.getElementById("end1").value = data.arrivalTime.substring(0,23);	
+			}				
+  		}
+	});
 })
 
 $(document).on('click', '.removeFlight', function(e) {
@@ -104,8 +122,6 @@ $(document).on('submit', '#flightformupdate', function(e) {
 	let numberOfTransfers = $("#numberOfTransfers").val();
 	let begin1 = $("#begin1").val();
 	let end1 = $("#end1").val();
-	let begin2 = $("#begin2").val();
-	let end2 = $("#end2").val();
 	let flight = new Object();
 	flight.basePrice = basePrice;
 	flight.transfers = transfers;
@@ -144,8 +160,6 @@ $(document).on('submit', '#flightform', function(e) {
 	let numberOfTransfers = $("#numberOfTransfers").val();
 	let begin1 = $("#begin1").val();
 	let end1 = $("#end1").val();
-	let begin2 = $("#begin2").val();
-	let end2 = $("#end2").val();
 	let flight = new Object();
 	flight.basePrice = basePrice;
 	flight.transfers = transfers;
@@ -174,7 +188,7 @@ $(document).on('click','#addFlight',function(e) {
 
 function createFlightForm() {
 	document.getElementById("collection").innerHTML = "";
-	document.getElementById("collection").innerHTML = "<br><form id=\"flightform\" method=\"POST\"></form>";
+	document.getElementById("collection").innerHTML = "<br><form id=\"flightform\" method=\"POST\"></form><br>";
 	let destinationHTML = "Finish destination: <select id=\"finishDestination\">";
 	$.ajax({
 		type: "GET",
@@ -197,8 +211,6 @@ function createFlightForm() {
 	let numberOfTransfersHTML = "Number of transfers: <input id=\"numberOfTransfers\" type=\"text\"><br><br>";
 	let beginDateHTML = "<label>Departure time: </label><input type=\"datetime-local\" id=\"begin1\"><br><br>";
 	let endDateHTML = "<label>Arrival time: </label><input type=\"datetime-local\" id=\"end1\"><br><br>";
-	let returnBeginDateHTML = "<label>Return departure time: </label><input type=\"datetime-local\" id=\"begin2\"><br><br>";
-	let returnEndDateHTML = "<label>Return arrival time: </label><input type=\"datetime-local\" id=\"end2\"><br><br>";
 	let submitHTML = "<input type=\"submit\" class=\"btn btn-info btn-block custombutton\" value=\"Add\">";
 	$("#flightform").append(destinationHTML);
 	$("#flightform").append(priceHTML);
@@ -206,8 +218,6 @@ function createFlightForm() {
 	$("#flightform").append(numberOfTransfersHTML);
 	$("#flightform").append(beginDateHTML);
 	$("#flightform").append(endDateHTML);
-	$("#flightform").append(returnBeginDateHTML);
-	$("#flightform").append(returnEndDateHTML);
 	$("#flightform").append(submitHTML);	
 	$("#collection").show();
 }

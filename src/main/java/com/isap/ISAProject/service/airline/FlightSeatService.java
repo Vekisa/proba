@@ -3,6 +3,8 @@ package com.isap.ISAProject.service.airline;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.LuggageInfo;
 import com.isap.ISAProject.model.airline.Passenger;
 import com.isap.ISAProject.model.airline.Ticket;
+import com.isap.ISAProject.repository.airline.FlightSeatCategoryRepository;
 import com.isap.ISAProject.repository.airline.FlightSeatsRepository;
 import com.isap.ISAProject.serviceInterface.airline.FlightSeatServiceInterface;
 
@@ -31,6 +34,9 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 
 	@Autowired
 	private FlightSeatsRepository repository;
+	
+	@Autowired
+	private FlightSeatCategoryRepository categoriesRepository;
 	
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -165,6 +171,29 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 		logger.info("< ticket fetched");
 		if(ticket != null) return ticket;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested ticket doesn't exist.");
+	}
+
+	public FlightSeat setCategoryOfSeat(Long seatId, Long id) {
+		logger.info("> setting category of seat with id {}", seatId);
+		FlightSeat seat = this.findById(seatId);
+		Optional<FlightSeatCategory> category = categoriesRepository.findById(id);
+		if(category.isPresent()) {
+			seat.setCategory(category.get());
+			repository.save(seat);
+			return seat;
+		}
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested category doesn't exist.");
+	}
+
+	public FlightSeat updateFlightSeat(Long id, @Valid FlightSeat newSeat) {
+		logger.info("> updating seat with id {}", id);
+		FlightSeat oldSeat = this.findById(id);
+		if(oldSeat.isTaken())
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested seat is taken.");
+		oldSeat.setPrice(newSeat.getPrice());
+		repository.save(oldSeat);
+		logger.info("< seat updated");
+		return oldSeat;
 	}
 
 }
