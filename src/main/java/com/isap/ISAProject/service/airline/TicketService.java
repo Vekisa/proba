@@ -57,7 +57,7 @@ public class TicketService implements TicketServiceInterface {
 
 	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	public Ticket saveTicket(Ticket ticket) {
+	public Reservation saveTicket(Ticket ticket) {
 		logger.info("> saving ticket");
 		Reservation reservation = new Reservation();
 		reservation.setTicket(ticket);
@@ -67,7 +67,7 @@ public class TicketService implements TicketServiceInterface {
 		repository.save(ticket);
 		reservationRepository.save(reservation);
 		logger.info("< ticket saved");
-		return ticket;
+		return reservation;
 	}
 
 	@Override

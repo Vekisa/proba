@@ -1,6 +1,7 @@
 package com.isap.ISAProject.controller.rentacar;
 
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -135,6 +136,11 @@ public class VehicleController {
 	@RequestMapping(value = "/{id}/office", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Resource<BranchOffice>> setOfficeOfVehicle(@PathVariable("id") Long id, @RequestParam("office") Long officeId) {
 		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(service.setBranchOfficeOfVehicle(id, officeId)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/is-free", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Boolean> isRoomFree(@PathVariable("id") Long roomId, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
+		return new ResponseEntity<Boolean>(service.checkIfVehicleIsFree(new Date(begin), new Date(end), roomId), HttpStatus.OK);
 	}
 	
 }

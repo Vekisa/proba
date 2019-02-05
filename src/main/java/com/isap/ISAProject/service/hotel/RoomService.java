@@ -121,7 +121,7 @@ public class RoomService {
 		Room room = this.findById(roomId);
 		if(roomReservation.getBeginDate().after(roomReservation.getEndDate()))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datum rezervacije je lose unesen");
-		if(!checkIfRoomIsFree(roomReservation.getBeginDate(), roomReservation.getEndDate(), room))
+		if(!checkIfRoomIsFree(roomReservation.getBeginDate(), roomReservation.getEndDate(), roomId))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba nije slobodna u tom periodu");
 		room.getRoomReservations().add(roomReservation);
 		roomReservation.setRoom(room);
@@ -174,9 +174,16 @@ public class RoomService {
 			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Tip sobe za datu sobu nije postavljen");
 	}
 	
-	public boolean checkIfRoomIsFree(Date start, Date end, Room room) {
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+	public boolean checkIfRoomIsFree(Date start, Date end, Long roomId) {
+		logger.info("> check if room is free", roomId);
+		Room room = this.findById(roomId);
 		Date reservedStart = null;
 		Date reservedEnd = null;
+		logger.info("< check if room is free");
+		
+		if(start.after(end))
+			return false;
 		for(RoomReservation roomReservation :room.getRoomReservations()) {
 			reservedStart = roomReservation.getBeginDate();
 			reservedEnd = roomReservation.getEndDate();

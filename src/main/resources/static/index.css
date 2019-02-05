@@ -21,7 +21,7 @@
 	margin: 10px;
 	border-radius: 10px;
 	opacity: 0.9;
-	z-index:9999;
+	z-index:8000;
 }
 
 .hidden{
@@ -59,10 +59,6 @@ tr:hover{
 	position: absolute;
     left: 1050px; /* bilo 27%*/
     top: 40px;
-}
-
-#dateModal{
-    top: 30%;
 }
 
 

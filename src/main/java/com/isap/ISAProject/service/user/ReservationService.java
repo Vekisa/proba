@@ -26,6 +26,7 @@ import com.isap.ISAProject.model.airline.Passenger;
 import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
+import com.isap.ISAProject.model.rentacar.Vehicle;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
@@ -36,7 +37,9 @@ import com.isap.ISAProject.repository.user.ReservationRepository;
 import com.isap.ISAProject.service.EmailSenderService;
 import com.isap.ISAProject.service.airline.TicketService;
 import com.isap.ISAProject.service.hotel.RoomReservationService;
+import com.isap.ISAProject.service.hotel.RoomService;
 import com.isap.ISAProject.service.rentacar.VehicleReservationService;
+import com.isap.ISAProject.service.rentacar.VehicleService;
 
 @Service
 @Transactional(readOnly = true)
@@ -49,6 +52,12 @@ public class ReservationService {
 	
 	@Autowired
 	private TicketService ticketService;
+	
+	@Autowired
+	private VehicleService vehicleService;
+	
+	@Autowired
+	private RoomService roomService;
 	
 	@Autowired
 	private VehicleReservationService vehicleReservationService;

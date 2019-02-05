@@ -35,6 +35,9 @@ public class RoomReservationService {
 	@Autowired
 	private ExtraOptionRepository optionsRepository;
 	
+	@Autowired
+	private RoomService roomService;
+	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public RoomReservation findById(long id) {
 		logger.info("> Rezervacija sobe findById id:{}", id);
@@ -165,6 +168,26 @@ public class RoomReservationService {
 			return room;
 		else
 			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Soba za rezervaciju nije postavljena");
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	public RoomReservation saveWithRoomId(Long roomId, Date begin, Date end) {	
+		logger.info("> create room reervation  with room", roomId);
+		Room room = roomService.findById(roomId);
+		if(!checkIfRoomIsFree(begin, end, room)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba za dati period nije slobodna");
+		}
+		RoomReservation roomReservation = new RoomReservation();
+		roomReservationRepository.save(roomReservation);
+		roomReservation.setRoom(room);
+		roomReservation.setBeginDate(begin);
+		roomReservation.setEndDate(end);
+		Long difference = end.getTime() - begin.getTime();
+		roomReservation.setNumberOfNights((int) TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS));
+		roomReservation.setPrice(roomReservation.getNumberOfNights() * room.getRoomType().getPricePerNight());
+		logger.info("< create room reervation  with room");
+		this.save(roomReservation);
+		return roomReservation;
 	}
 	
 	public boolean checkIfRoomIsFree(Date start, Date end, Room room) {

@@ -1,5 +1,6 @@
 package com.isap.ISAProject.controller.hotel;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -184,9 +185,15 @@ public class RoomController {
 		List<Room> ret = roomService.searchWithHotelAndRoomType(pageable, hotelId, roomTypeId);
 		return new ResponseEntity<List<Resource<Room>>>(HATEOASImplementorHotel.createRoomList(ret), HttpStatus.OK);
 	}
+	
 	@RequestMapping(value = "/{id}/floor", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Resource<Room>> setFloorForRoomWithId(@PathVariable("id") Long roomId, @RequestParam("floor") Long floorId) {
 		return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(roomService.setFloor(roomId, floorId)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/is-free", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Boolean> isRoomFree(@PathVariable("id") Long roomId, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
+		return new ResponseEntity<Boolean>(roomService.checkIfRoomIsFree(new Date(begin), new Date(end), roomId), HttpStatus.OK);
 	}
 	
 }
