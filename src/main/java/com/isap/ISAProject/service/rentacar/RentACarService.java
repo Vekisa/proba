@@ -231,5 +231,28 @@ public class RentACarService implements RentACarServiceInterface {
 		if(!vehicles.isEmpty()) return vehicles;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested vehicles do not exist.");
 	}
+
+	public Map<Long, Integer> getStatisticFor(Long id, Date beginDate, Date endDate) {
+		logger.info("> calculating statistic");
+		RentACar rents = this.getRentACarById(id);
+		Map<Long, Integer> statisticMap = new HashMap<Long, Integer>();
+		for(BranchOffice bo : rents.getBranchOffices())
+			for(Vehicle v : bo.getVehicles())
+				for(VehicleReservation reservation : v.getVehicleReservations())
+					if(reservation.getEndDate().after(beginDate) && reservation.getBeginDate().before(endDate)) {
+						if(statisticMap.containsKey(reservation.getBeginDate().getTime())) {
+							statisticMap.put(reservation.getBeginDate().getTime(), statisticMap.get(reservation.getBeginDate().getTime()) + 1);
+						} else {
+							statisticMap.put(reservation.getBeginDate().getTime(), 1);
+						}
+						if(statisticMap.containsKey(reservation.getEndDate().getTime())) {
+							statisticMap.put(reservation.getEndDate().getTime(), statisticMap.get(reservation.getEndDate().getTime()) + 1);
+						} else {
+							statisticMap.put(reservation.getEndDate().getTime(), 1);
+						}
+					}
+		logger.info("< statistic calculated");
+		return statisticMap;
+	}
 	
 }

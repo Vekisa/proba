@@ -47,5 +47,7 @@ public interface AirlineServiceInterface {
 	List<Flight> getFlightsOfAirline(Long id);
 
 	Map<Long, Double> getIncomeFor(Long id, Date beginDate, Date endDate);
+
+	Map<Long, Integer> getStatisticFor(Long id, Date beginDate, Date endDate);
 	
 }

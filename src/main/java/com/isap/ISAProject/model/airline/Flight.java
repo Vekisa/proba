@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,9 +49,6 @@ public class Flight {
 
 	@Column(nullable = false)
 	private int numberOfTransfers;
-	
-	@Column(nullable = false)
-	private boolean finished;
 
 	@Column(nullable = false)
 	private Date departureTime;
@@ -63,6 +62,7 @@ public class Flight {
 	@Column(nullable = false)
 	private double basePrice;
 	
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private TripType tripType;
 	
@@ -73,10 +73,6 @@ public class Flight {
 	@JsonIgnore
 	@OneToMany(mappedBy = "flight")
 	List<FlightRating> ratings;
-	
-	public boolean isFinished() { return finished; }
-
-	public void setFinished(boolean finished) { this.finished = finished; }
 
 	public Date getDepartureTime() { return departureTime; }
 

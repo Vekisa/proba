@@ -17,7 +17,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "flight_seat")
 public class FlightSeat {
 
-	@JsonIgnore
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -46,7 +45,6 @@ public class FlightSeat {
 	@ManyToOne
 	private Ticket ticket;
 
-	@JsonIgnore
 	@ManyToOne
 	private LuggageInfo luggageInfo;
 
@@ -54,7 +52,6 @@ public class FlightSeat {
 	@ManyToOne
 	private Passenger passenger;
 
-	@JsonIgnore
 	@ManyToOne
 	private FlightSeatCategory category;
 

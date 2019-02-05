@@ -267,4 +267,9 @@ public class HotelController {
 		return new ResponseEntity<Map<Long,Double>>(hotelService.getIncomeFor(id, new Date(begin), new Date(end)), HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/{id}/statistic", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<Long, Integer>> getStatisticForHotel(@PathVariable("id") Long id, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
+		return new ResponseEntity<Map<Long,Integer>>(hotelService.getStatisticFor(id, new Date(begin), new Date(end)), HttpStatus.OK);
+	}
+	
 }
