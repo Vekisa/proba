@@ -1,6 +1,8 @@
 var currentData;
 var selected_search_item;
 var addAdminPressed = false;
+var currentCompany;
+var companyId;
 
 $(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
   
@@ -23,6 +25,7 @@ $(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
 
 $(document).on('click','#airline',function(e){
 	e.preventDefault();
+	currentCompany = "AIRLINE_ADMIN";
 	$("#profile").hide();
 	$.ajax({
 		type: "GET",
@@ -53,6 +56,7 @@ $(document).on('click','#airbtn',function(e){
 
 $(document).on('click','#rentacar',function(e){
 	e.preventDefault();
+	currentCompany = "RENT_A_CAR_ADMIN";
 	$("#profile").hide();
 	$.ajax({
 		type: "GET",
@@ -82,6 +86,7 @@ $(document).on('click','#rentbtn',function(e){
 
 $(document).on('click','#hotel',function(e){
 	e.preventDefault();
+	currentCompany = "HOTEL_ADMIN";
 	$.ajax({
 		type: "GET",
 		url: "hotels?page=0&size=10",
@@ -118,7 +123,7 @@ function printListOfCompanies(data){
 	var s = "";
 	$.each(data, function(index, company) {
 		s += "<tr id = \"" + company.links[0].href + "\">" + "<th scope=\"row\">"+ index +"</th>" + "<td>" + company.name + "</td>" + "<td>"+ company.address
-		+ "</td>" + "<td>" + company.description + "</td><td><button id=\"addAdminBtn\" style=\"font-size: 14px;\" class=\"btn btn-lg btn-primary\">add admin</button></td></tr>";
+		+ "</td>" + "<td>" + company.description + "</td><td><button class=\"addAdminBtn\" id=\"" + company.id + "\" style=\"font-size: 14px;\" class=\"btn btn-lg btn-primary\">add admin</button></td></tr>";
 	});
 	document.getElementById("tablediv").innerHTML = "<button class=\"btn btn-lg btn-primary btn-block\" type=\"button\" id=\"addBtn\">Add new company</button>" +
 		"<table class=\"table table-hover\" id = \"table\"><thead>" +
@@ -133,22 +138,29 @@ function printListOfCompanies(data){
     $("#profile").hide();
 }
 
-$(document).on('click', '#addAdminBtn', function(e){
+$(document).on('click', '.addAdminBtn', function(e){
 	e.preventDefault();
 	addAdminPressed = true;
-	$('#tablediv').css('display', 'block');
 	$('#addAdminModal').modal('show');
+	companyId = $(this).attr('id');
+	loadAdminModal();
 })
 
 function loadAdminModal(){
-	var allUsers;
+	var allUsers = [];
     
 	$.ajax({
 		url: "/users/companyAdmins",
 		type:"GET",
 		async: false,
 		success: function(data){
-            allUsers = data;
+			for(let d of data){
+				if(d.authority == currentCompany){
+					if(d.airline == null && d.hotel == null && d.rentacar == null){
+						allUsers.push(d);
+					}
+				}
+			}
 		}
 	});
 	printUsersModal(allUsers);
@@ -192,10 +204,10 @@ $(document).on('click','#addBtn',function(e){
 function printCompanyForm() {
 	document.getElementById("collection1").innerHTML = "";
 	document.getElementById("collection1").innerHTML = "<br><form id=\"companyForm\" method=\"POST\"></form><br>";
-	let nameHTML = "<tr><td>Name:</td><td><input class=\"form-control\" id=\"name\" type=\"text\"></td></tr>";
-	let addressHTML = "<tr><td>Address: </td><td><input class=\"form-control\" id=\"address\" type=\"text\"></td></tr>";
-	let descriptionHTML = "<tr><td>Description: </td><td><input class=\"form-control\" id=\"description\" type=\"text\"></td></tr>";
-	let locationHTML = "<tr><td>Location: </td><td><select class=\"form-control\" id=\"location\">";
+	let nameHTML = "<tr><td>Name:</td><td><input class=\"form-control\" id=\"name1\" type=\"text\"></td></tr>";
+	let addressHTML = "<tr><td>Address: </td><td><input class=\"form-control\" id=\"address1\" type=\"text\"></td></tr>";
+	let descriptionHTML = "<tr><td>Description: </td><td><input class=\"form-control\" id=\"description1\" type=\"text\"></td></tr>";
+	let locationHTML = "<tr><td>Location: </td><td><select class=\"form-control\" id=\"location1\">";
 	$.ajax({
 		type: "GET",
 		url: "/destinations/all",
@@ -242,7 +254,7 @@ function printUsersModal(allUsers){
        
 		$.each(allUsers, function(index, user) {
 			users += "<tr>" + "<td scope=\"col\">" + user.username + "</td>" + "<td scope=\"col\">"+ user.firstName + "</td>" + "<td scope=\"col\">" + user.lastName + "</td>" +
-			"<td scope=\"col\">" + user.email + "</td>" + "<td scope=\"col\">" + user.city + "</td>"+ "<td><button id=\"addAdminBtn\" style=\"font-size: 14px;\" class=\"btn btn-lg btn-primary\">add</button></td>" + "</tr>";
+			"<td scope=\"col\">" + user.email + "</td>" + "<td scope=\"col\">" + user.city + "</td>"+ "<td><button id=\"" + user.id + "\" class=\"addCompanyAdmin\" style=\"font-size: 14px;\" class=\"btn btn-lg btn-primary\">add</button></td>" + "</tr>";
 		});
 	}
 	
@@ -258,6 +270,18 @@ function printUsersModal(allUsers){
 		"</thead><tbody>" + users + "</tbody></table>";
 }
 
+$(document).on('click', '.addCompanyAdmin', function(e){
+	e.preventDefault();
+	$.ajax({
+		url: "/users/companyAdmins/" + $(this).attr('id') + "/company?company=" + companyId,
+		type: "PUT",
+		async: false,
+		success: function(){
+			alert('Admin je dodat');
+		}
+	})
+})
+
 $(document).on('click','#admins',function(e){
 	e.preventDefault();
     
@@ -272,6 +296,17 @@ $(document).on('click','#admins',function(e){
 		async: false,
 		success: function(data){
             allUsers = data;
+		}
+	});
+	
+	$.ajax({
+		url: "/users/usersAdmins",
+		type:"GET",
+		async: false,
+		success: function(data){
+            for(let d of data){
+            	allUsers.push(d);
+            }
 		}
 	});
 	
@@ -869,7 +904,6 @@ function printProfileForm(user) {
 }
 
 function load(){
-	loadAdminModal();
 	
 	$('#loading').hide();
 	$("#companyProfile").hide();
@@ -996,6 +1030,30 @@ $(document).on('submit','.form-signup',function(e){
 	});
 });
 
+$(document).on('click','#submitNewCompany',function(e){
+	e.preventDefault();
+	let path;
+	if(currentCompany == "airline"){
+		path = "/airlines";
+	}
+	else if(currentCompany == "hotel"){
+		path = "/hotels";
+	}
+	else{
+		path = "/rent-a-cars";
+	}
+	$.ajax({
+		url: path,
+		type:"POST",
+		data: companyFormToJSON(),
+		contentType:"application/json",
+		async: false,
+		success:function(){
+			alert('nova kompanija je kreirana');
+		},
+	});
+});
+
 function formToJSON() {
 	return JSON.stringify({
 		"username":$('#inputUsername').val(),
@@ -1008,6 +1066,14 @@ function formToJSON() {
 		"authority": $('#selectAuth').val(),
 		"state": "ACTIVE"
 	});
+}
+
+function companyFormToJSON(){
+	return JSON.stringify({
+		"name": $('#name1').val(),
+		"address": $('#address1').val(),
+		"description": $('#description1').val()
+	})
 }
 
 $(document).on('click','#company',function(e){

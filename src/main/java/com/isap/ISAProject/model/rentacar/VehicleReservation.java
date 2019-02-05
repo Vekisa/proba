@@ -51,6 +51,12 @@ public class VehicleReservation {
 	@Version
 	private Long version;
 	
+	public VehicleReservation(Date beginDate, Date endDate, Vehicle vehicle) {
+		super();
+		this.beginDate = beginDate;
+		this.endDate = endDate;
+		this.vehicle = vehicle;
+	}
 	public Date getBeginDate() {
 		return beginDate;
 	}
