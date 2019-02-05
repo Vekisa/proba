@@ -4,7 +4,7 @@
 	margin: 10px;
 	border-radius: 10px;
 	opacity: 0.9;
-	z-index:9999;
+	z-index:8000;
 }
 
 #tablediv{
@@ -114,4 +114,17 @@ tr:hover{
 
 #dateModal{
     top: 30%;
+    z-index: 9000;
+}
+
+#flightModal{
+	top: 5%;
+    z-index: 9000;
+}
+
+.flight-seat {
+	padding: 1px;
+	cursor: pointer;
+	height: 40px;
+  	width: 40px;
 }

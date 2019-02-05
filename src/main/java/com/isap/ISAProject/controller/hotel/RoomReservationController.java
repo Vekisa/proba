@@ -1,5 +1,6 @@
 package com.isap.ISAProject.controller.hotel;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -56,6 +57,20 @@ public class RoomReservationController {
 	})
 	public ResponseEntity<Resource<RoomReservation>> createRoomReservation(@Valid @RequestBody RoomReservation roomReservation) {
 		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.save(roomReservation)), HttpStatus.CREATED);
+	}
+	
+	//Kreiranje rezeracije
+	@RequestMapping(value="/create-with-vehicle/{id}",method=RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Kreira i memoriše rezervaciju sobe.", notes = "Povratna vrednost servisa je sačuvana rezervacija sobe.",
+			httpMethod = "POST", consumes = "application/json", produces = "application/json")
+	@ApiResponses(value = { 
+			@ApiResponse(code = 200, message = "OK", response = RoomReservation.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request")
+	})
+	public ResponseEntity<Resource<RoomReservation>> createRoomReservationWithRoomId(@PathVariable(value="id") Long roomReservationId, 
+			@RequestParam("begin") Long begin, @RequestParam("end") Long end) {
+		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.saveWithRoomId(roomReservationId,new Date(begin),new Date(end))), HttpStatus.CREATED);
 	}
 	
 	//Vraca rezervaciju sobe sa zadatim ID-em

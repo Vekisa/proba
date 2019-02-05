@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightSeat;
 import com.isap.ISAProject.model.airline.Ticket;
+import com.isap.ISAProject.model.user.Reservation;
 
 public interface TicketServiceInterface {
 
@@ -14,7 +15,7 @@ public interface TicketServiceInterface {
 	
 	Ticket findById(Long id);
 	
-	Ticket saveTicket(Ticket ticket);
+	Reservation saveTicket(Ticket ticket);
 	
 	void deleteTicket(Long ticketId);
 	

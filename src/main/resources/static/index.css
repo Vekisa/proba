@@ -21,7 +21,7 @@
 	margin: 10px;
 	border-radius: 10px;
 	opacity: 0.9;
-	z-index:9999;
+	z-index:8000;
 }
 
 .hidden{

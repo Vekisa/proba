@@ -27,7 +27,6 @@ import com.isap.ISAProject.model.user.Reservation;
 @Table(name = "room_reservation")
 public class RoomReservation {
 	
-	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
