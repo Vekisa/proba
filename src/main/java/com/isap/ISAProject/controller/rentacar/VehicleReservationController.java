@@ -1,9 +1,11 @@
 package com.isap.ISAProject.controller.rentacar;
 
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -64,6 +66,20 @@ public class VehicleReservationController {
 	public ResponseEntity<Object> saveVehicleReservation(@Valid @RequestBody VehicleReservation vehRes) {
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(service.saveVehicleReservation(vehRes).getId()).toUri();
 		return ResponseEntity.created(location).build();
+	}
+	
+	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Kreiranje i sačuvavanje nove rezervacije.", notes = "Povratna vrednost je ID nove rezervacije.", httpMethod = "POST", consumes = "application/json", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 201, message = "Created", response = VehicleReservation.class),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđena rezervacija nije validna.")
+	})
+	public ResponseEntity<Object> createVehicleReservation(@PathParam("vehicleId") Long vehicleId, @PathParam("beginDate") Date beginDate, @PathParam("endDate") Date endDate) {
+		VehicleReservation vr = service.createVehicleReservationWithVehicleAndDates(vehicleId, beginDate, endDate);
+		if(vr == null) {
+			ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok().build();
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -26,7 +26,6 @@ import com.isap.ISAProject.model.airline.Passenger;
 import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
-import com.isap.ISAProject.model.rentacar.Vehicle;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
@@ -383,6 +382,15 @@ public class ReservationService {
 		if(location != null) 
 			return location;
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lokacija ne postoji");
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	public Reservation addVehicleReservationToReservationWithId(Long rId, Long vrId) {
+		Reservation r = findById(rId);
+		VehicleReservation vr = vehicleReservationService.getVehicleReservationById(vrId);
+		r.setVehicleReservation(vr);
+		vr.setReservation(r);
+		return r;
 	}
 	
 }

@@ -139,7 +139,7 @@ public class VehicleController {
 	}
 	
 	@RequestMapping(value = "/{id}/is-free", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Boolean> isRoomFree(@PathVariable("id") Long roomId, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
+	public ResponseEntity<Boolean> isVehicleFree(@PathVariable("id") Long roomId, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
 		return new ResponseEntity<Boolean>(service.checkIfVehicleIsFree(new Date(begin), new Date(end), roomId), HttpStatus.OK);
 	}
 	
