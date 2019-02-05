@@ -28,6 +28,7 @@ import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.LuggageInfo;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.repository.airline.AirlineRepository;
+import com.isap.ISAProject.repository.airline.FlightRepository;
 import com.isap.ISAProject.repository.airline.LocationRepository;
 import com.isap.ISAProject.serviceInterface.airline.AirlineServiceInterface;
 
@@ -42,6 +43,9 @@ public class AirlineService implements AirlineServiceInterface {
 	@Autowired
 	private LocationRepository destinationRepository;
 
+	@Autowired
+	private FlightRepository flightRepository;
+	
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Airline> findAll(Pageable pageable) {
@@ -252,6 +256,24 @@ public class AirlineService implements AirlineServiceInterface {
 			}
 		logger.info("< income calculated");
 		return incomeMap;
+	}
+
+	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public Map<Long, Integer> getStatisticFor(Long id, Date beginDate, Date endDate) {
+		logger.info("> calculating statistic");
+		Airline airline = this.findById(id);
+		Map<Long, Integer> statisticMap = new HashMap<Long, Integer>();
+		for(Flight flight : airline.getFlights()) {
+			if(flight.getDepartureTime().after(beginDate) && flight.getArrivalTime().before(endDate))
+				if(statisticMap.containsKey(flight.getDepartureTime().getTime())) {
+					statisticMap.put(flight.getDepartureTime().getTime(), statisticMap.get(flight.getDepartureTime().getTime()) + flightRepository.findTicketsForFlightWithId(flight.getId()).size());
+				} else {
+					statisticMap.put(flight.getDepartureTime().getTime(), flightRepository.findTicketsForFlightWithId(flight.getId()).size());
+				}
+		}
+		logger.info("< statistic calculated");
+		return statisticMap;
 	}
 
 }

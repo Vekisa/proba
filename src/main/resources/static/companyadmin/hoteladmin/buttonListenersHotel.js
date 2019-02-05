@@ -18,6 +18,14 @@ $(document).on('click','#incomeHotel',function(e){
 
 $(document).on('click','#graphHotel',function(e){
 	document.getElementById("collection").innerHTML = "";
+	let formHTML = "<br><label><strong>Statistic by date:</strong></label><form id=\"statisticFormHotel\" method=\"PUT\"></form>";
+	let beginDateHTML = "<br><input type=\"date\" id=\"begin\">-";
+	let endDateHTML = "<input type=\"date\" id=\"end\"><br>";
+	document.getElementById("collection").innerHTML = formHTML;
+	$("#statisticFormHotel").append(beginDateHTML);
+	$("#statisticFormHotel").append(endDateHTML);
+	let submitHTML = "<br><input type=\"submit\" value=\"Calculate\"  class=\"btn btn-info btn-block custombutton\"><br>";
+	$("#statisticFormHotel").append(submitHTML);
 })
 
 $(document).on('click', '.updateRoom', function(e) {
@@ -110,7 +118,33 @@ $(document).on('submit', '#incomeFormHotel', function(e) {
   		},
   		success: function(data) {
   			if(data != null)
-  				createChart(data);
+  				createChart(data, "Income", "$", 10000);
+  		}
+	});
+})
+
+$(document).on('submit', '#statisticFormHotel', function(e) {
+    e.preventDefault();
+    if(document.getElementById("chartContainer") == undefined) {
+    	let chartHTML = "<br><div id=\"chartContainer\" style=\"height: 380px; width: 100%;\"></div>"
+		$("#collection").append(chartHTML);
+	} else {
+		$("#chartContainer").show();
+	}
+	let beginTimeString = $("#begin").val();
+	let endTimeString = $("#end").val();
+	let beginTime = new Date(beginTimeString);
+	let endTime = new Date(endTimeString);
+	$.ajax({
+		type: "GET",
+		url: "/hotels/" + companyId + "/statistic?begin=" + beginTime.getTime() + "&end=" + endTime.getTime(),
+		async: false,
+		beforeSend: function(request) {
+    		request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
+  		},
+  		success: function(data) {
+  			if(data != null)
+  				createChart(data, "Statistic", "", 50);
   		}
 	});
 })

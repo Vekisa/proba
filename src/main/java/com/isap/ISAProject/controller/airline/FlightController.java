@@ -66,7 +66,7 @@ public class FlightController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili let nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Let sa traženim ID ne postoji.")
 	})
-	public ResponseEntity<Resource<Flight>> createFlightForAirline(@RequestBody @Valid Flight flight, @RequestParam("airline") Long id, @RequestParam("destination") Long destinationId) {
+	public ResponseEntity<Resource<Flight>> createFlightForAirline(@RequestBody Flight flight, @RequestParam("airline") Long id, @RequestParam("destination") Long destinationId) {
 		return new ResponseEntity<Resource<Flight>>(HATEOASImplementorAirline.createFlight(service.createFlight(id, flight, destinationId)), HttpStatus.CREATED);
 	}
 

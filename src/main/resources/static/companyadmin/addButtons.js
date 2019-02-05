@@ -28,7 +28,8 @@ function addButtonsForAirline() {
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addLuggage\"add> Add luggage </button>";
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addConfiguration\"add> Add configuration </button>";
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addSegment\"add> Add segment </button>";
-	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addCategory\"add> Add category </button><br>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addCategory\"add> Add category </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"readjustFlight\"add> Readjust flight </button><br>";
 	document.getElementById("buttons").innerHTML = buttonsHTML;
 }
 

@@ -22,6 +22,10 @@
     opacity: 0.9;
 }
 
+tr:hover{
+	cursor: pointer;
+}
+
 #profile{
 	position: absolute;
     top: 15%;
@@ -76,7 +80,7 @@
 #search-panel{
 	position:fixed;
     top: 18%;
-    left: -15%; /* bilo 27%*/
+    left: 27%; /* bilo 27%*/
 }
 
 #profiltable{
@@ -106,4 +110,8 @@
   border-radius: 50%;
   background: red;
   color: white;
+}
+
+#dateModal{
+    top: 30%;
 }

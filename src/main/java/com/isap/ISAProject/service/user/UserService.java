@@ -105,21 +105,14 @@ public class UserService implements UserServiceInterface {
 	}
 
 	@Override
-	public AuthenticationResponse signin(AuthenticationRequest authenticationRequest/*, Device device*/) {
+	public AuthenticationResponse signin(AuthenticationRequest authenticationRequest) {
 		logger.info("> signing in");
-		// Perform the authentication
 		Authentication authentication = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
 				authenticationRequest.getUsername(), authenticationRequest.getPassword()));
-		logger.info("> dobio {} postavio {}", authenticationRequest.getUsername(), authentication.getName());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		logger.info("> u sekuriti kontekst stavio {}", SecurityContextHolder.getContext().getAuthentication().getName());
-		// Reload password post-authentication so we can generate token
 		UserDetails userDetails = this.userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
-		logger.info("> userDetails je {}", userDetails.getUsername());
-		String token = this.tokenUtils.generateToken(userDetails/*, device*/);
-		logger.info("> 4");
+		String token = this.tokenUtils.generateToken(userDetails);
 		logger.info("signed in");
-		// Return the token
 		return new AuthenticationResponse(token);
 	}
 

@@ -2,6 +2,8 @@ package com.isap.ISAProject.controller.airline;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
@@ -9,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -124,6 +127,11 @@ public class SeatController {
 	public ResponseEntity<Resource<FlightSeatCategory>> getCategoryForSeatWithId(@PathVariable("id") Long seatId) {
 		return new ResponseEntity<Resource<FlightSeatCategory>>(HATEOASImplementorAirline.createFlightSeatCategory(service.getCategoryOfSeat(seatId)), HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/{id}/category", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<FlightSeat>> setCategoryForSeatWithId(@PathVariable("id") Long seatId, @RequestParam("category") Long id) {
+		return new ResponseEntity<Resource<FlightSeat>>(HATEOASImplementorAirline.createFlightSeat(service.setCategoryOfSeat(seatId, id)), HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/{id}/ticket", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraća kartu kojoj pripada sedište.", notes = "Povratna vrednost servisa je resurs kategorije sedišta.", httpMethod = "GET", produces = "application/json")
@@ -147,6 +155,11 @@ public class SeatController {
 	})
 	public ResponseEntity<Resource<Flight>> getFlightForSeatWithId(@PathVariable("id") Long id) {
 		return new ResponseEntity<Resource<Flight>>(HATEOASImplementorAirline.createFlight(service.getFlightOfSeat(id)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<FlightSeat>> updateSeatWithId(@PathVariable("id") Long id, @RequestBody @Valid FlightSeat newSeat) {
+		return new ResponseEntity<Resource<FlightSeat>>(HATEOASImplementorAirline.createFlightSeat(service.updateFlightSeat(id, newSeat)), HttpStatus.OK);
 	}
 
 }

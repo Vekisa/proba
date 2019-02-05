@@ -28,6 +28,7 @@ public class HATEOASImplementorHotel {
 		resource.add(linkTo(methodOn(HotelController.class).getCatalogueForHotelWithId(hotel.getId())).withRel("hotelcatalogue"));
 		resource.add(linkTo(methodOn(HotelController.class).getAdminsOfHotel(hotel.getId())).withRel("hotel_admins"));
 		resource.add(linkTo(methodOn(HotelController.class).getLocationOfHotel(hotel.getId())).withRel("location"));
+		resource.add(linkTo(methodOn(RoomController.class).search(null,hotel.getId(), null)).slash("?page=0&size=2000").withRel("search"));
 		return resource;
 	}
 	

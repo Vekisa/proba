@@ -5,6 +5,7 @@
 		<title>Hotel admin home</title>
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">	
 		<script type="text/javascript" src="jquery.min.js"></script>
+		<script type="text/javascript" src="tableSort.js"></script>
 		<script type="text/javascript" src="companyadmin/companyadmin.js"></script>
 		<script type="text/javascript" src="companyadmin/addButtons.js"></script>
 		<script type="text/javascript" src="companyadmin/hoteladmin/buttonListenersHotel.js"></script>
@@ -20,8 +21,10 @@
 		<script type="text/javascript" src="companyadmin/airlineadmin/addCategoryListener.js"></script>
 		<script type="text/javascript" src="companyadmin/airlineadmin/addConfigurationListener.js"></script>
 		<script type="text/javascript" src="companyadmin/airlineadmin/addSegmentListener.js"></script>
+		<script type="text/javascript" src="companyadmin/airlineadmin/readjustFlightListener.js"></script>
 		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="companyadmin/companyAdmin.css">
+		<link rel="stylesheet" type="text/css" href="companyadmin/airlineadmin/seatsChart.css">
 	</head>
 	<body background = "backgr.jpg" onload = load()>
 		<nav class="navbar navbar-expand-lg navbar-light bg-light" id = "navigation">
@@ -95,8 +98,7 @@
 					</div>
 				</div> 
 			</div> 
-		</div>     
-		<br>
+		</div>  
 		<br>
 		<div id="collection" align="center" class="container white-background"></div><br><br>
 		<div class="modal fade" id="myModal" role="dialog">

@@ -234,4 +234,9 @@ public class AirlineController {
 		return new ResponseEntity<Map<Long,Double>>(service.getIncomeFor(id, new Date(begin), new Date(end)), HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/{id}/statistic", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<Long, Integer>> getStatisticForAirline(@PathVariable("id") Long id, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
+		return new ResponseEntity<Map<Long,Integer>>(service.getStatisticFor(id, new Date(begin), new Date(end)), HttpStatus.OK);
+	}
+	
 }
