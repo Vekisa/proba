@@ -18,7 +18,7 @@ function setMapLocation(long, lat){
     map.addLayer(markers);
     
     markers.addMarker(new OpenLayers.Marker(lonLat));
-    
+     
     map.setCenter(lonLat, zoom);
 }
 
@@ -185,7 +185,7 @@ $(document).on('click','#flightsbtn',function(e){
 	printFlights(currentData);
 });
 
-$(document).on('click','#cataloguebtn',function(e){
+$(document).on('click','.cataloguebtn',function(e){
 	e.preventDefault();
 	printCompany(currentData,"hotel");
 	printHotelCatalogue(currentData);
@@ -223,7 +223,7 @@ function printExtraOptions(data){
 		"</tr>" +
 	"</thead><tbody>" + extraOptions + "</tbody></table>";
 	 
-	 document.getElementById("tablediv").innerHTML += "<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id =\"cataloguebtn\">Catalogue</button></div></div>" +
+	 document.getElementById("tablediv").innerHTML += "<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary cataloguebtn\" >Catalogue</button></div></div>" +
 	 "<hr>" + 
 		"<strong>Extra Options</strong>" +
 		"<hr>" + tabela;
@@ -365,6 +365,38 @@ $(document).on('click','#table tr', function() {
 	});
 });
 
+$(document).on('click','.tableRoomType tr', function() {
+    var searchLink = $(this).attr('id');
+   $.ajax({
+		type: "GET",
+		url: searchLink,
+		dataType: "json",
+		success: function(data){
+            printRooms(data);
+        }
+   });
+});
+
+function printRooms(data){
+    printCompany(currentData,"hotel");
+    var rooms = "";
+    $.each(data, function(index, room) {
+		rooms += "<tr>" + "<td scope=\"col\">"+ room.numberOfBeds + "</td>" 
+		+ "<td scope=\"col\">" + room.floor.number + "</td>"
+		+ "</tr>";
+	});
+	
+	var tabela = "<table class=\"table\" id = \"tablerooms\"><thead>" +
+				"<tr>" + 
+			    "<th scope=\"col\">Number Of Beds</th>" +
+			    "<th scope=\"col\">Floor</th>" +
+				"</tr>" +
+			"</thead><tbody>" + rooms + "</tbody></table>";
+	
+	document.getElementById("tablediv").innerHTML +=  "<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary cataloguebtn\">Catalogue</button></div></div>" + 
+		"<hr>" + "<strong>Rooms</strong>" + "<hr>" + tabela;
+}
+
 function printCompany(data, company){
 	let pomData;
 	
@@ -488,15 +520,18 @@ function printHotelCatalogue(data){
 	});
 	
 	let catalogue = "";
+    var linkId = "";
 	$.each(pomData, function(index, roomType) {
-		catalogue += "<tr><td scope=\"col\">" + roomType.name + "</td>" + "<td scope=\"col\">"+ roomType.description 
+        linkId = currentData._links.search.href;
+        linkId = linkId.replace("{roomTypeId}",roomType.id);
+		catalogue += "<tr id = \"" + linkId +"\"><td scope=\"col\">" + roomType.name + "</td>" + "<td scope=\"col\">"+ roomType.description 
 		+ "</td>" + "<td scope=\"col\">" + roomType.pricePerNight + "</td></tr>";
 	});
 	
 	document.getElementById("tablediv").innerHTML += "<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id =\"extraopt\">Extra Options</button></div></div>" + "<div>" + 
 	"<hr>" + 
 	"<strong>Catalogue</strong>" +
-	"<hr>" + "<table class=\"table table-hover\"><thead><tr><th scope=\"col\">Type</th><th scope=\"col\">Description</th><th scope=\"col\">Price per night(&euro;)</th></tr></thead><tbody>" + catalogue + "</tbody></table>" ;
+	"<hr>" + "<table class=\"table table-hover tableRoomType\"><thead><tr><th scope=\"col\">Type</th><th scope=\"col\">Description</th><th scope=\"col\">Price per night(&euro;)</th></tr></thead><tbody>" + catalogue + "</tbody></table>" ;
 }
 
 function printFlights(data){

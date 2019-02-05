@@ -31,11 +31,9 @@ public class Room extends RatableEntity {
 	@Column(nullable = false)
 	private int numberOfBeds;
 	
-	@JsonIgnore
 	@ManyToOne
 	private Floor floor;
 	
-	@JsonIgnore
 	@ManyToOne
 	private RoomType roomType;
 	

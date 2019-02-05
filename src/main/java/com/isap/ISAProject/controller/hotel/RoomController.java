@@ -171,7 +171,7 @@ public class RoomController {
 				return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(roomService.getRoomType(roomId)), HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/search", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/search", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Pretraga soba", responseContainer = "List", httpMethod = "GET", produces = "application/json")
 	@ApiResponses(value = { 
 			@ApiResponse(code = 200, message = "OK", response = List.class),
@@ -181,6 +181,7 @@ public class RoomController {
 	public ResponseEntity<List<Resource<Room>>> search(Pageable pageable, 
 			@RequestParam(value="hotelId", required=true) Long hotelId,
 			@RequestParam(value="roomTypeId", required=true) Long roomTypeId){
+		
 		List<Room> ret = roomService.searchWithHotelAndRoomType(pageable, hotelId, roomTypeId);
 		return new ResponseEntity<List<Resource<Room>>>(HATEOASImplementorHotel.createRoomList(ret), HttpStatus.OK);
 	}

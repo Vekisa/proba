@@ -241,11 +241,15 @@ function printUsers(allUsers,friends,sentRequests, receivedRequests){
 
 //Booking
 $(document).on('click','.bookvehicle',function(e){
-	alert("bukiram auto");
+    $("#dateModal").modal();
 });
 
 $(document).on('click','.bookflight',function(e){
-	alert("bukiram let");
+	//$("#dateModal").modal();
+});
+
+$(document).on('click','.bookRoom',function(e){
+	$("#dateModal").modal();
 });
 
 //-----------
@@ -258,6 +262,39 @@ $(document).on('click','#shoppingcart',function(e){
 	$("#myMap").hide();
 	document.getElementById("tablediv").innerHTML = "<h1><strong>Shopping Cart</strong></h1>";
 });
+
+$(document).on('click','.tableRoomType tr', function() {
+    var searchLink = $(this).attr('id');
+   $.ajax({
+		type: "GET",
+		url: searchLink,
+		dataType: "json",
+		success: function(data){
+            printRooms(data);
+        }
+   });
+});
+
+function printRooms(data){
+    printCompany(currentData,"hotel");
+    var rooms = "";
+    $.each(data, function(index, room) {
+		rooms += "<tr>" + "<td scope=\"col\">"+ room.numberOfBeds + "</td>" 
+		+ "<td scope=\"col\">" + room.floor.number + "</td>"
+        + "<td scope=\"col\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-success bookRoom\">Add To Cart</button></td>"
+		+ "</tr>";
+	});
+	
+	var tabela = "<table class=\"table\" id=\"tablerooms\"><thead>" +
+				"<tr>" + 
+			    "<th scope=\"col\">Number Of Beds</th>" +
+			    "<th scope=\"col\">Floor</th>" +
+				"</tr>" +
+			"</thead><tbody>" + rooms + "</tbody></table>";
+	
+	document.getElementById("tablediv").innerHTML +=  "<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary cataloguebtn\">Catalogue</button></div></div>" + 
+		"<hr>" + "<strong>Rooms</strong>" + "<hr>" + tabela;
+}
 
 $(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
 	  
@@ -462,7 +499,7 @@ $(document).on('click','#friendsBtn',function(e){
 	 
 	 $('#profdiv').show();
 	 $('#profile').hide();
-	 
+	  
 });
 
 $(document).on('click','#friendsReqBtn',function(e){
@@ -475,7 +512,7 @@ $(document).on('click','#friendsReqBtn',function(e){
 			async: false,
 			success: function(data){
 					pomData = data;
-			}
+			} 
 	 });
 	 
 	 printFriendRequests(pomData);
@@ -483,7 +520,7 @@ $(document).on('click','#friendsReqBtn',function(e){
 	 $('#profdiv').show();
 	 $('#profile').hide();
 	 
-});
+}); 
 
 $(document).on('click','#reservationHisBtn',function(e){
 	e.preventDefault();
@@ -686,7 +723,7 @@ $(document).on('click','#flightsbtn',function(e){
 	printFlights(currentData);
 });
 
-$(document).on('click','#cataloguebtn',function(e){
+$(document).on('click','.cataloguebtn',function(e){
 	e.preventDefault();
 	printCompany(currentData,"hotel");
 	printHotelCatalogue(currentData);
@@ -724,7 +761,7 @@ function printExtraOptions(data){
 		"</tr>" +
 	"</thead><tbody>" + extraOptions + "</tbody></table>";
 	 
-	 document.getElementById("tablediv").innerHTML += "<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id =\"cataloguebtn\">Catalogue</button></div></div>" +
+	 document.getElementById("tablediv").innerHTML += "<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary cataloguebtn\">Catalogue</button></div></div>" +
 	 "<hr>" + 
 		"<strong>Extra Options</strong>" +
 		"<hr>" + tabela;
@@ -826,7 +863,7 @@ $(document).on('click','#tablebo tr', function() {
 		+ "<td scope=\"col\">"+ vehicle.seatsNumber + "</td>" 
 		+ "<td scope=\"col\">"+ vehicle.type + "</td>"
 		+ "<td scope=\"col\">"+ vehicle.pricePerDay + "</td>"
-		+ "<td scope=\"col\"><button id = \"" + vehicle.links[1].href +"\" type=\"button\" class=\"btn btn-success bookvehicle\">Add to cart</button></td>" 
+		+ "<td scope=\"col\"><button id = \"" + vehicle.links[1].href +"\" type=\"button\" class=\"btn btn-success bookvehicle\">Add To Cart</button></td>" 
 		+ "</td></tr>";
 	});
 	
@@ -994,15 +1031,18 @@ function printHotelCatalogue(data){
 	});
 	
 	var catalogue = "";
+    var linkId = "";
 	$.each(pomData, function(index, roomType) {
-		catalogue += "<tr><td scope=\"col\">" + roomType.name + "</td>" + "<td scope=\"col\">"+ roomType.description 
+        linkId = currentData._links.search.href;
+        linkId = linkId.replace("{roomTypeId}",roomType.id);
+		catalogue += "<tr id = \"" + linkId +"\"><td scope=\"col\">" + roomType.name + "</td>" + "<td scope=\"col\">"+ roomType.description 
 		+ "</td>" + "<td scope=\"col\">" + roomType.pricePerNight + "</td></tr>";
 	});
 	
 	document.getElementById("tablediv").innerHTML += "<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id =\"extraopt\">Extra Options</button></div></div>" + "<div>" + 
 	"<hr>" + 
 	"<strong>Catalogue</strong>" +
-	"<hr>" + "<table class=\"table table-hover\"><thead><tr><th scope=\"col\">Type</th><th scope=\"col\">Description</th><th scope=\"col\">Price per night(&euro;)</th></tr></thead><tbody>" + catalogue + "</tbody></table>" ;
+	"<hr>" + "<table class=\"table table-hover tableRoomType\"><thead><tr><th scope=\"col\">Type</th><th scope=\"col\">Description</th><th scope=\"col\">Price per night(&euro;)</th></tr></thead><tbody>" + catalogue + "</tbody></table>" ;
 }
 
 function printFlights(data){
