@@ -74,7 +74,7 @@ public class VehicleReservationController {
 			@ApiResponse(code = 201, message = "Created", response = VehicleReservation.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđena rezervacija nije validna.")
 	})
-	public ResponseEntity<Object> saveVehicleReservation(@PathParam("vehicleId") Long vehicleId, @PathParam("beginDate") Date beginDate, @PathParam("endDate") Date endDate) {
+	public ResponseEntity<Object> createVehicleReservation(@PathParam("vehicleId") Long vehicleId, @PathParam("beginDate") Date beginDate, @PathParam("endDate") Date endDate) {
 		VehicleReservation vr = service.createVehicleReservationWithVehicleAndDates(vehicleId, beginDate, endDate);
 		if(vr == null) {
 			ResponseEntity.notFound().build();

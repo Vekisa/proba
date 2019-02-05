@@ -34,6 +34,9 @@ public class VehicleReservationService implements VehicleReservationServiceInter
 	@Autowired
 	private VehicleRepository vRepo;	
 	
+	@Autowired
+	private VehicleService vService;
+	
 	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<VehicleReservation> getAllVehicleReservation(Pageable pageable) {
@@ -66,10 +69,15 @@ public class VehicleReservationService implements VehicleReservationServiceInter
 	public VehicleReservation createVehicleReservationWithVehicleAndDates(Long vehicleId, Date beginDate, Date endDate) {
 		logger.info("> creating vehicle reservation");
 		Vehicle vehicle = vRepo.findById(vehicleId).get();
-		
-		VehicleReservation vr  = new VehicleReservation(beginDate, endDate, vehicle);
-		vr.setPrice(((endDate.getTime() - beginDate.getTime()) / (1000 * 60 * 60 * 24)) * vehicle.getPricePerDay());
-		this.saveVehicleReservation(vr);
+		if(vService.checkIfVehicleIsFree(beginDate, endDate, vehicleId)) {
+			VehicleReservation vr  = new VehicleReservation(beginDate, endDate, vehicle);
+			vr.setPrice(((endDate.getTime() - beginDate.getTime()) / (1000 * 60 * 60 * 24)) * vehicle.getPricePerDay());
+			this.saveVehicleReservation(vr);
+			return vr;
+		}
+		else {
+			return null;
+		}
 	}
 
 	@Override

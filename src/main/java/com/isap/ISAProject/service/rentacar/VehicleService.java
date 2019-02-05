@@ -16,8 +16,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.isap.ISAProject.model.hotel.Room;
-import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.Vehicle;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
@@ -153,7 +151,7 @@ public class VehicleService implements VehicleServiceInterface {
 		
 		if(start.after(end))
 			return false;
-		
+	
 		for(VehicleReservation vehicleReservation :vehicle.getVehicleReservations()) {
 			reservedStart = vehicleReservation.getBeginDate();
 			reservedEnd = vehicleReservation.getEndDate();
