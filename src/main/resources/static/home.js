@@ -375,7 +375,6 @@ $(document).on('click','#shoppingcart',function(e){
 	$('#profdiv').hide();
 	$("#myMap").hide();
     
-    var reservation = localStorage.getItem("reservation");
     var vehicle = localStorage.getItem("vehicleC");
     var vehicleStartDate = localStorage.getItem("vehicleStartC");
     var vehicleEndDate = localStorage.getItem("vehicleEndC");
@@ -409,8 +408,17 @@ $(document).on('click','#shoppingcart',function(e){
 });
 
 $(document).on('click','#bookNow', function() {
-    var reservation;
+    var seats = localStorage.getItem("seatsC");
+    var vehicle = localStorage.getItem("vehicleC");
+    var vehicleStartDate = localStorage.getItem("vehicleStartC");
+    var vehicleEndDate = localStorage.getItem("vehicleEndC");
+    var room = localStorage.getItem("roomC");
+    var roomStartDate = localStorage.getItem("roomStartC");
+    var roomEndDate = localStorage.getItem("roomEndC");
     var seats = JSON.parse(localStorage.getItem("seatsC"));
+    var reservation;
+    var roomReservaton;
+    
     //kreira kartu i rezervaciju i vraca je
     $.ajax({
 		type: "POST",
@@ -418,23 +426,55 @@ $(document).on('click','#bookNow', function() {
 		dataType: "json",
 		success: function(data){
             reservation = data;
+            alert("dobio nazad rezeraciju " + reservation.id)
         }
     });
     
-    //dodaje sedista u 
+    //dodaje sedista u  rezervaciju
     $.ajax({
 		type: "POST",
-		url: "/" + reservation.ticket.id + "/seats",
+		url: "tickets/" + reservation.ticket.id + "/seats",
+        data: seats,
 		dataType: "json",
 		success: function(data){
             alert("dodao sedista");
         }
     });
     
+    //dodaje vozilo u rezervaciju
+    if(vehicle !== "null" && vehicle !== undefined){
+        
+    }
+    
+    //pravi rezervaciju sobe i dodaje je u glavnu
+    if(room !== "null" && room !== undefined){
+        let s = new Date(roomStartDate);
+        let e = new Date(roomEndDate);
+        $.ajax({
+            type: "POST",
+            url: "room_reservations/create-with-room/" + room + "?begin=" + s.getTime() + "&end=" + e.getTime(),
+            dataType: "json",
+            success: function(data){
+                roomReservation = data;
+                alert("napravio room reservation");
+            }
+        });
+        
+        $.ajax({
+            type: "POST",
+            url: "/reservations/" + reservation.id + "/set-room-reservation/" + roomReservaton.id,
+            dataType: "json",
+            success: function(data){
+                alert("povezao sobu");
+            }
+        });
+    }
+    
 });
 
 $(document).on('click','.tableRoomType tr', function() {
     var searchLink = $(this).attr('id');
+    
    $.ajax({
 		type: "GET",
 		url: searchLink,

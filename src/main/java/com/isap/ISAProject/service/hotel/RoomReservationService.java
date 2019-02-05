@@ -185,7 +185,9 @@ public class RoomReservationService {
 		Long difference = end.getTime() - begin.getTime();
 		roomReservation.setNumberOfNights((int) TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS));
 		roomReservation.setPrice(roomReservation.getNumberOfNights() * room.getRoomType().getPricePerNight());
-		logger.info("< create room reervation  with room");
+		room.getRoomReservations().add(roomReservation);
+		roomService.save(room);
+		logger.info("< create room reservation  with room");
 		this.save(roomReservation);
 		return roomReservation;
 	}

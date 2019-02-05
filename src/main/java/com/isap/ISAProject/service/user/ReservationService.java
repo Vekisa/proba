@@ -311,6 +311,17 @@ public class ReservationService {
 	}
 	
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	public Reservation addRoomReservationToReservationWitdId(Long reservationid, Long roomReservationId) {
+		Reservation reservation = this.findById(reservationid);
+		RoomReservation roomReservation = roomReservationService.findById(roomReservationId);
+		reservation.setRoomReservation(roomReservation);
+		roomReservation.setReservation(reservation);
+		reservationRepository.save(reservation);
+		roomReservationService.save(roomReservation);
+		return reservation;
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public Reservation removeRoomReservation(Long id) {
 		logger.info("> removing room reservation from reservation with id {}", id);
 		Reservation reservation = this.findById(id);
