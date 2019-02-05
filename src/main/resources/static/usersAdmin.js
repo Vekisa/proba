@@ -1030,7 +1030,7 @@ $(document).on('submit','.form-signup',function(e){
 	});
 });
 
-$(document).on('click','#submitNewCompany',function(e){
+$(document).on('submit','#companyForm',function(e){
 	e.preventDefault();
 	let path;
 	if(currentCompany == "airline"){
@@ -1042,6 +1042,7 @@ $(document).on('click','#submitNewCompany',function(e){
 	else{
 		path = "/rent-a-cars";
 	}
+	
 	$.ajax({
 		url: path,
 		type:"POST",

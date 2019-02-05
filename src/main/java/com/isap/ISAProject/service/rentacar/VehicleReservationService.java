@@ -69,15 +69,15 @@ public class VehicleReservationService implements VehicleReservationServiceInter
 	public VehicleReservation createVehicleReservationWithVehicleAndDates(Long vehicleId, Date beginDate, Date endDate) {
 		logger.info("> creating vehicle reservation");
 		Vehicle vehicle = vRepo.findById(vehicleId).get();
-		if(vService.checkIfVehicleIsFree(beginDate, endDate, vehicleId)) {
-			VehicleReservation vr  = new VehicleReservation(beginDate, endDate, vehicle);
-			vr.setPrice(((endDate.getTime() - beginDate.getTime()) / (1000 * 60 * 60 * 24)) * vehicle.getPricePerDay());
-			this.saveVehicleReservation(vr);
-			return vr;
+		if(!vService.checkIfVehicleIsFree(beginDate, endDate, vehicleId)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Traženo vozilo nije slobodno.");
 		}
-		else {
-			return null;
-		}
+		VehicleReservation vr  = new VehicleReservation(beginDate, endDate, vehicle);
+		vr.setPrice(((endDate.getTime() - beginDate.getTime()) / (1000 * 60 * 60 * 24)) * vehicle.getPricePerDay());
+		this.saveVehicleReservation(vr);
+		vehicle.addVehicleReservation(vr);
+		vService.saveVehicle(vehicle);
+		return vr;
 	}
 
 	@Override
