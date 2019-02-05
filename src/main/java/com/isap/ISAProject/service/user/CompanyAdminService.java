@@ -22,6 +22,7 @@ import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.rentacar.RentACar;
 import com.isap.ISAProject.model.user.AuthorizationLevel;
 import com.isap.ISAProject.model.user.CompanyAdmin;
+import com.isap.ISAProject.model.user.UserState;
 import com.isap.ISAProject.repository.airline.AirlineRepository;
 import com.isap.ISAProject.repository.hotel.HotelRepository;
 import com.isap.ISAProject.repository.rentacar.RentACarRepository;
@@ -85,6 +86,7 @@ public class CompanyAdminService implements CompanyAdminServiceInterface {
 		oldAdmin.setPassword(bc.encode(newAdmin.getPassword()));
 		oldAdmin.setPhoneNumber(newAdmin.getPhoneNumber());
 		oldAdmin.setUsername(newAdmin.getUsername());
+		oldAdmin.setState(UserState.ACTIVE);
 		logger.info("< company admin updated");
 		return oldAdmin;
 	}

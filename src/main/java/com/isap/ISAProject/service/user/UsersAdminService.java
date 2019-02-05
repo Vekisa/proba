@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.model.user.UserState;
 import com.isap.ISAProject.model.user.UsersAdmin;
 import com.isap.ISAProject.repository.user.UsersAdminRepository;
 import com.isap.ISAProject.serviceInterface.user.UsersAdminServiceInterface;
@@ -67,6 +68,7 @@ public class UsersAdminService implements UsersAdminServiceInterface {
 		oldAdmin.setPassword(bc.encode(newAdmin.getPassword()));
 		oldAdmin.setPhoneNumber(newAdmin.getPhoneNumber());
 		oldAdmin.setUsername(newAdmin.getUsername());
+		oldAdmin.setState(UserState.ACTIVE);
 		logger.info("< users admin updated");
 		return oldAdmin;
 	}
