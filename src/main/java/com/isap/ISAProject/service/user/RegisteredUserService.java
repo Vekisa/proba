@@ -25,6 +25,7 @@ import com.isap.ISAProject.model.user.FriendRequest;
 import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
+import com.isap.ISAProject.model.user.UserState;
 import com.isap.ISAProject.repository.user.ConfirmationTokenRepository;
 import com.isap.ISAProject.repository.user.FriendRequestRepository;
 import com.isap.ISAProject.repository.user.FriendshipRepository;
@@ -263,6 +264,7 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 		if(confTok == null)
 			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Ne postoji user sa poslatim tokenom");
 		confTok.getUser().setAuthority(AuthorizationLevel.REGULAR_USER);
+		confTok.getUser().setState(UserState.ACTIVE);
 		repository.save(confTok.getUser());
 		confirmationTokenRepository.save(confTok);
 		return confTok.getUser();

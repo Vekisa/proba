@@ -53,7 +53,7 @@ public abstract class SystemUser extends UserBase{
 	}
 	
 	public SystemUser(String email, String username, String password, String firstName, String lastName, String city,
-			String phoneNumber/*, AuthorizationLevel authority*/) {
+			String phoneNumber) {
 		super();
 		this.email = email;
 		this.username = username;
@@ -62,7 +62,6 @@ public abstract class SystemUser extends UserBase{
 		this.lastName = lastName;
 		this.city = city;
 		this.phoneNumber = phoneNumber;
-		//authority.this.authority = authority;
 	}
 
 	public SystemUser(SystemUser user) {
@@ -106,5 +105,9 @@ public abstract class SystemUser extends UserBase{
 	public abstract AuthorizationLevel getAuthority();
 	
 	public abstract void setAuthority(AuthorizationLevel authority);
+
+	public UserState getState() { return state; }
+
+	public void setState(UserState state) { this.state = state; }
 	
 }
