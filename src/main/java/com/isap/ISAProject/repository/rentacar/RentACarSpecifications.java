@@ -10,7 +10,7 @@ public class RentACarSpecifications {
 			return null;
 		}
 		else {
-			return (root, query, cb) -> cb.equal(root.get("name"), name);
+			return (root, query, cb) -> cb.like(root.get("name"), "%"+name+"%");
 		}
 	}
 }

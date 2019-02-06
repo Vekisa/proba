@@ -1364,26 +1364,35 @@ function printBranchOffices(data){
 
 $(document).on('click', '#rentacar-search', function(event){
 	event.preventDefault();
+	selected_search_item = "rentacar";
 	$('#locationLabel1').text('Location');
 	$('#locationInput1').css("display", "block");
 	$('#nameLabel').text('Company name');
 	$('#nameInput').css("display", "block");
 	$('#search-title').text('Rent-a-car services');
+	$('#airline-controls').css("display", "none");
 	$('#search-panel').css("display", "block");
+})
+
+$(document).on('click', '#x', function(){
+	$('#search-panel').css("display", "none");
 })
 
 $(document).on('click', '#hotel-search', function(event){
 	event.preventDefault();
+	selected_search_item = "hotel";
 	$('#locationLabel1').text('Location');
 	$('#locationInput1').css("display", "block");
 	$('#nameLabel').text('Company name');
 	$('#nameInput').css("display", "block");
 	$('#search-title').text('Hotels');
+	$('#airline-controls').css("display", "none");
 	$('#search-panel').css("display", "block");
 })
 
 $(document).on('click', '#airline-search', function(event){
 	event.preventDefault();
+	selected_search_item = "airline";
 	$('#locationLabel1').text('Start location');
 	$('#locationInput1').css("display", "block");
 	$('#nameLabel').text('Target location');
@@ -1392,6 +1401,68 @@ $(document).on('click', '#airline-search', function(event){
 	$('#airline-controls').css("display", "block");
 	$('#search-panel').css("display", "block");
 })
+
+$(document).on('click', '#goSearch', function(e){
+	e.preventDefault();
+	let startDate = new Date($('#startDateInput').val());
+	let endDate = new Date($('#endDateInput').val());
+	if($('#startDateInput').val() != "" && $('#endDateInput').val() != ""){
+		if(startDate < endDate){
+			search_rentacars();
+		}
+		else{
+			alert('Neispravno unet vremenski period!');
+		}
+	}
+	search(selected_search_item);
+})
+
+function search(company){
+	let parameters = [{"key": "name", "value": $('#nameInput').val()},
+		{"key": "locationName", "value": $('#locationInput1').val()}]
+	if($('#startDateInput').val() != ""){
+		parameters[2] = {"key": "startDate", "value": new Date($('#startDateInput').val()).toISOString()};
+	}
+	if($('#endDateInput').val() != ""){
+		parameters[3] = {"key": "endDate", "value": new Date($('#endDateInput').val()).toISOString()};
+	}
+	let url;
+	for(i = 0; i < parameters.length; i++){
+		if(parameters[i].value != "" && parameters[i].value != undefined){
+			url += '&' + parameters[i].key + '=' + parameters[i].value;
+		}
+	}
+	if(company == "rentacar"){
+		$.ajax({
+			method: 'GET',
+			url: '/rent-a-cars/search?' + url,
+			contentType: 'application/json',
+			success: function(data){
+				printListOfCompanies(data);
+			}
+		})
+	}
+	else if(company == "hotel"){
+		$.ajax({
+			method: 'GET',
+			url: '/hotels/search?' + url,
+			contentType: 'application/json',
+			success: function(data){
+				printListOfCompanies(data);
+			}
+		})
+	}
+	else if(company == "airline"){
+		$.ajax({
+			method: 'GET',
+			url: '/flights/search?' + url,
+			contentType: 'application/json',
+			success: function(data){
+				printFlights1(data);
+			}
+		})
+	}
+}
 
 $(document).on('click','#addTicket',function(e){
     var x = document.getElementsByClassName("taken");

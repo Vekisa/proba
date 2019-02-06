@@ -29,7 +29,7 @@ $(document).on('click','#airline',function(e){
 	$("#profile").hide();
 	$.ajax({
 		type: "GET",
-		url: "airlines?page=0&size=10",
+		url: "airlines?page=0&size=500",
 		dataType: "json",
 		success: function(data){
 			if(data!=null){
@@ -44,7 +44,7 @@ $(document).on('click','#airbtn',function(e){
 	$("#profile").hide();
 	$.ajax({
 		type: "GET",
-		url: "airlines?page=0&size=10",
+		url: "airlines?page=0&size=500",
 		dataType: "json",
 		success: function(data){
 			if(data!=null){
@@ -60,7 +60,7 @@ $(document).on('click','#rentacar',function(e){
 	$("#profile").hide();
 	$.ajax({
 		type: "GET",
-		url: "rent-a-cars?page=0&size=10",
+		url: "rent-a-cars?page=0&size=500",
 		dataType: "json",
 		success: function(data){
 			if(data!=null){
@@ -74,7 +74,7 @@ $(document).on('click','#rentbtn',function(e){
 	e.preventDefault();
 	$.ajax({
 		type: "GET",
-		url: "rent-a-cars?page=0&size=10",
+		url: "rent-a-cars?page=0&size=500",
 		dataType: "json",
 		success: function(data){
 			if(data!=null){
@@ -89,7 +89,7 @@ $(document).on('click','#hotel',function(e){
 	currentCompany = "HOTEL_ADMIN";
 	$.ajax({
 		type: "GET",
-		url: "hotels?page=0&size=10",
+		url: "hotels?page=0&size=500",
 		dataType: "json",
 		success: function(data){
 			if(data!=null){
@@ -103,7 +103,7 @@ $(document).on('click','#hotbtn',function(e){
 	e.preventDefault();
 	$.ajax({
 		type: "GET",
-		url: "hotels?page=0&size=10",
+		url: "hotels?page=0&size=500",
 		dataType: "json",
 		success: function(data){
 			if(data!=null){
@@ -158,6 +158,18 @@ function loadAdminModal(){
 				if(d.authority == currentCompany){
 					if(d.airline == null && d.hotel == null && d.rentacar == null){
 						allUsers.push(d);
+					}else if(d.airline != null){
+						if(d.airline.id != companyId){
+							allUsers.push(d);
+						}
+					}else if(d.hotel != null){
+						if(d.hotel.id != companyId){
+							allUsers.push(d);
+						}
+					}else if(d.rentacar != null){
+						if(d.rentacar.id != companyId){
+							allUsers.push(d);
+						}
 					}
 				}
 			}
@@ -197,11 +209,11 @@ $(document).on('click', '#addUserBtn', function(e){
 
 $(document).on('click','#addBtn',function(e){
 	e.preventDefault();
-	printCompanyForm();
+	printCompanyForm(currentCompany);
 	$('#collectionModal').modal('show');
 })
 
-function printCompanyForm() {
+function printCompanyForm(currComp) {
 	document.getElementById("collection1").innerHTML = "";
 	document.getElementById("collection1").innerHTML = "<br><form id=\"companyForm\" method=\"POST\"></form><br>";
 	let nameHTML = "<tr><td>Name:</td><td><input class=\"form-control\" id=\"name1\" type=\"text\"></td></tr>";
@@ -229,7 +241,9 @@ function printCompanyForm() {
 	$("#companyForm").append(nameHTML);
 	$("#companyForm").append(addressHTML);
 	$("#companyForm").append(descriptionHTML);
-	$('#companyForm').append(locationHTML);
+	if(currentCompany != "RENT_A_CAR_ADMIN"){
+		$('#companyForm').append(locationHTML);
+	}
 	$("#companyForm").append(submitHTML);
 }
 
@@ -1033,14 +1047,18 @@ $(document).on('submit','.form-signup',function(e){
 $(document).on('submit','#companyForm',function(e){
 	e.preventDefault();
 	let path;
-	if(currentCompany == "airline"){
-		path = "/airlines";
+	let path1;
+	if(currentCompany == "AIRLINE_ADMIN"){
+		path = "/airlines?destination=" + $('#location1 option:selected').attr("value");
+		path1 = "/airlines";
 	}
-	else if(currentCompany == "hotel"){
-		path = "/hotels";
+	else if(currentCompany == "HOTEL_ADMIN"){
+		path = "/hotels?location=" + $('#location1 option:selected').attr("value");
+		path1 = "/hotels";
 	}
 	else{
 		path = "/rent-a-cars";
+		path1 = "/rent-a-cars";
 	}
 	
 	$.ajax({
@@ -1050,7 +1068,17 @@ $(document).on('submit','#companyForm',function(e){
 		contentType:"application/json",
 		async: false,
 		success:function(){
-			alert('nova kompanija je kreirana');
+			$.ajax({
+				type: "GET",
+				url: path1 + "?page=0&size=500",
+				dataType: "json",
+				success: function(data){
+					if(data!=null){
+						$('#collectionModal').modal('hide');
+						printListOfCompanies(data);
+					}
+				}
+			});
 		},
 	});
 });
@@ -1069,12 +1097,12 @@ function formToJSON() {
 	});
 }
 
-function companyFormToJSON(){
-	return JSON.stringify({
-		"name": $('#name1').val(),
-		"address": $('#address1').val(),
-		"description": $('#description1').val()
-	})
+function companyFormToJSON(currComp){
+	return data = JSON.stringify({
+			"name": $('#name1').val(),
+			"address": $('#address1').val(),
+			"description": $('#description1').val()
+		}) 
 }
 
 $(document).on('click','#company',function(e){

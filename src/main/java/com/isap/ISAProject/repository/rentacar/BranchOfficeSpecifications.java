@@ -10,7 +10,7 @@ public class BranchOfficeSpecifications {
 			return null;
 		}
 		else {
-			return (root, query, cb) -> cb.equal(root.join("location").get("name"), locationName);
+			return (root, query, cb) -> cb.like(root.join("location").get("name"), "%"+locationName+"%");
 		}
 	}
 	

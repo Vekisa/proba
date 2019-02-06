@@ -651,6 +651,10 @@ $(document).on('click', '#rentacar-search', function(event){
 	$('#search-panel').css("display", "block");
 })
 
+$(document).on('click', '#x', function(){
+	$('#search-panel').css("display", "none");
+})
+
 $(document).on('click', '#hotel-search', function(event){
 	event.preventDefault();
 	selected_search_item = "hotel";

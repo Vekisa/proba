@@ -27,11 +27,11 @@ public class FlightSpecifications {
 			public Predicate toPredicate(Root<Flight> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
 				final Collection<Predicate> predicates = new ArrayList<Predicate>();
 				if(startDest != null) {
-					final Predicate startDestIdPredicate = criteriaBuilder.equal(root.join("startDestination").get("name"), startDest);
+					final Predicate startDestIdPredicate = criteriaBuilder.like(root.join("startDestination").get("name"), "%"+startDest+"%");
 					predicates.add(startDestIdPredicate);
 				}
 				if(finishDest != null) {
-					final Predicate finishDestPredicate = criteriaBuilder.equal(root.join("finishDestination").get("name"), finishDest);
+					final Predicate finishDestPredicate = criteriaBuilder.like(root.join("finishDestination").get("name"), "%"+finishDest+"%");
 					predicates.add(finishDestPredicate);
 				}
 				if(depTime != null) {
@@ -51,7 +51,7 @@ public class FlightSpecifications {
 					predicates.add(categoryPredicate);
 				}
 				if(airlineName != null) {
-					final Predicate airlineNamePredicate = criteriaBuilder.equal(root.join("airline").get("name"), airlineName);
+					final Predicate airlineNamePredicate = criteriaBuilder.like(root.join("airline").get("name"), "%"+airlineName+"%");
 					predicates.add(airlineNamePredicate);
 				}
 				return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));

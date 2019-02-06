@@ -22,11 +22,11 @@ public class HotelSpecifications {
 			public Predicate toPredicate(Root<Hotel> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
 				final Collection<Predicate> predicates = new ArrayList<>();
 				if(name != null) {
-					final Predicate namePredicate = criteriaBuilder.equal(root.get("name"), name);
+					final Predicate namePredicate = criteriaBuilder.like(root.get("name"), "%"+name+"%");
 					predicates.add(namePredicate);
 				}
 				if(locationName != null) {
-					final Predicate locationNamePredicate = criteriaBuilder.equal(root.join("location").get("name"), locationName);
+					final Predicate locationNamePredicate = criteriaBuilder.like(root.join("location").get("name"), "%"+locationName+"%");
 					predicates.add(locationNamePredicate);
 				}
 				return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));

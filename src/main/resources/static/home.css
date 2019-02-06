@@ -78,9 +78,10 @@ tr:hover{
 }
 
 #search-panel{
-	position:fixed;
-    top: 18%;
-    left: 27%; /* bilo 27%*/
+	width: 50%;
+	position: absolute;
+    left: 1050px; /* bilo 27%*/
+    top: 40px;
 }
 
 #profiltable{
