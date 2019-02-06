@@ -417,25 +417,32 @@ $(document).on('click','#bookNow', function() {
     var roomEndDate = localStorage.getItem("roomEndC");
     var seats = JSON.parse(localStorage.getItem("seatsC"));
     var reservation;
-    var roomReservaton;
+    var roomReservation;
+    var vehicleReservation;
     
     //kreira kartu i rezervaciju i vraca je
     $.ajax({
 		type: "POST",
 		url: "/tickets",
-		dataType: "json",
+		contentType: "application/json",
+        dataType: "json",
+        async: false,
 		success: function(data){
             reservation = data;
-            alert("dobio nazad rezeraciju " + reservation.id)
+            alert("dobio nazad rezervaciju " + reservation.id)
         }
     });
     
     //dodaje sedista u  rezervaciju
+    alert("tickets/" + reservation.ticket.id + "/seats");
+    alert(seats);
     $.ajax({
 		type: "POST",
 		url: "tickets/" + reservation.ticket.id + "/seats",
-        data: seats,
-		dataType: "json",
+        data: JSON.stringify(seats),
+		contentType: "application/json",
+        dataType: "json",
+        async: false,
 		success: function(data){
             alert("dodao sedista");
         }
@@ -443,7 +450,29 @@ $(document).on('click','#bookNow', function() {
     
     //dodaje vozilo u rezervaciju
     if(vehicle !== "null" && vehicle !== undefined){
+         let s = new Date(vehicleStartDate);
+         let e = new Date(vehicleEndDate);
+         $.ajax({
+            type: "POST",
+            url: "vehicle-reservations/create?vehicleId=" + vehicle + "&beginDate=" + s.getTime() + "&endDate=" + e.getTime(),
+            contentType: "application/json",
+            async: false,
+            success: function(data){
+                vehicleReservation = data;
+                alert("napravio vehicle reservation");
+                $.ajax({
+                    type: "POST",
+                    url: "/reservations/" + reservation.id + "/set-vehicle-reservation/" + vehicleReservation.id,
+                    contentType: "application/json",
+                    async: false,
+                    success: function(data){
+                        alert("povezao vozilo");
+                    }
+                });
+            }
+            });
         
+            
     }
     
     //pravi rezervaciju sobe i dodaje je u glavnu
@@ -453,21 +482,24 @@ $(document).on('click','#bookNow', function() {
         $.ajax({
             type: "POST",
             url: "room_reservations/create-with-room/" + room + "?begin=" + s.getTime() + "&end=" + e.getTime(),
-            dataType: "json",
+            contentType: "application/json",
+            async: false,
             success: function(data){
                 roomReservation = data;
                 alert("napravio room reservation");
+                 $.ajax({
+                    type: "POST",
+                    url: "/reservations/" + reservation.id + "/set-room-reservation/" + roomReservation.id, 
+                    contentType: "application/json",
+                    async: false,
+                    success: function(data){
+                        alert("povezao sobu"); 
+                    }
+                });
             }
         });
         
-        $.ajax({
-            type: "POST",
-            url: "/reservations/" + reservation.id + "/set-room-reservation/" + roomReservaton.id,
-            dataType: "json",
-            success: function(data){
-                alert("povezao sobu");
-            }
-        });
+       
     }
     
 });
@@ -536,6 +568,7 @@ $(document).on('click','#logout',function(e){
 		async: false,
 		success: function(data){
 			localStorage.token = null;
+            clearShoppingCart();
 			window.location.href = 'index.html';		
 		}
 	});

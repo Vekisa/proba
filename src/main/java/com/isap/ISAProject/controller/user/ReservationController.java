@@ -77,6 +77,20 @@ public class ReservationController {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.addRoomReservationToReservationWitdId(reservationId, roomReservationId)), HttpStatus.OK);
 	}
 	
+	//Povezivanje sa rezervacijom automobila
+	@RequestMapping(value= "/{id}/set-vehicle-reservation/{idvehicle}", method=RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraca rezervaciju.", notes = "Povezuje rezervaciju automobila za glavnu rezervaciju",
+			httpMethod = "POST", consumes = "application/json", produces = "application/json")
+	@ApiResponses(value = { 
+			@ApiResponse(code = 200, message = "OK", response = Reservation.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request")
+	})
+	public ResponseEntity<Resource<Reservation>> addVehicleReservationToReservationWitdId(@PathVariable(value="id") Long reservationId, 
+			@PathVariable(value="idvehicle") Long vehicleReservationId) {
+		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.addVehicleReservationToReservationWithId(reservationId, vehicleReservationId)), HttpStatus.OK);
+	}
+	
 	//Vraca rezervaciju sa zadatim ID-em
 	@RequestMapping(value="/{id}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraća rezervaciju sa zadatim ID-em.", notes = "Povratna vrednost metode je rezervcacija"

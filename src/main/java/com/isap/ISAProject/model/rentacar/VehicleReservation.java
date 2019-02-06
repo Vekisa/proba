@@ -15,6 +15,7 @@ import javax.persistence.Version;
 
 import org.springframework.data.annotation.CreatedDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.user.Reservation;
 
 
@@ -41,12 +42,15 @@ public class VehicleReservation {
 	@Column(nullable = false)
 	private double price;
 	
+	@JsonIgnore
 	@ManyToOne
 	private Vehicle vehicle;
 	
+	@JsonIgnore
 	@OneToOne
 	private Reservation reservation;
 	
+	@JsonIgnore
 	@Version
 	private Long version;
 	
@@ -56,6 +60,11 @@ public class VehicleReservation {
 		this.endDate = endDate;
 		this.vehicle = vehicle;
 	}
+	
+	public VehicleReservation() {
+		
+	}
+	
 	public Date getBeginDate() {
 		return beginDate;
 	}

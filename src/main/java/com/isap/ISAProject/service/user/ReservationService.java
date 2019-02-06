@@ -386,10 +386,12 @@ public class ReservationService {
 	
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public Reservation addVehicleReservationToReservationWithId(Long rId, Long vrId) {
-		Reservation r = findById(rId);
+		Reservation r = this.findById(rId);
 		VehicleReservation vr = vehicleReservationService.getVehicleReservationById(vrId);
 		r.setVehicleReservation(vr);
 		vr.setReservation(r);
+		reservationRepository.save(r);
+		vehicleReservationService.saveVehicleReservation(vr);
 		return r;
 	}
 	

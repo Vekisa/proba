@@ -178,7 +178,6 @@ public class RoomReservationService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba za dati period nije slobodna");
 		}
 		RoomReservation roomReservation = new RoomReservation();
-		roomReservationRepository.save(roomReservation);
 		roomReservation.setRoom(room);
 		roomReservation.setBeginDate(begin);
 		roomReservation.setEndDate(end);
