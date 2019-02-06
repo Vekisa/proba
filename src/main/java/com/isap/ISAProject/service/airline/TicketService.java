@@ -16,13 +16,19 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.domain.security.CerberusUser;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightSeat;
 import com.isap.ISAProject.model.airline.SeatState;
 import com.isap.ISAProject.model.airline.Ticket;
+import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.repository.airline.TicketRepository;
 import com.isap.ISAProject.service.user.ReservationService;
+import com.isap.ISAProject.repository.user.RegisteredUserRepository;
+import com.isap.ISAProject.repository.user.ReservationRepository;
+import com.isap.ISAProject.service.user.RegisteredUserService;
+import com.isap.ISAProject.service.user.UserService;
 import com.isap.ISAProject.serviceInterface.airline.TicketServiceInterface;
 
 @Service
@@ -35,6 +41,15 @@ public class TicketService implements TicketServiceInterface {
 	
 	@Autowired
 	private ReservationService reservationService;
+	
+	@Autowired
+	private UserService userService;
+	
+	@Autowired
+	private RegisteredUserService regUserService;
+	
+	@Autowired
+	private RegisteredUserRepository regUserRepository;
 	
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -59,6 +74,10 @@ public class TicketService implements TicketServiceInterface {
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Reservation saveTicket(Ticket ticket) {
 		logger.info("> saving ticket");
+		CerberusUser user = userService.currentUser();
+		if(user == null)
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User ne postoji");	
+		RegisteredUser regUser = regUserService.findById(user.getId());
 		Reservation reservation = new Reservation();
 		reservation.setTicket(ticket);
 		reservation.setBeginDate(this.getDepartureTime(ticket));
@@ -89,6 +108,7 @@ public class TicketService implements TicketServiceInterface {
 		repository.save(ticket);
 		reservationService.create(reservation);
 		logger.info("< ticket created");
+		logger.info("< ticket saved");
 		return reservation;
 	}
 

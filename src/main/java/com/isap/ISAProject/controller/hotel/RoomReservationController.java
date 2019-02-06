@@ -166,5 +166,11 @@ public class RoomReservationController {
 	public ResponseEntity<Resource<RoomReservation>> createQuickRoomReservation(@RequestParam("room") Long roomId, @RequestBody @Valid RoomReservation reservation) {
 		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.saveQuickRoomReservation(reservation, roomId)), HttpStatus.CREATED);
 	}
+		
+	@RequestMapping(value = "/{id}/multiple_extra_options", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<RoomReservation>> addMultipleSeatsToTicketWithId(@PathVariable("id") Long roomReservationId, @RequestBody List<Long> extraOptions) {
+		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.addMultipleExtraOptionsToRoomReservation(roomReservationId, extraOptions)), HttpStatus.CREATED);
+
+	}
 	
 }

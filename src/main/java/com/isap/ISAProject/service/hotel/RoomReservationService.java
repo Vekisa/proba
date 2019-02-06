@@ -39,6 +39,9 @@ public class RoomReservationService implements RoomReservationServiceInterface {
 	@Autowired
 	private RoomService roomService;
 	
+	@Autowired
+	private ExtraOptionService extraOptionService;
+	
 	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public RoomReservation findById(long id) {
@@ -221,6 +224,36 @@ public class RoomReservationService implements RoomReservationServiceInterface {
 		roomReservation.setPrice(roomReservation.getNumberOfNights() * room.getRoomType().getPricePerNight());
 		roomReservation.setRoom(room);
 		this.save(roomReservation);
+		return roomReservation;
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
+	public RoomReservation addMultipleExtraOptionsToRoomReservation(Long roomReservationId, List<Long> extraOptions) {
+		logger.info("> adding multiple extra-options to room-reservation with id {}", roomReservationId);
+		for(Long extraOptionId : extraOptions)
+			this.addExtraOptionToRoomReservation(roomReservationId, extraOptionId);
+		logger.info("< adding multiple extra-options to room-reservation");
+		return this.findById(roomReservationId);
+	}
+	
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public RoomReservation addExtraOptionToRoomReservation(Long roomReservationId, Long extraOptionId) {
+		logger.info("> adding extra-option to room-reservation with id {}", roomReservationId);
+		RoomReservation roomReservation = this.findById(roomReservationId);
+		ExtraOption extraOption = extraOptionService.findById(extraOptionId);
+		if(roomReservation.getRoom().getFloor().getHotel().getId() != extraOption.getHotel().getId()) 
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Extra-option i room-reservation nisu iz istog hotela");
+		
+		roomReservation.add(extraOption);
+		extraOption.getRoomReservations().add(roomReservation);
+		
+		Long difference = roomReservation.getEndDate().getTime() - roomReservation.getBeginDate().getTime();
+		int dani = (int) TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS);
+		roomReservation.setPrice(roomReservation.getPrice() + extraOption.getPricePerDay() * dani );
+		
+		this.save(roomReservation);
+		extraOptionService.save(extraOption);
+		logger.info("< adding extra-option to room-reservation");
 		return roomReservation;
 	}
 

@@ -6,9 +6,11 @@
     roomC - soba u korpi
     roomStartC - pocetak rezervacije za sobu
     roomEndC - kraj rezervacije za sobu
+    extraOptionsC - extra optioni za room
     
     flightC - let
     seatsC - lista sedista
+   
 */
 var currentData;
 var currentUser;
@@ -22,6 +24,7 @@ function clearShoppingCart(){
     localStorage.setItem("roomEndC", null);
     localStorage.setItem("seatsC", null);
     localStorage.setItem("flightC", null);
+    localStorage.setItem("extraOptionsC",null);
 }
 
 
@@ -135,7 +138,15 @@ $(document).on('click','#addDate',function(e){
                     localStorage.setItem('roomC', data.id);
                 }
             });
-
+            
+            var selects = document.getElementsByClassName("cbExtraOptions");
+            var extOpt = new Array();
+            $.each(selects, function(index, select){
+                    if(select.checked == true)
+                        extOpt.push(select.value);
+            });
+            
+            localStorage.setItem("extraOptionsC",JSON.stringify(extOpt));  
             localStorage.setItem('roomStartC', $('#startDate').val());
             localStorage.setItem('roomEndC', $('#endDate').val());
             $('#dateModal').modal('toggle');
@@ -158,8 +169,11 @@ $(document).on('click','#addDate',function(e){
 
 $(document).on('click','#allUsers',function(e){
 	e.preventDefault();
-    
-    $('#tablediv').show();
+	printAllUsers("firstName");
+});
+
+function printAllUsers(sort){
+     $('#tablediv').show();
     $('#profdiv').hide();
     $('#profile').hide();
     
@@ -186,6 +200,11 @@ $(document).on('click','#allUsers',function(e){
     
 	allUsers.splice(indexPom, 1);
     
+    if(sort == "lastName"){
+        allUsers.sort(SortByLastName);
+    }else{
+        allUsers.sort(SortByFirstName);
+    }
     
 	$.ajax({
 		url: currentUser._links.friends.href,
@@ -215,8 +234,7 @@ $(document).on('click','#allUsers',function(e){
 	});
 	
 	printUsers(allUsers,friends,sentRequests, receivedRequests);
-	
-});
+}
 
 function userInList(userN,data){
     var a = 0;
@@ -328,13 +346,23 @@ function printUsers(allUsers,friends,sentRequests, receivedRequests){
 		"<table class=\"table\"><thead>" +
 		"<tr>" + 
 	    "<th scope=\"col\">Username</th>" +
-	    "<th scope=\"col\">First Name</th>" +
-	    "<th scope=\"col\">Last Name</th>" +
+	    "<th scope=\"col\" id =\"firstNameSort\">First Name</th>" +
+	    "<th scope=\"col\"  id =\"lastNameSort\">Last Name</th>" +
 	    "<th scope=\"col\">Email</th>" +
         "<th scope=\"col\">City</th>" +
 		"</tr>" +
 		"</thead><tbody>" + users + "</tbody></table>";
 }
+
+$(document).on('click','#firstNameSort',function(e){
+    e.preventDefault();
+    printAllUsers("firstName");
+});
+
+$(document).on('click','#lastNameSort',function(e){
+    e.preventDefault();
+    printAllUsers("lastName");
+});
 
 //Booking
 $(document).on('click','.bookvehicle',function(e){
@@ -342,6 +370,9 @@ $(document).on('click','.bookvehicle',function(e){
     $("#errorIndicator").hide();
     $("#okIndicator").hide();
     $('#addDate').val("vehicle");
+    $('#startDate').val("");
+    $('#endDate').val("");
+    $('#dropDown').hide();
     $("#dateModal").modal();
     $("#addDate").prop( "disabled", false );
 });
@@ -357,6 +388,24 @@ $(document).on('click','.bookRoom',function(e){
     $("#errorIndicator").hide();
     $("#okIndicator").hide();
     $('#addDate').val("room");
+    $('#startDate').val("");
+    $('#endDate').val("");
+    
+    let extraOptions = "";
+    $.ajax({
+		url: currentData._links.hotel_extra_options.href,
+		type:"GET",
+        async: false,
+		success: function(data){
+            $.each(data,function(index,extraOption){
+              extraOptions += "<input type=\"checkbox\" class=\"cbExtraOptions\" name=\"" + index + "\" value=\"" + extraOption.id + "\"" + index + "\">" + extraOption.description + "  " + extraOption.pricePerDay +"&euro;" + "<br>"; 
+            });     
+		}
+	});
+    
+    document.getElementById('extraOptionsList').innerHTML = extraOptions;
+    
+    $('#dropDown').show();
 	$("#dateModal").modal();
     $("#addDate").prop( "disabled", false );
 });
@@ -368,9 +417,9 @@ $(document).on('click','#clearCart',function(e){
     document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>";
 })
 
-$(document).on('click','#shoppingcart',function(e){
-	e.preventDefault();
-	$("#tablediv").show();
+function printSC(){
+    
+    $("#tablediv").show();
 	$("#profile").hide();
 	$('#profdiv').hide();
 	$("#myMap").hide();
@@ -384,34 +433,188 @@ $(document).on('click','#shoppingcart',function(e){
     var flight = localStorage.getItem("flightC");
     var seats = JSON.parse(localStorage.getItem("seatsC"));
     var a = 0;
+    var b = 0;
     var buttonBook = "<hr>" + "<button type=\"button\" class=\"btn btn-success\" id=\"bookNow\">Book Now</button>" ;
     
     var vehicleHTML = "";
-    if(vehicle != null && vehicle != "null" && vehicle != undefined){
-        vehicleHTML = "<hr>" + "<strong>Vehicle</strong>" + "<hr>" + vehicle + "   " + vehicleStartDate + "  " + vehicleEndDate;
+    if(vehicle != null && vehicle != "null" && vehicle != undefined){   
+        $.ajax({
+            type: "GET",
+            url: "/vehicles/" + vehicle,
+            dataType: "json",
+            async: false,
+            success: function(data){
+                 vehicleHTML = "<hr>" + "<strong>Vehicle</strong>" + "<hr>" + "<table class=\"table\" id=\"tablescvehicle\"><thead>" +
+                    "<tr>" + 
+                    "<th scope=\"col\">Brand</th>" +
+                    "<th scope=\"col\">Model</th>" +
+                    "<th scope=\"col\">Type</th>" +
+                    "<th scope=\"col\">Seats Number</th>" +
+                    "<th scope=\"col\">Price Per Day</th>" +
+                    "<th scope=\"col\">Begin Date</th>" +
+                    "<th scope=\"col\">End Date</th>" +
+                    "</tr>" +
+                "</thead><tbody>" +
+                     "<tr>" + "<td scope=\"col\">"+ data.brand + "</td>" 
+                    + "<td scope=\"col\">" + data.model + "</td>"
+                    + "<td scope=\"col\">" + data.type + "</td>"
+                    + "<td scope=\"col\">" + data.seatsNumber + "</td>"
+                    + "<td scope=\"col\">" + data.pricePerDay + "</td>"
+                    + "<td scope=\"col\">" + vehicleStartDate + "</td>"
+                    + "<td scope=\"col\">" + vehicleEndDate + "</td>"
+                    + "<td scope=\"col\">" + "<button type=\"button\" class=\"btn btn-danger\" id=\"removeVehicleFromSC\">Remove</button>" + "</td>"
+                    + "</tr>"     
+                + "</tbody></table>";
+            }
+        });
     }
     
     var roomHTML = "";
+    var extraOptionsHTML = "<hr>" + "<strong>Extra Options</strong>" + "<hr>" + "<table class=\"table\" id=\"tablescextraoption\"><thead>" +
+                    "<tr>" + 
+                    "<th scope=\"col\">Description</th>" +
+                    "<th scope=\"col\">Price Per Day</th>" +
+                    "</tr>" +
+                "</thead><tbody>"     
+                
     if(room != null && room != "null" && room != undefined){
-        roomHTML = "<hr>" + "<strong>Room</strong>" + "<hr>" + room + "   " + roomStartDate + "   " + roomEndDate;
+        var extOptions = JSON.parse(localStorage.getItem("extraOptionsC"))
+        
+        $.each(extOptions,function(index,extOptId){
+            $.ajax({
+                url: "/extra_options/" + extOptId,
+                type:"GET",
+                async: false,
+                success: function(data){
+                        b = 1;
+                        extraOptionsHTML += "<tr>" + "<td scope=\"col\">" + data.description + "</td>" + "<td scope=\"col\">" + data.pricePerDay + "</td>" + "</tr>";
+                        
+                }
+            }); 
+        });
+        
+            
+        extraOptionsHTML += "</tbody></table>";
+        
+         $.ajax({
+            type: "GET",
+            url: "/rooms/" + room,
+            dataType: "json",
+            async: false,
+            success: function(data){
+                 roomHTML = "<hr>" + "<strong>Room</strong>" + "<hr>" + "<table class=\"table\" id=\"tablescroom\"><thead>" +
+                    "<tr>" + 
+                    "<th scope=\"col\">Room Type</th>" +
+                    "<th scope=\"col\">Floor</th>" +
+                    "<th scope=\"col\">Number Of Beds</th>" +
+                    "<th scope=\"col\">Price Per Day</th>" +
+                    "<th scope=\"col\">Begin Date</th>" +
+                    "<th scope=\"col\">End Date</th>" +
+                    "</tr>" +
+                "</thead><tbody>" +
+                     "<tr>" + "<td scope=\"col\">"+ data.roomType.name + "</td>" 
+                    + "<td scope=\"col\">" + data.floor.number + "</td>"
+                    + "<td scope=\"col\">" + data.numberOfBeds + "</td>"
+                    + "<td scope=\"col\">" + data.roomType.pricePerNight + "</td>"
+                    + "<td scope=\"col\">" + roomStartDate + "</td>"
+                    + "<td scope=\"col\">" + roomEndDate + "</td>"
+                    + "<td scope=\"col\">" + "<button type=\"button\" class=\"btn btn-danger\" id=\"removeRoomFromSC\">Remove</button>" + "</td>"
+                    + "</tr>"     
+                + "</tbody></table>";
+            }
+        });
     }
     
     var flightHTML = "";
+    var seatsStr = "";
     if(flight != null && flight != "null" && flight != undefined){
         a = 1;
-        flightHTML = "<hr>" + "<strong>Flight</strong>" + "<hr>" + flight + "  seats: ";
+        
         $.each(seats,function(index,seat){
-           flightHTML += seat + " "; 
+           seatsStr += seat + " "; 
         });
+        
+        $.ajax({
+            type: "GET",
+            url: "/flights/" + flight,
+            dataType: "json",
+            async: false,
+            success: function(data){
+                 flightHTML = "<hr>" + "<strong>Flight</strong>" + "<hr>" + "<table class=\"table\" id=\"tablescflight\"><thead>" +
+                    "<tr>" + 
+                    "<th scope=\"col\">Start Destination</th>" +
+                    "<th scope=\"col\">Finish Destination</th>" +
+                    "<th scope=\"col\">Transfers</th>" +
+                    "<th scope=\"col\">Departure Time</th>" +
+                    "<th scope=\"col\">Arrival Time </th>" + 
+                    "<th scope=\"col\">Flight Length</th>" +
+                    "<th scope=\"col\">Base Price</th>" +
+                    "<th scope=\"col\">Seats</th>" +
+                    "</tr>" +
+                "</thead><tbody>" +
+                     "<tr>" + "<td scope=\"col\">"+ data.startDestination.name + "</td>" 
+                    + "<td scope=\"col\">" + data.finishDestination.name + "</td>"
+                    + "<td scope=\"col\">" + data.transfers + "</td>"
+                    + "<td scope=\"col\">" + data.departureTime + "</td>"
+                    + "<td scope=\"col\">" + data.arrivalTime + "</td>"
+                    + "<td scope=\"col\">" + data.flightLength + "</td>"
+                    + "<td scope=\"col\">" + data.basePrice + "</td>"
+                    + "<td scope=\"col\">" + seatsStr + "</td>"
+                    + "<td scope=\"col\">" + "<button type=\"button\" class=\"btn btn-danger\" id=\"removeFlightFromSC\">Remove</button>" + "</td>"
+                    + "</tr>"     
+                + "</tbody></table>";
+            }
+        });
+        
+        
         
     }
     
     if(a == 0){
-	   document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML;
+        if(b == 0){
+	       document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML;
+        }else{
+             document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML + extraOptionsHTML;
+        }
     }else{
-        document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML + buttonBook;
+        if(b == 0){
+            document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML + buttonBook;
+        }else{
+            document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML + extraOptionsHTML + buttonBook;
+        }
     }
+}
+
+$(document).on('click','#shoppingcart',function(e){
+	e.preventDefault();
+    printSC();
+	
 });
+
+$(document).on('click','#removeVehicleFromSC', function(e) {
+    e.preventDefault();
+    localStorage.setItem("vehicleC", null);
+    localStorage.setItem("vehicleStartC", null);
+    localStorage.setItem("vehicleEndC", null);
+    printSC();
+});
+
+$(document).on('click','#removeRoomFromSC', function(e) {
+    e.preventDefault();
+    localStorage.setItem("roomC", null);
+    localStorage.setItem("roomStartC", null);
+    localStorage.setItem("roomEndC", null);
+    localStorage.setItem("extraOptionsC",null);
+    printSC();
+});
+
+$(document).on('click','#removeFlightFromSC', function(e) {
+    e.preventDefault();
+    localStorage.setItem("seatsC", null);
+    localStorage.setItem("flightC", null);
+    printSC();
+});
+
 
 $(document).on('click','#bookNow', function() {
     var seats = localStorage.getItem("seatsC");
@@ -422,6 +625,7 @@ $(document).on('click','#bookNow', function() {
     var roomStartDate = localStorage.getItem("roomStartC");
     var roomEndDate = localStorage.getItem("roomEndC");
     var seats = JSON.parse(localStorage.getItem("seatsC"));
+    var extraOptions = JSON.parse(localStorage.getItem("extraOptionsC"));
     var reservation;
     var roomReservation;
     var vehicleReservation;
@@ -433,6 +637,9 @@ $(document).on('click','#bookNow', function() {
 		contentType: "application/json",
         dataType: "json",
         async: false,
+        beforeSend: function(request) {
+    		request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
+  		},
 		success: function(data){
             reservation = data;
             alert("dobio nazad rezervaciju " + reservation.id)
@@ -505,8 +712,51 @@ $(document).on('click','#bookNow', function() {
             }
         });
         
+        alert(extraOptions);
+        if(extraOptions != null && extraOptions != "null" && extraOptions != ""){
+        alert("postavljam ih");
+            $.ajax({
+                type: "POST",
+                url: "/room_reservations/" + roomReservation.id + "/multiple_extra_options", 
+                contentType: "application/json",
+                data: "json",
+                data: JSON.stringify(extraOptions),
+                async: false,
+                success: function(data){
+                    alert("ubacio extra optione"); 
+                }
+            });
+        }
+        
        
     }
+    
+    $.ajax({
+        type: "GET",
+        url: "users/registered/currentUser",
+        beforeSend: function(xhr) {
+            if (localStorage.token) {
+              xhr.setRequestHeader('X-Auth-Token', localStorage.token);	            
+            }
+        },
+        success: function(data){
+            if(data!=null){
+                alert("vratio usera");
+                $.ajax({
+                    type: "POST",
+                    url: "/reservations/" + reservation.id + "/user?user=" + data.id, 
+                    contentType: "application/json",
+                    async: false,
+                    success: function(data2){
+                        alert("postavio usera"); 
+                    }
+                });
+            }
+        }
+    });
+    
+    clearShoppingCart();
+    printSC();
     
 });
 
@@ -906,7 +1156,7 @@ function printReservationHistory(data){
 		$.each(data, function(index, reservation) {
 			 $.ajax({
 					type: "GET",
-					url:  reservation._links.location.href,
+					url:  reservation.links[1].href,
 					dataType: "json",
 					async: false,
 					success: function(data){
@@ -1314,7 +1564,7 @@ function printFlights(data){
 		$.each(pomDataFlights, function(index, flight) {
 			s += "<tr>" + "<td>" + flight.startDestination.name + "</td>" + "<td>"+ flight.finishDestination.name 
 			+ "</td>" + "<td>" + flight.transfers + "</td><td>" + flight.departureTime + "</td><td>" + flight.arrivalTime + "</td><td>"
-			+ flight.flightLength + "</td><td>" + flight.basePrice + "</td>"
+			+ flight.flightLength + "</td><td>" + flight.basePrice + "</td><td>" + flight.tripType +"</td>"
 			+ "<td scope=\"col\"><button id = \"" + flight.links[0].href +"\" type=\"button\" class=\"btn btn-success bookflight\" value = \"" + flight.id +"\">Add to cart</button></td>"
 			+"</tr>";
 		});
@@ -1332,6 +1582,7 @@ function printFlights(data){
 		"<th scope=\"col\">Arrival Time</th>" +
 		"<th scope=\"col\">Flight Length</th>" +
 		"<th scope=\"col\">Base Price</th>" +
+        "<th scope=\"col\">Trip Type</th>" +
 		"</tr>" +
 		"</thead><tbody>" + s + "</tbody></table>";
 	
@@ -1408,6 +1659,7 @@ $(document).on('click','#addTicket',function(e){
     $.each(x, function(index, seat) {
     	seats.push(seat.id);
     });
+    
     localStorage.setItem("flightC",$('#cancelBookingSeats').val());
     localStorage.setItem("seatsC",JSON.stringify(seats));
     $('#flightModal').modal('toggle');
@@ -1466,3 +1718,15 @@ $(document).on('click','.btn-success',function(e) {
 $(document).on('click','.btn-danger',function(e) {
     e.preventDefault();
 })
+
+function SortByFirstName(a, b){
+  var aName = a.firstName.toLowerCase();
+  var bName = b.firstName.toLowerCase(); 
+  return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+}
+
+function SortByLastName(a, b){
+  var aName = a.lastName.toLowerCase();
+  var bName = b.lastName.toLowerCase(); 
+  return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+}

@@ -156,6 +156,7 @@ public class ReservationService {
 		RegisteredUser user = userService.findById(userId);
 		reservation.getConfirmedReservations().add(new ConfirmedReservation(user, reservation));
 		reservationRepository.save(reservation);
+		
 		emailService.sendReservationInfo(user, reservation);
 		logger.info("< user added");
 		return reservation;

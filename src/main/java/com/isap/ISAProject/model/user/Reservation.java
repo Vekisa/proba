@@ -1,5 +1,6 @@
 package com.isap.ISAProject.model.user;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -62,6 +63,11 @@ public class Reservation {
 	@JsonIgnore
 	@OneToMany(mappedBy = "reservation")
 	private List<PendingReservation> pendingReservations;
+	
+	public Reservation() {
+		confirmedReservations = new ArrayList<>();
+		pendingReservations = new ArrayList<>();
+	}
 	
 	public Ticket getTicket() { return ticket; }
 	
