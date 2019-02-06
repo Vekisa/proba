@@ -273,7 +273,7 @@ $(document).on('click','.addFriend',function(e){
 		url: $(this).val(),
 		type:"POST",
 		success: function(data){
-            alert("poslao");      
+            //alert("poslao");      
 		}
 	});
 });
@@ -285,7 +285,7 @@ $(document).on('click','.unFriend',function(e){
 		url: $(this).val(),
 		type:"DELETE",
 		success: function(data){
-            alert("Izbacio iz prijatelja");      
+            //alert("Izbacio iz prijatelja");      
 		}
 	});
 });
@@ -297,7 +297,7 @@ $(document).on('click','.cancelFr',function(e){
 		url: $(this).val(),
 		type:"DELETE",
 		success: function(data){
-            alert("Odustao od zahteva");      
+            //alert("Odustao od zahteva");      
 		}
 	});
 });
@@ -324,7 +324,7 @@ function printUsers(allUsers,friends,sentRequests, receivedRequests){
                 valueBtn = link.substring(0, link.length-1) + user.id;
                 button = "<button value = \"" + valueBtn +"\" type=\"button\" class=\"btn btn-warning cancelFr\">Cancel</button>";    
             }else if(receivedRequests != null && userInListFriendRequests(user.username,receivedRequests)){
-            	alert("tu sam");
+            	//alert("tu sam");
                 link = currentUser._links.accept_request.href;
                 valueBtn = link.substring(0, link.length-1) + user.id;
                 button = "<button value = \"" + valueBtn +"\" type=\"button\" class=\"btn btn-success btnAcceptReq\">Accept</button>";  
@@ -642,13 +642,13 @@ $(document).on('click','#bookNow', function() {
   		},
 		success: function(data){
             reservation = data;
-            alert("dobio nazad rezervaciju " + reservation.id)
+            //alert("dobio nazad rezervaciju " + reservation.id)
         }
     });
     
     //dodaje sedista u  rezervaciju
-    alert("tickets/" + reservation.ticket.id + "/seats");
-    alert(seats);
+    //alert("tickets/" + reservation.ticket.id + "/seats");
+    //alert(seats);
     $.ajax({
 		type: "POST",
 		url: "tickets/" + reservation.ticket.id + "/seats",
@@ -657,7 +657,7 @@ $(document).on('click','#bookNow', function() {
         dataType: "json",
         async: false,
 		success: function(data){
-            alert("dodao sedista");
+            //alert("dodao sedista");
         }
     });
     
@@ -672,14 +672,14 @@ $(document).on('click','#bookNow', function() {
             async: false,
             success: function(data){
                 vehicleReservation = data;
-                alert("napravio vehicle reservation");
+                //alert("napravio vehicle reservation");
                 $.ajax({
                     type: "POST",
                     url: "/reservations/" + reservation.id + "/set-vehicle-reservation/" + vehicleReservation.id,
                     contentType: "application/json",
                     async: false,
                     success: function(data){
-                        alert("povezao vozilo");
+                        //alert("povezao vozilo");
                     }
                 });
             }
@@ -699,22 +699,22 @@ $(document).on('click','#bookNow', function() {
             async: false,
             success: function(data){
                 roomReservation = data;
-                alert("napravio room reservation");
+                //alert("napravio room reservation");
                  $.ajax({
                     type: "POST",
                     url: "/reservations/" + reservation.id + "/set-room-reservation/" + roomReservation.id, 
                     contentType: "application/json",
                     async: false,
                     success: function(data){
-                        alert("povezao sobu"); 
+                        //alert("povezao sobu"); 
                     }
                 });
             }
         });
         
-        alert(extraOptions);
+        //alert(extraOptions);
         if(extraOptions != null && extraOptions != "null" && extraOptions != ""){
-        alert("postavljam ih");
+        //alert("postavljam ih");
             $.ajax({
                 type: "POST",
                 url: "/room_reservations/" + roomReservation.id + "/multiple_extra_options", 
@@ -723,7 +723,7 @@ $(document).on('click','#bookNow', function() {
                 data: JSON.stringify(extraOptions),
                 async: false,
                 success: function(data){
-                    alert("ubacio extra optione"); 
+                    //alert("ubacio extra optione"); 
                 }
             });
         }
@@ -741,14 +741,14 @@ $(document).on('click','#bookNow', function() {
         },
         success: function(data){
             if(data!=null){
-                alert("vratio usera");
+                //alert("vratio usera");
                 $.ajax({
                     type: "POST",
                     url: "/reservations/" + reservation.id + "/user?user=" + data.id, 
                     contentType: "application/json",
                     async: false,
                     success: function(data2){
-                        alert("postavio usera"); 
+                        //alert("postavio usera"); 
                     }
                 });
             }
@@ -779,6 +779,7 @@ function printRooms(data){
     $.each(data, function(index, room) {
 		rooms += "<tr>" + "<td scope=\"col\">"+ room.numberOfBeds + "</td>" 
 		+ "<td scope=\"col\">" + room.floor.number + "</td>"
+        + "<td scope=\"col\">" + createRating(room.rating) + "</td>"
         + "<td scope=\"col\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-success bookRoom\" value = \"" + room.id + "\">Add To Cart</button></td>"
 		+ "</tr>";
 	});
@@ -787,6 +788,7 @@ function printRooms(data){
 				"<tr>" + 
 			    "<th scope=\"col\">Number Of Beds</th>" +
 			    "<th scope=\"col\">Floor</th>" +
+                "<th scope=\"col\">Rating</th>" +
 				"</tr>" +
 			"</thead><tbody>" + rooms + "</tbody></table>";
 	
@@ -969,7 +971,7 @@ function printListOfCompanies(data){
 	var s = "";
 	$.each(data, function(index, company) {
 		s += "<tr id = \"" + company.links[0].href + "\">" + "<th scope=\"row\">"+ index +"</th>" + "<td>" + company.name + "</td>" + "<td>"+ company.address
-		+ "</td>" + "<td>" + company.description + "</td></tr>";
+		+ "</td>" + "<td>" + company.description + "</td><td>" +  createRating(company.rating) + "</td></tr>";
 	});
 	document.getElementById("tablediv").innerHTML = "<table class=\"table table-hover\" id = \"table\"><thead>" +
 	    		"<tr>" + 
@@ -977,6 +979,7 @@ function printListOfCompanies(data){
 			      "<th scope=\"col\">Name</th>" +
 			      "<th scope=\"col\">Address</th>" +
 			      "<th scope=\"col\">Description</th>" +
+                  "<th scope=\"col\">Rating</th>" +
 	    		"</tr>" +
 	  		"</thead><tbody>" + s + "</tbody></table>";
 }
@@ -1044,7 +1047,7 @@ $(document).on('click','#reservationHisBtn',function(e){
 $(document).on('click','#activeResBtn',function(e){
 	e.preventDefault();
 	var pomData;
-    alert($(this).val());
+    //alert($(this).val());
 	 $.ajax({
 			type: "GET",
 			url: $(this).val(),
@@ -1095,7 +1098,7 @@ $(document).on('click','.btnAcceptReq',function(e){
 		async: false,
 		success: function(data){
 			if(data!=null){
-				alert("prihvatio");
+				//alert("prihvatio");
 			}
 		}
 	});
@@ -1111,7 +1114,7 @@ $(document).on('click','.btnDeclineReq',function(e){
 		async: false,
 		success: function(data){
 			if(data!=null){
-				alert("odustao");
+				//alert("odustao");
 			}
 		}
 	});
@@ -1164,7 +1167,7 @@ function printReservationHistory(data){
 					}
 			 });
 			 
-			history += "<tr>" + "<td scope=\"col\">" + reservation.beginDate + "</td>" + "<td scope=\"col\">"+ reservation.endDate + "</td>" +
+			history += "<tr>" + "<td scope=\"col\">" + reservation.beginDate.substring(0, 19).replace('T', '<br>') + "</td>" + "<td scope=\"col\">"+ reservation.endDate.substring(0, 19).replace('T', '<br>') + "</td>" +
 			"<td scope=\"col\">" + name + "</td>" + "</tr>";
 		});
 	}
@@ -1182,9 +1185,9 @@ function printReservationHistory(data){
 function printActiveReservations(data){
 	var history = "";
 	var name = "";
-    alert("tu sam");
+    //alert("tu sam");
 	if(data!=null){
-        alert("imam sta da prikazem");
+        //alert("imam sta da prikazem");
 		$.each(data, function(index, reservation) {
 			 $.ajax({
 					type: "GET",
@@ -1365,6 +1368,7 @@ $(document).on('click','#tablebo tr', function() {
 		+ "<td scope=\"col\">"+ vehicle.seatsNumber + "</td>" 
 		+ "<td scope=\"col\">"+ vehicle.type + "</td>"
 		+ "<td scope=\"col\">"+ vehicle.pricePerDay + "</td>"
+        + "<td scope=\"col\">"+ createRating(vehicle.rating) + "</td>"
 		+ "<td scope=\"col\"><button id = \"" + vehicle.links[1].href +"\" type=\"button\" class=\"btn btn-success bookvehicle\" value = \"" + vehicle.id +"\">Add To Cart</button></td>" 
 		+ "</td></tr>";
 	});
@@ -1376,6 +1380,7 @@ $(document).on('click','#tablebo tr', function() {
 			    "<th scope=\"col\">Seats number</th>" +
 			    "<th scope=\"col\">Type</th>" +
 			    "<th scope=\"col\">Price per day(&euro;)</th>" +
+                "<th scope=\"col\">Rating</th>" +
 			    "<th scope=\"col\"></th>" +
 				"</tr>" +
 			"</thead><tbody>" + vehicles + "</tbody></table>";
@@ -1563,8 +1568,8 @@ function printFlights(data){
 	if(pomDataFlights!=null){
 		$.each(pomDataFlights, function(index, flight) {
 			s += "<tr>" + "<td>" + flight.startDestination.name + "</td>" + "<td>"+ flight.finishDestination.name 
-			+ "</td>" + "<td>" + flight.transfers + "</td><td>" + flight.departureTime + "</td><td>" + flight.arrivalTime + "</td><td>"
-			+ flight.flightLength + "</td><td>" + flight.basePrice + "</td><td>" + flight.tripType +"</td>"
+			+ "</td>" + "<td>" + flight.transfers + "</td><td>" + flight.departureTime.substring(0, 19).replace('T', '<br>') + "</td><td>" + flight.arrivalTime.substring(0, 19).replace('T', '<br>') + "</td><td>"
+			+ flight.flightLength + "</td><td>" + flight.basePrice + "</td><td>" + flight.tripType +"</td><td>" + createRating(flight.rating) + "</td>"
 			+ "<td scope=\"col\"><button id = \"" + flight.links[0].href +"\" type=\"button\" class=\"btn btn-success bookflight\" value = \"" + flight.id +"\">Add to cart</button></td>"
 			+"</tr>";
 		});
@@ -1729,4 +1734,18 @@ function SortByLastName(a, b){
   var aName = a.lastName.toLowerCase();
   var bName = b.lastName.toLowerCase(); 
   return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
+}
+
+function createRating(value){
+    if(value < 1.5){
+        return "<img src=\"star.png\">";
+    }else if(value >= 1.5 &&  value < 2.5){
+        return "<img src=\"star.png\"><img src=\"star.png\">";
+    }else if(value >= 2.5 &&  value < 3.5){
+        return "<img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\">";
+    }else if(value >= 3.5 && value < 4.5){
+        return "<img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\">";
+    }else if(value > 4.5){
+        return "<img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\">";
+    }
 }
