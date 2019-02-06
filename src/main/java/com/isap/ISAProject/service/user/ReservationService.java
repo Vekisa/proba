@@ -26,11 +26,13 @@ import com.isap.ISAProject.model.airline.Passenger;
 import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
+import com.isap.ISAProject.model.rentacar.Vehicle;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.repository.airline.PassengerRepository;
 import com.isap.ISAProject.repository.hotel.RoomRepository;
+import com.isap.ISAProject.repository.rentacar.VehicleRepository;
 import com.isap.ISAProject.repository.user.RegisteredUserRepository;
 import com.isap.ISAProject.repository.user.ReservationRepository;
 import com.isap.ISAProject.service.EmailSenderService;
@@ -64,6 +66,12 @@ public class ReservationService {
 	
 	@Autowired
 	private PassengerRepository passengersRepository;
+	
+	@Autowired
+	private RatingService ratingService;
+	
+	@Autowired
+	private VehicleRepository vehicleRepository;
 	
 	@Autowired
 	private EmailSenderService emailService;
@@ -222,7 +230,10 @@ public class ReservationService {
 			user.setPassenger(this.createNewPassenger(user));
 		seat.setPassenger(user.getPassenger());
 		reservation.getConfirmedUsers().add(user);
-		passengersRepository.save(user.getPassenger());
+		ratingService.giveAccessToRating(user, reservation);
+		try {
+			passengersRepository.save(user.getPassenger());
+		} catch(Exception e) { }
 		usersRepository.save(user);
 		reservationRepository.save(reservation);
 		emailService.sendReservationInfo(user, reservation);
@@ -333,6 +344,50 @@ public class ReservationService {
 				return false;
 		}
 		return true;
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	public Reservation addVehicleReservationToReservation(Long id, Long vehicleId, @Valid VehicleReservation vehicleReservation) {
+		logger.info("> adding vehicle reservation to room with id {}", id);
+		Reservation reservation = this.findById(id);
+		Vehicle vehicle = this.findVehicle(vehicleId);
+		if(vehicleReservation.getBeginDate().after(vehicleReservation.getEndDate()))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datum rezervacije je lose unesen!");
+		if(vehicleReservation.getBeginDate().before(reservation.getBeginDate()))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba se moze iznajmiti samo nakon sletanja!");
+		if(!this.checkIfVehicleIsFree(vehicleReservation.getBeginDate(), vehicleReservation.getEndDate(), vehicle))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba nije slobodna u tom periodu!");
+		if(reservation.getTicket().getNumberOfSeats() < vehicleReservation.getVehicle().getSeatsNumber())
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Niste zauzeli sobe za sve putnike.!");
+		vehicle.getVehicleReservations().add(vehicleReservation);
+		vehicleReservation.setVehicle(vehicle);
+		Long difference = vehicleReservation.getEndDate().getTime() - vehicleReservation.getBeginDate().getTime();
+		vehicleReservation.setPrice(((int) TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS)) * vehicle.getPricePerDay());
+		reservation.setVehicleReservation(vehicleReservation);
+		reservation.setPrice(reservation.getPrice() + vehicleReservation.getPrice());
+		reservationRepository.save(reservation);
+		logger.info("< vehicle reservation added");
+		return reservation;
+	}
+
+	private boolean checkIfVehicleIsFree(Date start, Date end, Vehicle vehicle) {
+		Date reservedStart = null;
+		Date reservedEnd = null;
+		for(VehicleReservation vehicleReservation : vehicle.getVehicleReservations()) {
+			reservedStart = vehicleReservation.getBeginDate();
+			reservedEnd = vehicleReservation.getEndDate();
+			if((start.after(reservedStart) && start.before(reservedEnd)) || (end.after(reservedStart) && end.before(reservedEnd)))
+				return false;
+		}
+		return true;
+	}
+
+	private Vehicle findVehicle(Long vehicleId) {
+		logger.info("> fetching vehicle with id {}", vehicleId);
+		Optional<Vehicle> vehicle = vehicleRepository.findById(vehicleId);
+		logger.info("< vehicle fetched");
+		if(vehicle.isPresent()) return vehicle.get();
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request vehicle doesn't exist.");
 	}
 
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)

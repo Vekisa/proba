@@ -327,4 +327,19 @@ public class HotelService {
 		return statisticMap;
 	}
 	
+	public List<Room> getQuickRooms(Long id) {
+		logger.info("> fetching quick room reservations");
+		Hotel hotel = this.findById(id);
+		Date time = new Date();
+		List<Room> list = new ArrayList<>();
+		for(Floor floor : hotel.getFloors())
+			for(Room room : floor.getRooms())
+				for(RoomReservation roomReservation : room.getRoomReservations())
+					if(roomReservation.getBeginDate().after(time) && roomReservation.getReservation() == null)
+						list.add(room);
+		logger.info("< quick room reservations fetched");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested seats do not exist.");
+	}
+	
 }

@@ -23,6 +23,7 @@ import com.isap.ISAProject.controller.user.HATEOASImplementorUsers;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightConfiguration;
+import com.isap.ISAProject.model.airline.FlightSeat;
 import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.LuggageInfo;
@@ -237,6 +238,11 @@ public class AirlineController {
 	@RequestMapping(value = "/{id}/statistic", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<Long, Integer>> getStatisticForAirline(@PathVariable("id") Long id, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
 		return new ResponseEntity<Map<Long,Integer>>(service.getStatisticFor(id, new Date(begin), new Date(end)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/quicks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Resource<FlightSeat>>> getQuickFlights(@PathVariable("id") Long id) {
+		return new ResponseEntity<List<Resource<FlightSeat>>>(HATEOASImplementorAirline.createFlightSeatsList(service.getQuicks(id)), HttpStatus.OK);
 	}
 	
 }

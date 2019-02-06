@@ -10,6 +10,7 @@ $(document).on('click','#incomeAirline',function(e){
 	$("#incomeFormAirline").append(endDateHTML);
 	let submitHTML = "<br><input type=\"submit\" value=\"Calculate\"  class=\"btn btn-info btn-block custombutton\"><br>";
 	$("#incomeFormAirline").append(submitHTML);
+	$("#collection").show();
 })
 
 $(document).on('click','#graphAirline',function(e){
@@ -22,6 +23,7 @@ $(document).on('click','#graphAirline',function(e){
 	$("#statisticFormAirline").append(endDateHTML);
 	let submitHTML = "<br><input type=\"submit\" value=\"Calculate\"  class=\"btn btn-info btn-block custombutton\"><br>";
 	$("#statisticFormAirline").append(submitHTML);
+	$("#collection").show();
 })
 
 $(document).on('submit', '#incomeFormAirline', function(e) {
@@ -99,6 +101,7 @@ $(document).on('click', '.updateFlight', function(e) {
 			}				
   		}
 	});
+	$("#collection").show();
 })
 
 $(document).on('click', '.removeFlight', function(e) {

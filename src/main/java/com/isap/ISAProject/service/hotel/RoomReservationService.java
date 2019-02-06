@@ -21,6 +21,7 @@ import com.isap.ISAProject.model.hotel.ExtraOption;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.repository.hotel.ExtraOptionRepository;
+import com.isap.ISAProject.repository.hotel.RoomRepository;
 import com.isap.ISAProject.repository.hotel.RoomReservationRepository;
 
 @Service
@@ -34,6 +35,9 @@ public class RoomReservationService {
 	
 	@Autowired
 	private ExtraOptionRepository optionsRepository;
+	
+	@Autowired
+	private RoomRepository roomRepository;
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public RoomReservation findById(long id) {
@@ -177,5 +181,20 @@ public class RoomReservationService {
 				return false;
 		}
 		return true;
+	}
+	
+	public RoomReservation saveRoomReservation(RoomReservation roomReservation, Long id) {
+		Room room = this.findRoom(id);
+		roomReservation.setRoom(room);
+		this.save(roomReservation);
+		return roomReservation;
+	}
+	
+	private Room findRoom(Long id) {
+		logger.info("> fetching room with id {}", id);
+		Optional<Room> room = roomRepository.findById(id);
+		logger.info("< room fetched");
+		if(room.isPresent()) return room.get();
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Soba ne postoji");
 	}
 }

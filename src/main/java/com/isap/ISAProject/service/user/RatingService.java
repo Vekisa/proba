@@ -1,13 +1,11 @@
 package com.isap.ISAProject.service.user;
 
-import java.util.Date;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -42,21 +40,9 @@ public class RatingService implements RatingServiceInterface {
 	
 	@Autowired
 	private RatingRepository ratingRepository;
-	
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-	@Scheduled(fixedRate = 300000)
-	public void giveAllUsersAccessToRating() {
-		logger.info("> creating ratings for all eligible users");
-		Date time = new Date();
-		for(RegisteredUser user : usersRepository.findAll())
-			for(Reservation reservation : user.getConfirmedReservations())
-				if(reservation.getEndDate().after(time))
-					this.giveAccessToRating(user, reservation);
-		logger.info("< ratings created");
-	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
-	private void giveAccessToRating(RegisteredUser user, Reservation reservation) {
+	public void giveAccessToRating(RegisteredUser user, Reservation reservation) {
 		logger.info("> giving access to user");
 		Flight flight = reservation.getTicket().getSeats().get(0).getFlight();
 		accessToRateFlight(flight, user);
