@@ -1,0 +1,351 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Welcome!</title>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="usersAdmin.js"></script>
+<script type="text/javascript" src="companyadmin/addButtons.js"></script>
+<script type="text/javascript" src="companyadmin/printCollection.js"></script>
+<script type="text/javascript" src="companyadmin/hoteladmin/buttonListenersHotel.js"></script>
+<script type="text/javascript" src="companyadmin/airlineadmin/buttonListenersAirline.js"></script>
+<script type="text/javascript" src="companyadmin/rentsadmin/buttonListenersRentACar.js"></script>
+<script type="text/javascript" src="companyadmin/generateGraph.js"></script>
+<script type="text/javascript" src="companyadmin/hoteladmin/addRoomTypeListener.js"></script>
+<script type="text/javascript" src="companyadmin/hoteladmin/addFloorListener.js"></script>
+<script type="text/javascript" src="companyadmin/hoteladmin/addExtraOptionListener.js"></script>
+<script type="text/javascript" src="companyadmin/rentsadmin/addOfficeListener.js"></script>
+<script type="text/javascript" src="companyadmin/airlineadmin/addLuggageListener.js"></script>
+<script type="text/javascript" src="companyadmin/airlineadmin/addCategoryListener.js"></script>
+<script type="text/javascript" src="companyadmin/airlineadmin/addConfigurationListener.js"></script>
+<script type="text/javascript" src="companyadmin/airlineadmin/addSegmentListener.js"></script>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+	integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+	crossorigin="anonymous">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="usersAdmin.css">
+</head>
+
+<body background="backgr.jpg" onload=load()>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light"
+		id="navigation">
+		<img src="air-plane-cartoon.png" alt="Airplane" hegiht="100"
+			width="100">
+		<button class="navbar-toggler" type="button" data-toggle="collapse"
+			data-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false"
+			aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item"><a class="nav-link" href="" id="admins">Company
+						admins</a></li>
+				<li class="nav-item dropdown"><a
+					class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+					role="button" data-toggle="dropdown" aria-haspopup="true"
+					aria-expanded="false"> Companies </a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<a class="dropdown-item" href="" id="airline">Airline</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" href="" id="rentacar">Rent-a-car</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" href="" id="hotel">Hotel</a>
+					</div></li>
+				<li class="nav-item"><a class="nav-link" href="" id="discount">Discount
+						rule</a></li>
+			</ul>
+			<form class="form-inline my-2 my-lg-0">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item dropdown" id="search-list-item"><a
+						class="nav-link dropdown-toggle" href="" id="navbarDropdown"
+						role="button" data-toggle="dropdown" aria-haspopup="true"
+						aria-expanded="false"> Search </a>
+						<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+							<a class="dropdown-item" href="" id="airline-search">Airlines</a>
+							<div class="dropdown-divider"></div>
+							<a class="dropdown-item" href="" id="rentacar-search">Rent-a-car
+								services</a>
+							<div class="dropdown-divider"></div>
+							<a class="dropdown-item" href="" id="hotel-search">Hotels</a>
+						</div></li>
+					<li class="nav-item active"><a class="nav-link  hoverable"
+						id="user">UserName<span class="sr-only">(current)</span></a></li>
+					<li class="nav-item active"><a class="nav-link" id="logout"
+						href="">Logout<span class="sr-only">(current)</span></a></li>
+				</ul>
+			</form>
+		</div>
+	</nav>
+
+	<div class="modal fade" id="myModal" role="dialog">
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Message</h4>
+				</div>
+				<div class="modal-body">
+					<p id="error"></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="modal fade" id="addAdminModal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content" style="width: 170%; margin-left: -35%">
+				<div class="modal-header">
+					<h4 class="modal-title">Company admins</h4>
+				</div>
+				<div class="modal-body" id="adminsModalBody"></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	
+	<div class="modal fade" id="addNewAdminModal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content" style="width: 170%; margin-left: -35%">
+				<div class="modal-header">
+					<h4 class="modal-title">Company admins</h4>
+				</div>
+				<div class="modal-body" id="newAdminModalBody">
+					<form class="form-signup">
+						<div class="form-label-group">
+							<label for="inputFirstName">First name</label> <input type="text"
+								id="inputFirstName" class="form-control"
+								placeholder="First name" required autofocus>
+						</div>
+
+						<div class="form-label-group">
+							<label for="inputLastName">Last name</label> <input type="text"
+								id="inputLastName" class="form-control" placeholder="Last name"
+								required>
+						</div>
+
+						<div class="form-label-group">
+							<label for="inputUsername">Username</label> <input type="text"
+								id="inputUsername" class="form-control" placeholder="Username"
+								required>
+						</div>
+
+						<div class="form-label-group">
+							<label for="inputEmail">Email</label> <input type="email"
+								id="inputEmail" class="form-control" placeholder="Email"
+								required>
+						</div>
+
+						<div class="form-label-group">
+							<label for="inputPassword">Password</label> <input
+								type="password" id="inputPassword" class="form-control"
+								placeholder="Password" required>
+						</div>
+
+						<div class="form-label-group">
+							<label for="inputCity">City</label> <input type="text"
+								id="inputCity" class="form-control" placeholder="City" required>
+						</div>
+
+						<div class="form-label-group">
+							<label for="inputPhoneNumber">Phone number</label> <input
+								type="text" id="inputPhoneNumber" class="form-control"
+								placeholder="Phone number" required>
+						</div>
+						
+						<div class="form-label-group">
+							<label for="selectAuthority">Authority</label>
+							 <select id="selectAuth" class="form-control">
+								<option value="USERS_ADMIN">System admin</option>
+								<option value="AIRLINE_ADMIN">Airline admin</option>
+								<option value="HOTEL_ADMIN">Hotel admin</option>
+								<option value="RENT_A_CAR_ADMIN">Rent-a-car admin</option>
+							</select>
+						</div>
+
+						<hr size="30">
+
+						<button class="btn btn-lg btn-primary btn-block text-uppercase"
+							type="submit">Sign up</button>
+						<div class="lds-spinner" id="loading">
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+						</div>
+					</form>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div align="center">
+		<div id="tablediv" class="container"></div>
+	</div>
+
+	<div align="center" id="companyProfile"
+		class="container white-background profile">
+		<div>
+			<div>
+				<div>
+					<div>
+						<div>
+							<h2 id="company_name"></h2>
+							<p id="company_description"></p>
+							<p id="company_address"></p>
+						</div>
+						<div align="center">
+							<div id="buttons"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container white-background profile" id="profile"
+		align="center">
+		<div>
+			<img src="profile.png" alt="Profile picture">
+		</div>
+		<div>
+			<div>
+				<div>
+					<div>
+						<div>
+							<div>
+								<h2 id="username"></h2>
+								<p id="first_name"></p>
+								<p id="last_name"></p>
+								<p id="email"></p>
+								<p id="city"></p>
+								<p id="phone"></p>
+							</div>
+						</div>
+						<div align="center">
+							<div align="center">
+								<button id="updateProfile"
+									class="btn btn-info btn-block custombutton" align="center">
+									Update</button>
+								<br>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="collection" align="center" class="container white-background" style="width: 40%"></div>
+	
+	<div class="modal fade" id="collectionModal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content" style="width: 170%; margin-left: -35%">
+				<div class="modal-header">
+					<h4 class="modal-title">New company</h4>
+				</div>
+				<div class="modal-body">
+					<div id="collection1" align="center" class="container white-background" style="width: 40%"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="submitNewCompany" class="btn btn-default" data-dismiss="modal">Ok</button>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	
+	<br>
+	<br>
+	<div>
+		<div>
+			<div id="search-panel" style="display: none;>
+			<div class="row">
+				<div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+					<div class="card card-signin my-5"
+						style="background-color: #f3f3f3; opacity: 0.95; border-radius: 10px;">
+						<div class="card-body">
+							<h5 id="search-title" class="card-title text-center"></h5>
+							<form class="form-search">
+								<div class="form-label-group">
+									<label id="locationLabel1"></label> <input
+										style="display: none" id="locationInput1" type="text"
+										class="form-control" autofocus> <label id="nameLabel"></label>
+									<input style="display: none" id="nameInput"
+										class="form-control">
+
+									<table>
+										<tbody>
+											<tr>
+												<td><label style="font-size: 11px">Choose a
+														start date</label></td>
+											</tr>
+											<tr>
+												<td><input class="form-control" type="date"
+													id="startDateInput"></td>
+											</tr>
+											<tr>
+												<td><label style="font-size: 11px">Choose an
+														end date</label></td>
+											</tr>
+											<tr>
+												<td><input class="form-control" type="date"
+													id="endDateInput"></td>
+											</tr>
+										</tbody>
+									</table>
+									<div id="airline-controls" style="display: none;">
+										<label>Trip type</label> <select id="tripTypeSelect"
+											class="form-control">
+											<option>round trip</option>
+											<option>one-way</option>
+											<option>multi-city</option>
+										</select> <label>Number of persons</label> <input
+											id="personsNumberInput" class="form-control" type="number"
+											min="0"> <label>Lugagge weight</label> <input
+											id="luggageWeightInput" class="form-control" type="text">
+										<label>Class</label> <input id="flightClassInput"
+											class="form-control" type="text">
+									</div>
+								</div>
+								<button class="btn btn-lg btn-primary btn-block text-uppercase"
+									style="margin-top: 20px;" type="button" id="goSearch">Go</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+	<script
+		src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+		integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+		crossorigin="anonymous"></script>
+</body>
+</html>

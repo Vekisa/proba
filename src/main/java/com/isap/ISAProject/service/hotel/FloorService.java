@@ -21,9 +21,11 @@ import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.repository.hotel.FloorRepository;
 import com.isap.ISAProject.repository.hotel.RoomRepository;
 
+import hotelInterf.FloorServiceInterface;
+
 @Service
 @Transactional(readOnly = true)
-public class FloorService {
+public class FloorService implements FloorServiceInterface {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -33,6 +35,7 @@ public class FloorService {
 	@Autowired
 	private RoomRepository roomRepository;
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Floor findById(long id) {
 		logger.info("> Floor findById id:{}", id);
@@ -44,6 +47,7 @@ public class FloorService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sprat sa zadatim id-em ne postoji");
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<Floor> findAll(Pageable pageable) {
 		logger.info("> Floor findAll");
@@ -55,6 +59,7 @@ public class FloorService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hoteli ne postoje");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public Floor save(Floor floor) {
 		logger.info("> Floor create");
@@ -63,6 +68,7 @@ public class FloorService {
 		return savedFloor;
 	}
 	
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteById(long id) {
 		logger.info("> Floor delete");
@@ -71,6 +77,7 @@ public class FloorService {
 		logger.info("< Floor delete");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public Floor updateFloorById(Long floorId, Floor newFloor) {
 		logger.info("> Floor update");
@@ -81,6 +88,7 @@ public class FloorService {
 		return oldFloor;
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<Room> getRooms(Long id){
 		logger.info("> get rooms for floor");
@@ -93,6 +101,7 @@ public class FloorService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sobe za dati sprat ne postoje");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public Room createRoom(Long floorId, Room room){
 		logger.info("> create room for floor");
@@ -104,6 +113,7 @@ public class FloorService {
 		return room;
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public Hotel getHotel(Long floorId) {
 		logger.info("> hotel from floor", floorId);

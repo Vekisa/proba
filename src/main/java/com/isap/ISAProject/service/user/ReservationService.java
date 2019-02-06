@@ -28,17 +28,18 @@ import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.rentacar.Vehicle;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
+import com.isap.ISAProject.model.user.ConfirmedReservation;
+import com.isap.ISAProject.model.user.PendingReservation;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.repository.airline.PassengerRepository;
-import com.isap.ISAProject.repository.hotel.RoomRepository;
-import com.isap.ISAProject.repository.rentacar.VehicleRepository;
-import com.isap.ISAProject.repository.user.RegisteredUserRepository;
 import com.isap.ISAProject.repository.user.ReservationRepository;
 import com.isap.ISAProject.service.EmailSenderService;
 import com.isap.ISAProject.service.airline.TicketService;
 import com.isap.ISAProject.service.hotel.RoomReservationService;
+import com.isap.ISAProject.service.hotel.RoomService;
 import com.isap.ISAProject.service.rentacar.VehicleReservationService;
+import com.isap.ISAProject.service.rentacar.VehicleService;
 
 @Service
 @Transactional(readOnly = true)
@@ -53,25 +54,22 @@ public class ReservationService {
 	private TicketService ticketService;
 	
 	@Autowired
+	private VehicleService vehicleService;
+	
+	@Autowired
+	private RoomService roomService;
+	
+	@Autowired
 	private VehicleReservationService vehicleReservationService;
 	
 	@Autowired
 	private RoomReservationService roomReservationService;
 	
 	@Autowired
-	private RoomRepository roomRepository;
-	
-	@Autowired
-	private RegisteredUserRepository usersRepository;
+	private RegisteredUserService userService;
 	
 	@Autowired
 	private PassengerRepository passengersRepository;
-	
-	@Autowired
-	private RatingService ratingService;
-	
-	@Autowired
-	private VehicleRepository vehicleRepository;
 	
 	@Autowired
 	private EmailSenderService emailService;
@@ -134,7 +132,7 @@ public class ReservationService {
 	public void deleteById(long id) {
 		logger.info("> Reservation delete");
 		Reservation reservation = this.findById(id);
-		checkIfReservationCanBeCancelled(reservation.getTicket().getSeats().get(0).getFlight().getDepartureTime());
+		checkIfReservationCanBeCancelled(reservation.getBeginDate());
 		ticketService.deleteTicket(reservation.getTicket().getId());
 		vehicleReservationService.deleteVehicleReservation(reservation.getVehicleReservation().getId());
 		roomReservationService.deleteById(reservation.getRoomReservation().getId());
@@ -151,30 +149,16 @@ public class ReservationService {
 		logger.info("< ticket (reservation) can be cancelled");
 	}
 
-	public static long getDifferenceDays(Date d1, Date d2) {
-	    long diff = d2.getTime() - d1.getTime();
-	    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-	}
-
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public Reservation addUserToReservation(Long id, Long userId) {
 		logger.info("> adding user to reservation with id {}", id);
 		Reservation reservation = this.findById(id);
-		RegisteredUser user = this.findRegisteredUser(userId);
-		reservation.getConfirmedUsers().add(user);
+		RegisteredUser user = userService.findById(userId);
+		reservation.getConfirmedReservations().add(new ConfirmedReservation(user, reservation));
 		reservationRepository.save(reservation);
 		emailService.sendReservationInfo(user, reservation);
 		logger.info("< user added");
 		return reservation;
-	}
-	
-	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-	private RegisteredUser findRegisteredUser(Long id) {
-		logger.info("> fetching registered user with id {}", id);
-		Optional<RegisteredUser> user = usersRepository.findById(id);
-		logger.info("< user fetched");
-		if(user.isPresent()) return user.get();
-		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested user doesn't exist.");
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
@@ -183,12 +167,12 @@ public class ReservationService {
 		Reservation reservation = this.findById(id);
 		if(users.size() > reservation.getTicket().getNumberOfSeats())
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Too many friends invited.");
-		RegisteredUser owner = reservation.getConfirmedUsers().get(0);
+		RegisteredUser owner = reservation.getConfirmedReservations().get(0).getUser();
 		if(owner == null) 
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This reservation is unassigned.");
-		List<RegisteredUser> friends = usersRepository.findFriendsOfUser(owner.getId());
+		List<RegisteredUser> friends = userService.getFriends(owner.getId());
 		for(Long userId : users) {
-			RegisteredUser user = this.findRegisteredUser(userId);
+			RegisteredUser user = userService.findById(userId);
 			this.inviteUserToReservation(user, friends, reservation);
 			emailService.sendInvitation(user, reservation, owner);
 		}
@@ -199,9 +183,8 @@ public class ReservationService {
 
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	private void inviteUserToReservation(RegisteredUser user, List<RegisteredUser> friends, Reservation reservation) {
-		// TODO : Istek za pozivnicu
 		if(friends.contains(user))
-			reservation.getInvitedUsers().add(user);
+			reservation.getPendingReservations().add(new PendingReservation(user, reservation));
 		else
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Owner is not friend with user with id " + user.getId());
 	}
@@ -210,8 +193,8 @@ public class ReservationService {
 	public Reservation declineInvitation(Long id, Long userId) {
 		logger.info("> declining invitation of reservation with id {}", id);
 		Reservation reservation = this.findById(id);
-		RegisteredUser user = this.findRegisteredUser(userId);
-		if(!reservation.getInvitedUsers().remove(user))
+		RegisteredUser user = userService.findById(userId);
+		if(!this.removeUserFromPendingReservations(reservation, user))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with id " + userId + " isn't invited.");
 		reservationRepository.save(reservation);
 		logger.info("< invitation declined");
@@ -222,19 +205,18 @@ public class ReservationService {
 	public Reservation acceptInvitation(Long id, Long userId) {
 		logger.info("> accepting invitation of reservation with id {}", id);
 		Reservation reservation = this.findById(id);
-		RegisteredUser user = this.findRegisteredUser(userId);
-		if(!reservation.getInvitedUsers().remove(user))
+		RegisteredUser user = userService.findById(userId);
+		if(!this.removeUserFromPendingReservations(reservation, user))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with id " + userId + " isn't invited.");
 		FlightSeat seat = getFreeSeat(reservation.getTicket());
 		if(user.getPassenger() == null)
 			user.setPassenger(this.createNewPassenger(user));
 		seat.setPassenger(user.getPassenger());
-		reservation.getConfirmedUsers().add(user);
-		ratingService.giveAccessToRating(user, reservation);
+		reservation.getConfirmedReservations().add(new ConfirmedReservation(user, reservation));
 		try {
 			passengersRepository.save(user.getPassenger());
 		} catch(Exception e) { }
-		usersRepository.save(user);
+		userService.save(user);
 		reservationRepository.save(reservation);
 		emailService.sendReservationInfo(user, reservation);
 		logger.info("< accepted invitation");
@@ -266,15 +248,40 @@ public class ReservationService {
 	public Reservation cancelReservation(Long id, Long userId) {
 		logger.info("> cancelling reservation with id {}", id);
 		Reservation reservation = this.findById(id);
-		RegisteredUser user = this.findRegisteredUser(userId);
-		// TODO : Vremensa provera ogranicenja
-		// TODO : Ako je poslednji korisnik otkazao, rezervacija se u celosti brise
-		if(!reservation.getConfirmedUsers().remove(user))
+		RegisteredUser user = userService.findById(userId);
+		checkIfReservationCanBeCancelled(reservation.getBeginDate());
+		if(!this.removeUserFromConfirmedReservations(reservation, user))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with id " + userId + " isn't on the reservation.");
 		this.removeUserFromSeat(reservation.getTicket(), user.getPassenger());
-		reservationRepository.save(reservation);
-		logger.info("< reservation cancelled");
-		return reservation;
+		if(reservation.getConfirmedReservations().isEmpty()) {
+			logger.info("< reservation cancelled");
+			this.deleteById(id);
+			return null;
+		} else {
+			reservationRepository.save(reservation);
+			logger.info("< reservation cancelled");
+			return reservation;			
+		}
+	}
+	
+	private boolean removeUserFromConfirmedReservations(Reservation reservation, RegisteredUser user) {
+		ConfirmedReservation forRemoval = null;
+		for(ConfirmedReservation confirmed : reservation.getConfirmedReservations())
+			if(confirmed.getUser().equals(user)) {
+				forRemoval = confirmed;
+				break;
+			}
+		return reservation.getConfirmedReservations().remove(forRemoval);
+	}
+	
+	private boolean removeUserFromPendingReservations(Reservation reservation, RegisteredUser user) {
+		PendingReservation forRemoval = null;
+		for(PendingReservation pending : reservation.getPendingReservations())
+			if(pending.getUser().equals(user)) {
+				forRemoval = pending;
+				break;
+			}
+		return reservation.getPendingReservations().remove(forRemoval);
 	}
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
@@ -291,7 +298,7 @@ public class ReservationService {
 	public Reservation addRoomReservationToReservation(Long id, Long roomId, @Valid RoomReservation roomReservation) {
 		logger.info("> adding room reservation to room with id {}", id);
 		Reservation reservation = this.findById(id);
-		Room room = this.findRoom(roomId);
+		Room room = roomService.findById(roomId);
 		if(roomReservation.getBeginDate().after(roomReservation.getEndDate()))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datum rezervacije je lose unesen!");
 		if(roomReservation.getBeginDate().before(reservation.getBeginDate()))
@@ -309,6 +316,17 @@ public class ReservationService {
 		reservation.setPrice(reservation.getPrice() + roomReservation.getPrice());
 		reservationRepository.save(reservation);
 		logger.info("< room reservation added");
+		return reservation;
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	public Reservation addRoomReservationToReservationWitdId(Long reservationid, Long roomReservationId) {
+		Reservation reservation = this.findById(reservationid);
+		RoomReservation roomReservation = roomReservationService.findById(roomReservationId);
+		reservation.setRoomReservation(roomReservation);
+		roomReservation.setReservation(reservation);
+		reservationRepository.save(reservation);
+		roomReservationService.save(roomReservation);
 		return reservation;
 	}
 	
@@ -350,7 +368,7 @@ public class ReservationService {
 	public Reservation addVehicleReservationToReservation(Long id, Long vehicleId, @Valid VehicleReservation vehicleReservation) {
 		logger.info("> adding vehicle reservation to room with id {}", id);
 		Reservation reservation = this.findById(id);
-		Vehicle vehicle = this.findVehicle(vehicleId);
+		Vehicle vehicle = vehicleService.getVehicleById(vehicleId);
 		if(vehicleReservation.getBeginDate().after(vehicleReservation.getEndDate()))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datum rezervacije je lose unesen!");
 		if(vehicleReservation.getBeginDate().before(reservation.getBeginDate()))
@@ -381,23 +399,6 @@ public class ReservationService {
 		}
 		return true;
 	}
-
-	private Vehicle findVehicle(Long vehicleId) {
-		logger.info("> fetching vehicle with id {}", vehicleId);
-		Optional<Vehicle> vehicle = vehicleRepository.findById(vehicleId);
-		logger.info("< vehicle fetched");
-		if(vehicle.isPresent()) return vehicle.get();
-		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request vehicle doesn't exist.");
-	}
-
-	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-	private Room findRoom(Long roomId) {
-		logger.info("> fethcing room with id {}", roomId);
-		Optional<Room> room = roomRepository.findById(roomId);
-		logger.info("< room fetched");
-		if(room.isPresent()) return room.get();
-		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested room doesn't exist.");
-	}
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public Location getLocation(Long reservationId) {
@@ -418,6 +419,25 @@ public class ReservationService {
 		if(location != null) 
 			return location;
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lokacija ne postoji");
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	public Reservation addVehicleReservationToReservationWithId(Long rId, Long vrId) {
+		Reservation r = this.findById(rId);
+		VehicleReservation vr = vehicleReservationService.getVehicleReservationById(vrId);
+		r.setVehicleReservation(vr);
+		vr.setReservation(r);
+		reservationRepository.save(r);
+		vehicleReservationService.saveVehicleReservation(vr);
+		return r;
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	public Reservation create(Reservation reservation) {
+		logger.info("> creating reservation");
+		reservationRepository.save(reservation);
+		logger.info("< reservation created");
+		return reservation;
 	}
 	
 }

@@ -25,6 +25,8 @@ $(document).on('submit','.form-signin',function(e){
 	  				   data.authorities[0].authority == "AIRLINE_ADMIN" ||
 	  				   data.authorities[0].authority == "RENT_A_CAR_ADMIN")
 	  				   window.location.href = "companyadmin.html";
+	  				else if(data.authorities[0].authority == "USERS_ADMIN")
+	  					window.location.href = "usersAdmin.html";
 	  				else
 	  			       window.location.href = "home.html";
 	  			}

@@ -20,15 +20,18 @@ import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.repository.hotel.ExtraOptionRepository;
 
+import hotelInterf.ExtraOptionServiceInterface;
+
 @Service
 @Transactional(readOnly = true)
-public class ExtraOptionService {
+public class ExtraOptionService implements ExtraOptionServiceInterface {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
 	private ExtraOptionRepository extraOptionRepository;
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public ExtraOption findById(long id) {
 		logger.info("> Extra-option findById id:{}", id);
@@ -40,6 +43,7 @@ public class ExtraOptionService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Extra-option sa zadatim id-em ne postoji");
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<ExtraOption> findAll(Pageable pageable) {
 		logger.info("> Extra-option findAll");
@@ -51,6 +55,7 @@ public class ExtraOptionService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Extra-optioni ne postoje");
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public ExtraOption save(ExtraOption extraOption) {
 		logger.info("> Extra-option create");
@@ -59,6 +64,7 @@ public class ExtraOptionService {
 		return savedExtraOption;
 	}
 	
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteById(long id) {
 		logger.info("> Extra-option delete");
@@ -67,6 +73,7 @@ public class ExtraOptionService {
 		logger.info("< Extra-option delete");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public ExtraOption updateExtraOptionById(Long extraOptionId, ExtraOption newExtraOption) {
 		logger.info("> Extra-option update");
@@ -79,6 +86,7 @@ public class ExtraOptionService {
 		return oldExtraOption;
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<RoomReservation> getRoomReservation(Long extraOptionId) {
 		logger.info("> room-reservations from extra-option", extraOptionId);
@@ -91,6 +99,7 @@ public class ExtraOptionService {
 			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Rezervacija sobe za dati extra-option nije postavljen");
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public Hotel getHotel(Long extraOptionId) {
 		logger.info("> hotel from extra-option", extraOptionId);

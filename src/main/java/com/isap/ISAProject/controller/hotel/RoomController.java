@@ -1,5 +1,6 @@
 package com.isap.ISAProject.controller.hotel;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -170,7 +171,7 @@ public class RoomController {
 	public ResponseEntity<Resource<RoomType>> getRoomTypeForRoomWithId(@PathVariable("id") Long roomId) {
 				return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(roomService.getRoomType(roomId)), HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/search", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Pretraga soba", responseContainer = "List", httpMethod = "GET", produces = "application/json")
 	@ApiResponses(value = { 
@@ -178,16 +179,21 @@ public class RoomController {
 			@ApiResponse(code = 204, message = "No Content. Lista je prazna."),
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
-	public ResponseEntity<List<Resource<Room>>> search(Pageable pageable, 
+	public ResponseEntity<List<Resource<Room>>> search(Pageable pageable,
 			@RequestParam(value="hotelId", required=true) Long hotelId,
 			@RequestParam(value="roomTypeId", required=true) Long roomTypeId){
-		
 		List<Room> ret = roomService.searchWithHotelAndRoomType(pageable, hotelId, roomTypeId);
 		return new ResponseEntity<List<Resource<Room>>>(HATEOASImplementorHotel.createRoomList(ret), HttpStatus.OK);
 	}
+	
 	@RequestMapping(value = "/{id}/floor", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Resource<Room>> setFloorForRoomWithId(@PathVariable("id") Long roomId, @RequestParam("floor") Long floorId) {
 		return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(roomService.setFloor(roomId, floorId)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/is-free", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Boolean> isRoomFree(@PathVariable("id") Long roomId, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
+		return new ResponseEntity<Boolean>(roomService.checkIfRoomIsFree(new Date(begin), new Date(end), roomId), HttpStatus.OK);
 	}
 	
 }

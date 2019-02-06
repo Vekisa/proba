@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.isap.ISAProject.controller.user.HATEOASImplementorUsers;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightSeat;
 import com.isap.ISAProject.model.airline.Ticket;
+import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.service.airline.TicketService;
 
 import io.swagger.annotations.ApiOperation;
@@ -58,8 +60,8 @@ public class TicketController {
 	@ApiResponses(value = {
 			@ApiResponse(code = 201, message = "Created", response = Ticket.class)
 	})
-	public ResponseEntity<Resource<Ticket>> createNewTicket() {
-		return new ResponseEntity<Resource<Ticket>>(HATEOASImplementorAirline.createTicket(service.saveTicket(new Ticket())), HttpStatus.CREATED);
+	public ResponseEntity<Resource<Reservation>> createNewTicket() {
+		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(service.saveTicket(new Ticket())), HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -113,5 +115,4 @@ public class TicketController {
 	public ResponseEntity<Resource<Flight>> getFlightForTicketWithId(@PathVariable("id") Long ticketId) {
 		return new ResponseEntity<Resource<Flight>>(HATEOASImplementorAirline.createFlight(service.getFlightOfTicket(ticketId)), HttpStatus.OK);
 	}
-
 }

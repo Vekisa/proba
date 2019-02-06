@@ -23,7 +23,6 @@ import com.isap.ISAProject.model.user.Reservation;
 @Table(name = "ticket")
 public class Ticket {
 
-	@JsonIgnore
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

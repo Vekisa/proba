@@ -1,9 +1,11 @@
 package com.isap.ISAProject.controller.rentacar;
 
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -66,6 +69,16 @@ public class VehicleReservationController {
 		return ResponseEntity.created(location).build();
 	}
 	
+	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Kreiranje i sačuvavanje nove rezervacije.", notes = "Povratna vrednost je ID nove rezervacije.", httpMethod = "POST", consumes = "application/json", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 201, message = "Created", response = VehicleReservation.class),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđena rezervacija nije validna.")
+	})
+	public ResponseEntity<Resource<VehicleReservation>> createVehicleReservation(@PathParam("vehicleId") Long vehicleId, @PathParam("beginDate") Long beginDate, @PathParam("endDate") Long endDate) {
+		return new ResponseEntity<Resource<VehicleReservation>>(HATEOASImplementorRentacar.vehicleReservationLinks(service.createVehicleReservationWithVehicleAndDates(vehicleId, new Date(beginDate), new Date(endDate))),HttpStatus.CREATED);
+	}
+	
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Ažuriranje rezervacije vozila.", notes = "Ažurira rezervaciju vozila sa prosleđenim ID-em na osnovu prosleđene rezervacije.", httpMethod = "PUT", consumes = "application/json", produces = "application/json")
 	@ApiResponses(value = {
@@ -88,5 +101,11 @@ public class VehicleReservationController {
 		service.deleteVehicleReservation(id);
 		return ResponseEntity.ok().build();
 	}
+	
+	@RequestMapping(value = "/quicks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<VehicleReservation>> createQuickRoomReservation(@RequestParam("vehicle") Long vehicleId, @RequestBody @Valid VehicleReservation reservation) {
+		return new ResponseEntity<Resource<VehicleReservation>>(HATEOASImplementorRentacar.vehicleReservationLinks(service.saveQuickVehicleReservation(reservation, vehicleId)), HttpStatus.CREATED);
+	}
+	
 }
 

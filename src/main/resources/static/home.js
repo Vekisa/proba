@@ -1,5 +1,29 @@
+/*
+    vehicleC - vozilo u korpi
+    vehicleStartC - pocetak rezervacije za auto
+    vehicleEndC - kraj rezervacije za auto
+    
+    roomC - soba u korpi
+    roomStartC - pocetak rezervacije za sobu
+    roomEndC - kraj rezervacije za sobu
+    
+    flightC - let
+    seatsC - lista sedista
+*/
 var currentData;
 var currentUser;
+
+function clearShoppingCart(){
+    localStorage.setItem("vehicleC", null);
+    localStorage.setItem("vehicleStartC", null);
+    localStorage.setItem("vehicleEndC", null);
+    localStorage.setItem("roomC", null);
+    localStorage.setItem("roomStartC", null);
+    localStorage.setItem("roomEndC", null);
+    localStorage.setItem("seatsC", null);
+    localStorage.setItem("flightC", null);
+}
+
 
 function load(){
 		$.ajax({
@@ -57,6 +81,79 @@ $(document).on('click','#userName',function(e){
 	$('#friendsReqBtn').val(currentUser._links.friend_requests.href);
 	$('#reservationHisBtn').val(currentUser._links.reservations_history.href);
 	$('#activeResBtn').val(currentUser._links.active_reservations.href);
+});
+
+$(document).ready(function(){
+    $(document).on('change','.reservationDates',function(e){
+        let startDate = $('#startDate').val();
+        let endDate = $('#endDate').val();
+          
+        if(startDate != "" && endDate != ""){
+            let s = new Date(startDate);
+            let e = new Date(endDate);
+            var path = "";
+            if($("#addDate").val() == "room"){
+                path = "rooms";
+            }else{
+                path = "vehicles";
+            }
+            $.ajax({
+                url: "/"+ path +"/" + $('#cancelBooking').val() + "/is-free?begin=" + s.getTime() + "&end=" + e.getTime(),
+                type:"GET",
+                async: false,
+                success: function(data){
+                    if(data == true){
+                        $("#okIndicator").show();
+                        $("#errorIndicator").hide();
+                        $("#addDate").prop( "disabled", false );
+                    }else{
+                        $("#addDate").prop( "disabled", true );
+                        $("#okIndicator").hide();
+                        $("#errorIndicator").show();
+                    }
+                        
+		        }
+	       });
+        }
+    });
+});
+
+
+
+$(document).on('click','#addDate',function(e){
+    e.preventDefault();
+    if($('#endDate').val() == "" ||  $('#startDate').val() == ""){
+        $("#error").html("Choose dates!");
+        $('#myModal').modal("show");
+    }else{
+        if($('#addDate').val() == "room"){
+            $.ajax({
+                url: "/rooms/"+$('#cancelBooking').val(),
+                type:"GET",
+                async: false,
+                success: function(data){
+                    localStorage.setItem('roomC', data.id);
+                }
+            });
+
+            localStorage.setItem('roomStartC', $('#startDate').val());
+            localStorage.setItem('roomEndC', $('#endDate').val());
+            $('#dateModal').modal('toggle');
+        }else if($('#addDate').val() == "vehicle"){         
+            $.ajax({
+                url: "/vehicles/"+$('#cancelBooking').val(),
+                type:"GET",
+                async: false,
+                success: function(data){
+                    localStorage.setItem('vehicleC', data.id);
+                }
+            });
+
+            localStorage.setItem('vehicleStartC', $('#startDate').val());
+            localStorage.setItem('vehicleEndC', $('#endDate').val());
+            $('#dateModal').modal('toggle');
+        }
+    }
 });
 
 $(document).on('click','#allUsers',function(e){
@@ -241,18 +338,35 @@ function printUsers(allUsers,friends,sentRequests, receivedRequests){
 
 //Booking
 $(document).on('click','.bookvehicle',function(e){
+    $("#cancelBooking").val($(this).val());
+    $("#errorIndicator").hide();
+    $("#okIndicator").hide();
+    $('#addDate').val("vehicle");
     $("#dateModal").modal();
+    $("#addDate").prop( "disabled", false );
 });
 
 $(document).on('click','.bookflight',function(e){
-	//$("#dateModal").modal();
+    loadSeatsChartFor($(this).val());
+    $("#cancelBookingSeats").val($(this).val());
+	$("#flightModal").modal();
 });
 
 $(document).on('click','.bookRoom',function(e){
+    $("#cancelBooking").val($(this).val());
+    $("#errorIndicator").hide();
+    $("#okIndicator").hide();
+    $('#addDate').val("room");
 	$("#dateModal").modal();
+    $("#addDate").prop( "disabled", false );
 });
 
 //-----------
+
+$(document).on('click','#clearCart',function(e){
+    clearShoppingCart();
+    document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>";
+})
 
 $(document).on('click','#shoppingcart',function(e){
 	e.preventDefault();
@@ -260,11 +374,145 @@ $(document).on('click','#shoppingcart',function(e){
 	$("#profile").hide();
 	$('#profdiv').hide();
 	$("#myMap").hide();
-	document.getElementById("tablediv").innerHTML = "<h1><strong>Shopping Cart</strong></h1>";
+    
+    var vehicle = localStorage.getItem("vehicleC");
+    var vehicleStartDate = localStorage.getItem("vehicleStartC");
+    var vehicleEndDate = localStorage.getItem("vehicleEndC");
+    var room = localStorage.getItem("roomC");
+    var roomStartDate = localStorage.getItem("roomStartC");
+    var roomEndDate = localStorage.getItem("roomEndC");
+    var flight = localStorage.getItem("flightC");
+    var seats = JSON.parse(localStorage.getItem("seatsC"));
+    var a = 0;
+    var buttonBook = "<hr>" + "<button type=\"button\" class=\"btn btn-success\" id=\"bookNow\">Book Now</button>" ;
+    
+    var vehicleHTML = "";
+    if(vehicle != null && vehicle != "null" && vehicle != undefined){
+        vehicleHTML = "<hr>" + "<strong>Vehicle</strong>" + "<hr>" + vehicle + "   " + vehicleStartDate + "  " + vehicleEndDate;
+    }
+    
+    var roomHTML = "";
+    if(room != null && room != "null" && room != undefined){
+        roomHTML = "<hr>" + "<strong>Room</strong>" + "<hr>" + room + "   " + roomStartDate + "   " + roomEndDate;
+    }
+    
+    var flightHTML = "";
+    if(flight != null && flight != "null" && flight != undefined){
+        a = 1;
+        flightHTML = "<hr>" + "<strong>Flight</strong>" + "<hr>" + flight + "  seats: ";
+        $.each(seats,function(index,seat){
+           flightHTML += seat + " "; 
+        });
+        
+    }
+    
+    if(a == 0){
+	   document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML;
+    }else{
+        document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML + buttonBook;
+    }
+});
+
+$(document).on('click','#bookNow', function() {
+    var seats = localStorage.getItem("seatsC");
+    var vehicle = localStorage.getItem("vehicleC");
+    var vehicleStartDate = localStorage.getItem("vehicleStartC");
+    var vehicleEndDate = localStorage.getItem("vehicleEndC");
+    var room = localStorage.getItem("roomC");
+    var roomStartDate = localStorage.getItem("roomStartC");
+    var roomEndDate = localStorage.getItem("roomEndC");
+    var seats = JSON.parse(localStorage.getItem("seatsC"));
+    var reservation;
+    var roomReservation;
+    var vehicleReservation;
+    
+    //kreira kartu i rezervaciju i vraca je
+    $.ajax({
+		type: "POST",
+		url: "/tickets",
+		contentType: "application/json",
+        dataType: "json",
+        async: false,
+		success: function(data){
+            reservation = data;
+            alert("dobio nazad rezervaciju " + reservation.id)
+        }
+    });
+    
+    //dodaje sedista u  rezervaciju
+    alert("tickets/" + reservation.ticket.id + "/seats");
+    alert(seats);
+    $.ajax({
+		type: "POST",
+		url: "tickets/" + reservation.ticket.id + "/seats",
+        data: JSON.stringify(seats),
+		contentType: "application/json",
+        dataType: "json",
+        async: false,
+		success: function(data){
+            alert("dodao sedista");
+        }
+    });
+    
+    //dodaje vozilo u rezervaciju
+    if(vehicle !== "null" && vehicle !== undefined){
+         let s = new Date(vehicleStartDate);
+         let e = new Date(vehicleEndDate);
+         $.ajax({
+            type: "POST",
+            url: "vehicle-reservations/create?vehicleId=" + vehicle + "&beginDate=" + s.getTime() + "&endDate=" + e.getTime(),
+            contentType: "application/json",
+            async: false,
+            success: function(data){
+                vehicleReservation = data;
+                alert("napravio vehicle reservation");
+                $.ajax({
+                    type: "POST",
+                    url: "/reservations/" + reservation.id + "/set-vehicle-reservation/" + vehicleReservation.id,
+                    contentType: "application/json",
+                    async: false,
+                    success: function(data){
+                        alert("povezao vozilo");
+                    }
+                });
+            }
+            });
+        
+            
+    }
+    
+    //pravi rezervaciju sobe i dodaje je u glavnu
+    if(room !== "null" && room !== undefined){
+        let s = new Date(roomStartDate);
+        let e = new Date(roomEndDate);
+        $.ajax({
+            type: "POST",
+            url: "room_reservations/create-with-room/" + room + "?begin=" + s.getTime() + "&end=" + e.getTime(),
+            contentType: "application/json",
+            async: false,
+            success: function(data){
+                roomReservation = data;
+                alert("napravio room reservation");
+                 $.ajax({
+                    type: "POST",
+                    url: "/reservations/" + reservation.id + "/set-room-reservation/" + roomReservation.id, 
+                    contentType: "application/json",
+                    async: false,
+                    success: function(data){
+                        alert("povezao sobu"); 
+                    }
+                });
+            }
+        });
+        
+       
+    }
+    
 });
 
 $(document).on('click','.tableRoomType tr', function() {
     var searchLink = $(this).attr('id');
+    
    $.ajax({
 		type: "GET",
 		url: searchLink,
@@ -281,7 +529,7 @@ function printRooms(data){
     $.each(data, function(index, room) {
 		rooms += "<tr>" + "<td scope=\"col\">"+ room.numberOfBeds + "</td>" 
 		+ "<td scope=\"col\">" + room.floor.number + "</td>"
-        + "<td scope=\"col\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-success bookRoom\">Add To Cart</button></td>"
+        + "<td scope=\"col\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-success bookRoom\" value = \"" + room.id + "\">Add To Cart</button></td>"
 		+ "</tr>";
 	});
 	
@@ -326,6 +574,7 @@ $(document).on('click','#logout',function(e){
 		async: false,
 		success: function(data){
 			localStorage.token = null;
+            clearShoppingCart();
 			window.location.href = 'index.html';		
 		}
 	});
@@ -525,7 +774,7 @@ $(document).on('click','#friendsReqBtn',function(e){
 $(document).on('click','#reservationHisBtn',function(e){
 	e.preventDefault();
 	var pomData;
-	 $.ajax({
+	$.ajax({
 			type: "GET",
 			url: $(this).val(),
 			dataType: "json",
@@ -545,6 +794,7 @@ $(document).on('click','#reservationHisBtn',function(e){
 $(document).on('click','#activeResBtn',function(e){
 	e.preventDefault();
 	var pomData;
+    alert($(this).val());
 	 $.ajax({
 			type: "GET",
 			url: $(this).val(),
@@ -555,7 +805,7 @@ $(document).on('click','#activeResBtn',function(e){
 			}
 	 });
 	 
-	 printReservationHistory(pomData);
+	 printActiveReservations(pomData);
 	 
 	 $('#profdiv').show();
 	 $('#profile').hide();
@@ -682,7 +932,9 @@ function printReservationHistory(data){
 function printActiveReservations(data){
 	var history = "";
 	var name = "";
+    alert("tu sam");
 	if(data!=null){
+        alert("imam sta da prikazem");
 		$.each(data, function(index, reservation) {
 			 $.ajax({
 					type: "GET",
@@ -858,18 +1110,17 @@ $(document).on('click','#tablebo tr', function() {
 	var vehicles = "";
 	
 	$.each(pomDataVehicles, function(index, vehicle) {
-		vehicles += "<tr><td scope=\"col\">" + vehicle.name + "</td>" + "<td scope=\"col\">"+ vehicle.brand 
+		vehicles += "<tr>" + "<td scope=\"col\">"+ vehicle.brand 
 		+ "<td scope=\"col\">" + vehicle.model + "</td>"
 		+ "<td scope=\"col\">"+ vehicle.seatsNumber + "</td>" 
 		+ "<td scope=\"col\">"+ vehicle.type + "</td>"
 		+ "<td scope=\"col\">"+ vehicle.pricePerDay + "</td>"
-		+ "<td scope=\"col\"><button id = \"" + vehicle.links[1].href +"\" type=\"button\" class=\"btn btn-success bookvehicle\">Add To Cart</button></td>" 
+		+ "<td scope=\"col\"><button id = \"" + vehicle.links[1].href +"\" type=\"button\" class=\"btn btn-success bookvehicle\" value = \"" + vehicle.id +"\">Add To Cart</button></td>" 
 		+ "</td></tr>";
 	});
 	
 	var tabela = "<table class=\"table table-hover\" id = \"tableveh\"><thead>" +
 				"<tr>" + 
-			    "<th scope=\"col\">Name</th>" +
 			    "<th scope=\"col\">Brand</th>" +
 			    "<th scope=\"col\">Model</th>" +
 			    "<th scope=\"col\">Seats number</th>" +
@@ -1061,10 +1312,10 @@ function printFlights(data){
 	var s = "";
 	if(pomDataFlights!=null){
 		$.each(pomDataFlights, function(index, flight) {
-			s += "<tr>" + "<td>" + flight.startDestination + "</td>" + "<td>"+ flight.finishDestination 
+			s += "<tr>" + "<td>" + flight.startDestination.name + "</td>" + "<td>"+ flight.finishDestination.name 
 			+ "</td>" + "<td>" + flight.transfers + "</td><td>" + flight.departureTime + "</td><td>" + flight.arrivalTime + "</td><td>"
 			+ flight.flightLength + "</td><td>" + flight.basePrice + "</td>"
-			+ "<td scope=\"col\"><button id = \"" + flight.links[0].href +"\" type=\"button\" class=\"btn btn-success bookflight\">Add to cart</button></td>"
+			+ "<td scope=\"col\"><button id = \"" + flight.links[0].href +"\" type=\"button\" class=\"btn btn-success bookflight\" value = \"" + flight.id +"\">Add to cart</button></td>"
 			+"</tr>";
 		});
 	}
@@ -1149,4 +1400,69 @@ $(document).on('click', '#airline-search', function(event){
 	$('#search-title').text('Airlines');
 	$('#airline-controls').css("display", "block");
 	$('#search-panel').css("display", "block");
+})
+
+$(document).on('click','#addTicket',function(e){
+    var x = document.getElementsByClassName("taken");
+    var seats = new Array();
+    $.each(x, function(index, seat) {
+    	seats.push(seat.id);
+    });
+    localStorage.setItem("flightC",$('#cancelBookingSeats').val());
+    localStorage.setItem("seatsC",JSON.stringify(seats));
+    $('#flightModal').modal('toggle');
+    
+});
+
+function loadSeatsChartFor(id) {
+	flightId = id;
+	$.ajax({
+		type: "GET",
+		url: "/flights/" + id + "/seats",
+		async: false,
+		beforeSend: function(request) {
+    		request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
+  		},
+  		success: function(data) {
+  			if(data != null) {
+  				let tableHTML = "<table id=\"seatsChart\"><tr>";
+  				let currentRow = 1;
+  				let seatClass = "";
+			 	$.each(data, function(index, seat) {
+			 		if(seat.state == "TAKEN")
+			 			seatClass = "btn-danger";
+			 		else
+			 			seatClass = "btn-primary";
+					if(seat.row == currentRow) {
+						tableHTML += "<td><button id=\"" + seat.id + "\" class=\"btn flight-seat " + seatClass + "\" align=\"center\">" + (index + 1) + "</button></td>";
+					} else {
+						tableHTML += "</tr><tr><td><button id=\"" + seat.id + "\" class=\"btn flight-seat " + seatClass + "\" align=\"center\">" + (index + 1) + "</button></td>";
+						currentRow = seat.row;
+					}
+				});	
+  				tableHTML += "</tr></table><br><br>";
+  				document.getElementById("seats").innerHTML = tableHTML;
+  			}
+  		}
+	});
+}
+
+$(document).on('click','.btn-primary',function(e) {
+    e.preventDefault();
+    if($(this).hasClass('flight-seat')){
+        $(this).removeClass('btn-primary').addClass('btn-success');
+        $(this).addClass('taken');
+    }
+})
+
+$(document).on('click','.btn-success',function(e) {
+    e.preventDefault();
+    if($(this).hasClass('flight-seat')){
+        $(this).removeClass('btn-success').addClass('btn-primary');
+        $(this).removeClass('taken');
+    }
+})
+
+$(document).on('click','.btn-danger',function(e) {
+    e.preventDefault();
 })

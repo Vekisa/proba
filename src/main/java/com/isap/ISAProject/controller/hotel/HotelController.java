@@ -28,6 +28,7 @@ import com.isap.ISAProject.model.hotel.ExtraOption;
 import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.hotel.Room;
+import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.service.hotel.HotelService;
@@ -270,6 +271,11 @@ public class HotelController {
 	@RequestMapping(value = "/{id}/statistic", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<Long, Integer>> getStatisticForHotel(@PathVariable("id") Long id, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
 		return new ResponseEntity<Map<Long,Integer>>(hotelService.getStatisticFor(id, new Date(begin), new Date(end)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/quicks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Resource<RoomReservation>>> getQuickRoomReservationsForHotel(@PathVariable("id") Long id) {
+		return new ResponseEntity<List<Resource<RoomReservation>>>(HATEOASImplementorHotel.createRoomReservationList(hotelService.getQuickRoomReservations(id)), HttpStatus.OK);
 	}
 	
 }

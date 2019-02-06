@@ -8,7 +8,8 @@ $(document).on('submit', '#quickRoomForm', function(e) {
     newRoomReservation.beginDate = beginTime;
     newRoomReservation.endDate = endTime;
 	let jsonBody = JSON.stringify(newRoomReservation);
-	let url = "/room_reservations";
+	let roomId = $("#quickRoomSelect option:selected").val();
+	let url = "/room_reservations/quicks?room=" + roomId;
 	$.ajax({
 		type: "POST",
 		url: url,
@@ -18,9 +19,11 @@ $(document).on('submit', '#quickRoomForm', function(e) {
 		async: false,
 		beforeSend: function(request) {
     		request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
+  		},
+  		success: function() {
+  			loadCollection();
   		}
 	});
-	loadCollection();
 })
 
 $(document).on('click', '#addQuickRoom', function(e) {

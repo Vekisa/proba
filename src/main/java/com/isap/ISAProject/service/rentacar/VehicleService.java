@@ -1,5 +1,6 @@
 package com.isap.ISAProject.service.rentacar;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -138,6 +139,25 @@ public class VehicleService implements VehicleServiceInterface {
 			return office.get();
 		}
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tražena filijala nije pronađena.");
+	}
+	
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+	public boolean checkIfVehicleIsFree(Date start, Date end, Long vehicleId) {
+		logger.info("> check if vehicle is free", vehicleId);
+		Vehicle vehicle = this.getVehicleById(vehicleId);
+		Date reservedStart = null;
+		Date reservedEnd = null;
+		logger.info("< check if vehicle is free");
+		if(start.after(end))
+			return false;
+		for(VehicleReservation vehicleReservation :vehicle.getVehicleReservations()) {
+			reservedStart = vehicleReservation.getBeginDate();
+			reservedEnd = vehicleReservation.getEndDate();
+			if((start.after(reservedStart) && start.before(reservedEnd)) || (end.after(reservedStart) && end.before(reservedEnd))
+					|| (start.before(reservedStart) && end.after(reservedEnd)))
+				return false;
+		}
+		return true;
 	}
 
 }

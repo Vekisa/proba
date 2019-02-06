@@ -185,7 +185,7 @@
 		</div>
 	</div>
                                                                        
-                                                                    <!-- Modal -->
+    <!-- Modal -->
       <div class="modal fade" id="dateModal" role="dialog">
         <div class="modal-dialog">
 
@@ -198,20 +198,46 @@
               <form role="form">
                 <div class="form-group">
                   <label for="startDate"><span class="glyphicon glyphicon-user"></span> Start date</label>
-                  <input type="date" class="form-control" id="startDate" placeholder="Start date">
+                  <input type="date" class="form-control reservationDates" id="startDate" placeholder="Start date">
                 </div>
                 <div class="form-group">
                   <label for="endDate"><span class="glyphicon glyphicon-eye-open"></span> End date</label>
-                  <input type="date" class="form-control" id="endDate" placeholder="End date">
+                  <input type="date" class="form-control reservationDates" id="endDate" placeholder="End date">
+          		 	<img width ="24" height ="18" src="error.png" id ="errorIndicator">
+          		 	<img src="ok.png" id ="okIndicator">
                 </div>
-                  <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-off"></span> Add</button>
+                  <button type="submit" id="addDate" class="btn btn-success btn-block" disabled ><span class="glyphicon glyphicon-off" value= ""></span> Add</button>
               </form>
             </div>
             <div class="modal-footer">
-              <button type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
+              <button type="submit" class="btn btn-danger btn-default pull-left" id ="cancelBooking" data-dismiss="modal"><span class="glyphicon glyphicon-remove" value = ""></span> Cancel</button>
             </div>
           </div>
 
+        </div>
+      </div>
+      
+      <!-- Modal -->
+      <div class="modal fade" id="flightModal" role="dialog" style="overflow:scroll;">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header" style="padding:35px 50px;" align="center">
+              <h4><span class="glyphicon glyphicon-lock"></span>Choose Seats</h4>
+            </div>
+            <div class="modal-body" style="padding:40px 50px;">
+              <form role="form">
+                <div class="form-group" id="seats">
+
+                </div>
+                  <button type="submit" class="btn btn-success btn-block" id = "addTicket" ><span class="glyphicon glyphicon-off"></span> Add</button>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" id="cancelBookingSeats" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
+            </div>
+          </div>	
         </div>
       </div> 
                                                                     

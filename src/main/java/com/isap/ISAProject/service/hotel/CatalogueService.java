@@ -21,9 +21,11 @@ import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.repository.hotel.CatalogueRepository;
 import com.isap.ISAProject.repository.hotel.RoomTypeRepository;
 
+import hotelInterf.CatalogueServiceInterface;
+
 @Service
 @Transactional(readOnly = true)
-public class CatalogueService {
+public class CatalogueService implements CatalogueServiceInterface {
 	
 private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -33,6 +35,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private RoomTypeRepository roomTypeRepository;
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Catalogue findById(long id) {
 		logger.info("> Catalogue findById id:{}", id);
@@ -44,6 +47,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cenovnik sa zadatim id-em ne postoji");
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<Catalogue> findAll(Pageable pageable) {
 		logger.info("> Catalogue findAll");
@@ -55,6 +59,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cenovnici ne postoje");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public Catalogue save(Catalogue catalogue) {
 		logger.info("> Catalogue create");
@@ -63,6 +68,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 		return savedCatalogue;
 	}
 	
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteById(long id) {
 		logger.info("> Catalogue delete");
@@ -71,6 +77,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 		logger.info("< Catalogue delete");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public Catalogue updateCatalogueById(Long catalogueId, Catalogue newCatalogue) {
 		logger.info("> Catalogue update");
@@ -80,6 +87,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 		return oldCatalogue;
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<RoomType> getRoomTypes(Long id){
 		logger.info("> get room-types for catalogue");
@@ -92,6 +100,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tipovi soba za dati cenovnik ne postoje");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED) 
 	public RoomType createRoomType(Long catalogueId, RoomType roomType){
 		logger.info("> create room-type for catalogue");
@@ -102,6 +111,7 @@ private Logger logger = LoggerFactory.getLogger(this.getClass());
 		return roomType;
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<Hotel> getHotels(Long catalogueId) {
 		logger.info("> hotel from catalogue", catalogueId);

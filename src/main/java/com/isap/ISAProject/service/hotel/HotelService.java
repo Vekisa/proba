@@ -37,9 +37,11 @@ import com.isap.ISAProject.repository.hotel.RoomRepository;
 import com.isap.ISAProject.repository.hotel.RoomReservationRepository;
 import com.isap.ISAProject.repository.hotel.RoomReservationSpecifications;
 
+import hotelInterf.HotelServiceInterface;
+
 @Service
 @Transactional(readOnly = true)
-public class HotelService {
+public class HotelService implements HotelServiceInterface {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -61,6 +63,7 @@ public class HotelService {
 	@Autowired
 	private RoomRepository roomRepo;
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Hotel findById(long id) {
 			logger.info("> Hotel findById id:{}", id);
@@ -72,6 +75,7 @@ public class HotelService {
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hotel sa zadatim id-em ne postoji");
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<Hotel> findAll(Pageable pageable) {
 		logger.info("> Hotel findAll");
@@ -83,6 +87,7 @@ public class HotelService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hoteli ne postoje");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public Hotel saveWithLocation(Hotel hotel, Long id) {
 		logger.info("> Hotel create");
@@ -94,6 +99,8 @@ public class HotelService {
 		return hotel;
 	}
 	
+	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Hotel save(Hotel hotel) {
 		logger.info("> saving hotel");
 		hotelRepository.save(hotel);
@@ -101,6 +108,7 @@ public class HotelService {
 		return hotel;
 	}
 	
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteById(long id) {
 		logger.info("> Hotel delete");
@@ -109,6 +117,7 @@ public class HotelService {
 		logger.info("< Hotel delete");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public Hotel updateHotelById(Long hotelId, Hotel newHotel) {
 		logger.info("> Hotel update");
@@ -121,6 +130,7 @@ public class HotelService {
 		return oldHotel;
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<Floor> getFloors(Long id){
 		logger.info("> get floors for hotel");
@@ -133,6 +143,7 @@ public class HotelService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Spratovi za dati hotel ne postoje");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public Floor createFloor(Long hotelId, Floor floor){
 		logger.info("> create floor for hotel");
@@ -143,6 +154,7 @@ public class HotelService {
 		return floor;
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<ExtraOption> getExtraOptions(Long id){
 		logger.info("> get extra-options for hotel");
@@ -155,6 +167,7 @@ public class HotelService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Extra-optioni za dati hotel ne postoje");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public ExtraOption createExtraOption(Long hotelId, ExtraOption extraOption){
 		logger.info("> create extra-option for hotel");
@@ -166,6 +179,7 @@ public class HotelService {
 		return extraOption;
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public Catalogue getCatalogue(Long id){
 		logger.info("> get catalogue for hotel");
@@ -178,6 +192,7 @@ public class HotelService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cenovnik za dati hotel ne postoji");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public Catalogue createCatalogue(Long hotelId, Long catalogueId){
 		logger.info("> create catalogue for hotel");
@@ -189,14 +204,16 @@ public class HotelService {
 		return catalogue;
 	}
 	
-	private Catalogue findCatalogue(Long catalogueId) {
+	@Override
+	public Catalogue findCatalogue(Long catalogueId) {
 		logger.info("fetching catalogue with id {}", catalogueId);
 		Optional<Catalogue> catalogue = catalogueRepository.findById(catalogueId);
 		logger.info("< catalogue fetched");
 		if(catalogue.isPresent()) return catalogue.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested catalogue doesn't exist.");
 	}
-
+	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public Hotel changeLocationOfHotel(Long hotelId, Long destinationId) {
 		logger.info("> changing location of hotel with id {}", hotelId);
@@ -209,8 +226,9 @@ public class HotelService {
 		return hotel;
 	}
 	
+	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	private Location findDestination(Long id) {
+	public Location findDestination(Long id) {
 		logger.info("> fetching destination with id {}", id);
 		Optional<Location> destination = destinationRepository.findById(id);
 		logger.info("< destination fetched");
@@ -218,6 +236,7 @@ public class HotelService {
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested destination doesn't exist.");
 	}
 	
+	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<CompanyAdmin> getAdminsOfHotel(Long id) {
 		logger.info("> fetching admins of hotel with id {}", id);
@@ -227,7 +246,8 @@ public class HotelService {
 		if(!list.isEmpty()) return list;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested admins do not exist.");
 	}
-
+	
+	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Location getLocationOfHotel(Long id) {
 		logger.info("> fetching location of hotel with id {}", id);
@@ -238,6 +258,7 @@ public class HotelService {
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested destination doesn't exist.");
 	}
 	
+	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Map<Long, Double> getIncomeFor(Long id, Date beginDate, Date endDate) {
 		logger.info("> calculating income");
@@ -256,6 +277,7 @@ public class HotelService {
 		return incomeMap;
 	}
 
+	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Room> getRooms(Long id) {
 		logger.info("> fetching rooms for hotel with id {}", id);
@@ -267,6 +289,7 @@ public class HotelService {
 		return rooms;
 	}
 
+	@Override
 	public List<RoomType> getRoomTypes(Long id) {
 		logger.info("> fetching room types for hotel with id {}", id);
 		Hotel hotel = this.findById(id);
@@ -274,6 +297,7 @@ public class HotelService {
 		return hotel.getCatalogue().getRoomTypes();
 	}
 	
+	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Hotel> search(Pageable pageable, String locationName, String hotelName, Date beginDate, Date endDate) {
 		logger.info("> searching hotels");
@@ -304,6 +328,7 @@ public class HotelService {
 		return ret;
 	}
 
+	@Override
 	public Map<Long, Integer> getStatisticFor(Long id, Date beginDate, Date endDate) {
 		logger.info("> calculating statistic");
 		Hotel hotel = this.findById(id);
@@ -326,17 +351,17 @@ public class HotelService {
 		logger.info("< statistic calculated");
 		return statisticMap;
 	}
-	
-	public List<Room> getQuickRooms(Long id) {
+
+	public List<RoomReservation> getQuickRoomReservations(Long id) {
 		logger.info("> fetching quick room reservations");
 		Hotel hotel = this.findById(id);
 		Date time = new Date();
-		List<Room> list = new ArrayList<>();
+		List<RoomReservation> list = new ArrayList<>();
 		for(Floor floor : hotel.getFloors())
 			for(Room room : floor.getRooms())
 				for(RoomReservation roomReservation : room.getRoomReservations())
 					if(roomReservation.getBeginDate().after(time) && roomReservation.getReservation() == null)
-						list.add(room);
+						list.add(roomReservation);
 		logger.info("< quick room reservations fetched");
 		if(!list.isEmpty()) return list;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested seats do not exist.");

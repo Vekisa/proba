@@ -27,9 +27,11 @@ import com.isap.ISAProject.repository.hotel.RoomRepository;
 import com.isap.ISAProject.repository.hotel.RoomSpecifications;
 import com.isap.ISAProject.repository.hotel.RoomTypeRepository;
 
+import hotelInterf.RoomServiceInterface;
+
 @Service
 @Transactional(readOnly = true)
-public class RoomService {
+public class RoomService implements RoomServiceInterface {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -42,6 +44,7 @@ public class RoomService {
 	@Autowired
 	private FloorRepository floorRepository;
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Room findById(long id) {
 		logger.info("> Room findById id:{}", id);
@@ -53,6 +56,7 @@ public class RoomService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Soba sa zadatim id-em ne postoji");
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<Room> findAll(Pageable pageable) {
 		logger.info("> Room findAll");
@@ -64,6 +68,7 @@ public class RoomService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sobe ne postoje");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public Room save(Room room) {
 		logger.info("> Room create");
@@ -72,6 +77,7 @@ public class RoomService {
 		return savedRoom;
 	}
 	
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteById(long id) {
 		logger.info("> Room delete");
@@ -82,6 +88,7 @@ public class RoomService {
 		logger.info("< Room delete");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public Room updateRoomById(Long roomId, Room newRoom) {
 		logger.info("> Room update");
@@ -94,8 +101,9 @@ public class RoomService {
 		return oldRoom;
 	}
 	
+	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	private boolean checkIfRoomIsReserved(Room oldRoom) {
+	public boolean checkIfRoomIsReserved(Room oldRoom) {
 		Date current = new Date();
 		for(RoomReservation r : oldRoom.getRoomReservations())
 			if(r.getBeginDate().after(current) || r.getEndDate().after(current))
@@ -103,6 +111,7 @@ public class RoomService {
 		return false;
 	}
 
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<RoomReservation> getRoomReservations(Long id){
 		logger.info("> get room reservations for room");
@@ -115,13 +124,14 @@ public class RoomService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rezervacije za datu sobu ne postoje");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public RoomReservation createRoomReservation(Long roomId, RoomReservation roomReservation){
 		logger.info("> create room reservation for room");
 		Room room = this.findById(roomId);
 		if(roomReservation.getBeginDate().after(roomReservation.getEndDate()))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datum rezervacije je lose unesen");
-		if(!checkIfRoomIsFree(roomReservation.getBeginDate(), roomReservation.getEndDate(), room))
+		if(!checkIfRoomIsFree(roomReservation.getBeginDate(), roomReservation.getEndDate(), roomId))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba nije slobodna u tom periodu");
 		room.getRoomReservations().add(roomReservation);
 		roomReservation.setRoom(room);
@@ -133,6 +143,7 @@ public class RoomService {
 		return roomReservation;
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public Hotel getHotel(Long roomId) {
 		logger.info("> hotel from room", roomId);
@@ -150,6 +161,7 @@ public class RoomService {
 			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Hotel za datu sobu nije postavljen");
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public Floor getFloor(Long roomId) {
 		logger.info("> floor from room", roomId);
@@ -162,6 +174,7 @@ public class RoomService {
 			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Sprat za datu sobu nije postavljen");
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public RoomType getRoomType(Long roomId) {
 		logger.info("> room-type from room", roomId);
@@ -174,9 +187,17 @@ public class RoomService {
 			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Tip sobe za datu sobu nije postavljen");
 	}
 	
-	public boolean checkIfRoomIsFree(Date start, Date end, Room room) {
+	@Override
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+	public boolean checkIfRoomIsFree(Date start, Date end, Long roomId) {
+		logger.info("> check if room is free", roomId);
+		Room room = this.findById(roomId);
 		Date reservedStart = null;
 		Date reservedEnd = null;
+		logger.info("< check if room is free");
+		
+		if(start.after(end))
+			return false;
 		for(RoomReservation roomReservation :room.getRoomReservations()) {
 			reservedStart = roomReservation.getBeginDate();
 			reservedEnd = roomReservation.getEndDate();
@@ -186,6 +207,7 @@ public class RoomService {
 		return true;
 	}
 
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public Room setRoomTypeForRoom(Long roomTypeId, Long id) {
 		logger.info("> setting room type for room {}", id);
@@ -201,7 +223,8 @@ public class RoomService {
 		return room;
 	}
 
-	private RoomType findRoomType(Long roomTypeId) {
+	@Override
+	public RoomType findRoomType(Long roomTypeId) {
 		logger.info("> fetching room type with id {}", roomTypeId);
 		Optional<RoomType> type = roomTypeRepository.findById(roomTypeId);
 		logger.info("< room type fetched");
@@ -209,15 +232,17 @@ public class RoomService {
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Request room type doesn't exist.");
 	}
 	
+	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Room> searchWithHotelAndRoomType(Pageable pageable, Long hotelId, Long roomTypeId) {
 		logger.info("> searching rooms for specific hotel and room type");
 		List<Room> rooms = roomRepository.findAll(RoomSpecifications.findByHotelRoomType(hotelId, roomTypeId));
-		logger.info("hotels: " + rooms);
+		logger.info("rooms: " + rooms);
 		logger.info("< rooms found");
 		return rooms;
 	}
 
+	@Override
 	@Transactional(readOnly = false)
 	public Room setFloor(Long roomId, Long floorId) {
 		logger.info("> setting floor to room with id {}", roomId);

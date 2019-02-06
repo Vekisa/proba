@@ -68,6 +68,8 @@ public class UserService implements UserServiceInterface {
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	public CompanyAdmin createCompanyAdmin(CompanyAdmin admin) {
 		logger.info("> save admin with username {} and email {}", admin.getUsername(), admin.getEmail());
+		BCryptPasswordEncoder bc = new BCryptPasswordEncoder();
+		admin.setPassword(bc.encode(admin.getPassword()));
 		companyAdminsRepository.save(admin);
 		logger.info("< admin saved");
 		return admin;
@@ -78,6 +80,8 @@ public class UserService implements UserServiceInterface {
 	public UsersAdmin createUserAdmin(UsersAdmin admin) {
 		logger.info("> save admin with username {} and email {}", admin.getUsername(), admin.getEmail());
 		admin.setAuthority(AuthorizationLevel.USERS_ADMIN);
+		BCryptPasswordEncoder bc = new BCryptPasswordEncoder();
+		admin.setPassword(bc.encode(admin.getPassword()));
 		usersAdminsRepository.save(admin);
 		logger.info("< admin saved");
 		return admin;
