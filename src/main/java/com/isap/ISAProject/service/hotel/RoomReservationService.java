@@ -17,9 +17,13 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.isap.ISAProject.model.airline.FlightSeat;
+import com.isap.ISAProject.model.airline.SeatState;
+import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.hotel.ExtraOption;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
+import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.repository.hotel.ExtraOptionRepository;
 import com.isap.ISAProject.repository.hotel.RoomReservationRepository;
 
@@ -39,6 +43,9 @@ public class RoomReservationService implements RoomReservationServiceInterface {
 	
 	@Autowired
 	private RoomService roomService;
+	
+	@Autowired
+	private ExtraOptionService extraOptionService;
 	
 	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
@@ -217,5 +224,35 @@ public class RoomReservationService implements RoomReservationServiceInterface {
 				return false;
 		}
 		return true;
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
+	public RoomReservation addMultipleExtraOptionsToRoomReservation(Long roomReservationId, List<Long> extraOptions) {
+		logger.info("> adding multiple extra-options to room-reservation with id {}", roomReservationId);
+		for(Long extraOptionId : extraOptions)
+			this.addExtraOptionToRoomReservation(roomReservationId, extraOptionId);
+		logger.info("< adding multiple extra-options to room-reservation");
+		return this.findById(roomReservationId);
+	}
+	
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public RoomReservation addExtraOptionToRoomReservation(Long roomReservationId, Long extraOptionId) {
+		logger.info("> adding extra-option to room-reservation with id {}", roomReservationId);
+		RoomReservation roomReservation = this.findById(roomReservationId);
+		ExtraOption extraOption = extraOptionService.findById(extraOptionId);
+		if(roomReservation.getRoom().getFloor().getHotel().getId() != extraOption.getHotel().getId()) 
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Extra-option i room-reservation nisu iz istog hotela");
+		
+		roomReservation.add(extraOption);
+		extraOption.getRoomReservations().add(roomReservation);
+		
+		Long difference = roomReservation.getEndDate().getTime() - roomReservation.getBeginDate().getTime();
+		int dani = (int) TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS);
+		roomReservation.setPrice(roomReservation.getPrice() + extraOption.getPricePerDay() * dani );
+		
+		this.save(roomReservation);
+		extraOptionService.save(extraOption);
+		logger.info("< adding extra-option to room-reservation");
+		return roomReservation;
 	}
 }

@@ -163,6 +163,7 @@ public class ReservationService {
 		RegisteredUser user = this.findRegisteredUser(userId);
 		reservation.getConfirmedUsers().add(user);
 		reservationRepository.save(reservation);
+		
 		emailService.sendReservationInfo(user, reservation);
 		logger.info("< user added");
 		return reservation;

@@ -38,6 +38,10 @@ tr:hover{
 	opacity: 0.9;
 }
 
+#dropDown{
+	margin: 10px;
+}
+
 #profdiv{
 	position: absolute;
     top: 15%;
@@ -127,4 +131,8 @@ tr:hover{
 	cursor: pointer;
 	height: 40px;
   	width: 40px;
+}
+
+#firstNameSort:hover, #lastNameSort:hover{
+    background: gray;
 }

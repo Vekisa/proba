@@ -205,6 +205,13 @@
                   <input type="date" class="form-control reservationDates" id="endDate" placeholder="End date">
           		 	<img width ="24" height ="18" src="error.png" id ="errorIndicator">
           		 	<img src="ok.png" id ="okIndicator">
+                   <div class="dropdown show" id = "dropDown">
+					  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					    Extra Options
+					  </a>
+					  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" id="extraOptionsList">
+					  </div>
+					</div>
                 </div>
                   <button type="submit" id="addDate" class="btn btn-success btn-block" disabled ><span class="glyphicon glyphicon-off" value= ""></span> Add</button>
               </form>
@@ -262,6 +269,7 @@
 		    
 		    map.setCenter (lonLat, zoom);
 		  </script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 	</body>
 </html>

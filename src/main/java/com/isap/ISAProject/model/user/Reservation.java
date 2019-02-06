@@ -1,5 +1,6 @@
 package com.isap.ISAProject.model.user;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -76,6 +77,12 @@ public class Reservation {
 	   joinColumns = { @JoinColumn(name = "reservation_id") },
     inverseJoinColumns = { @JoinColumn(name = "user_id")} )
 	private List<RegisteredUser> invitedUsers;
+	
+	public Reservation() {
+		confirmedUsers = new ArrayList<>();
+		usersThatRated = new ArrayList<>();
+		invitedUsers = new ArrayList<>();
+	}
 	
 	public Ticket getTicket() { return ticket; }
 	

@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.isap.ISAProject.controller.airline.HATEOASImplementorAirline;
+import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.hotel.ExtraOption;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.model.hotel.RoomReservation;
@@ -160,6 +162,11 @@ public class RoomReservationController {
 	public ResponseEntity<?> removeExtraOptionFromRoomReservation(@PathVariable("id") Long id, @RequestParam("option") Long optionId) {
 		roomReservationService.removeExtraOption(id, optionId);
 		return ResponseEntity.ok().build();
+	}
+	
+	@RequestMapping(value = "/{id}/multiple_extra_options", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<RoomReservation>> addMultipleSeatsToTicketWithId(@PathVariable("id") Long roomReservationId, @RequestBody List<Long> extraOptions) {
+		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.addMultipleExtraOptionsToRoomReservation(roomReservationId, extraOptions)), HttpStatus.CREATED);
 	}
 	
 }

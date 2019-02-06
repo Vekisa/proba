@@ -52,7 +52,7 @@ public class HATEOASImplementorUsers {
 	public static Resource<Reservation> createReservation(Reservation reservation) {
 		Resource<Reservation> resource = new Resource<Reservation>(reservation);
 		resource.add(linkTo(methodOn(ReservationController.class).getReservationById(reservation.getId())).withRel("self"));
-		resource.add(linkTo(methodOn(ReservationController.class).getLocationOfReservation(reservation.getId())).withRel("friends"));
+		resource.add(linkTo(methodOn(ReservationController.class).getLocationOfReservation(reservation.getId())).withRel("location"));
 		return resource;
 	}
 	
