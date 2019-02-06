@@ -383,19 +383,22 @@ $(document).on('click','#shoppingcart',function(e){
     var roomEndDate = localStorage.getItem("roomEndC");
     var flight = localStorage.getItem("flightC");
     var seats = JSON.parse(localStorage.getItem("seatsC"));
+    var a = 0;
+    var buttonBook = "<hr>" + "<button type=\"button\" class=\"btn btn-success\" id=\"bookNow\">Book Now</button>" ;
     
     var vehicleHTML = "";
-    if(vehicle !== "null" && vehicle !== undefined){
+    if(vehicle != null && vehicle != "null" && vehicle != undefined){
         vehicleHTML = "<hr>" + "<strong>Vehicle</strong>" + "<hr>" + vehicle + "   " + vehicleStartDate + "  " + vehicleEndDate;
     }
     
     var roomHTML = "";
-    if(room != "null" && room != "undefined"){
+    if(room != null && room != "null" && room != undefined){
         roomHTML = "<hr>" + "<strong>Room</strong>" + "<hr>" + room + "   " + roomStartDate + "   " + roomEndDate;
     }
     
     var flightHTML = "";
-    if(flight != "null" && flight != "undefined"){
+    if(flight != null && flight != "null" && flight != undefined){
+        a = 1;
         flightHTML = "<hr>" + "<strong>Flight</strong>" + "<hr>" + flight + "  seats: ";
         $.each(seats,function(index,seat){
            flightHTML += seat + " "; 
@@ -403,8 +406,11 @@ $(document).on('click','#shoppingcart',function(e){
         
     }
     
-	document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML +
-        "<hr>" + "<button type=\"button\" class=\"btn btn-success\" id=\"bookNow\">Book Now</button>";
+    if(a == 0){
+	   document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML;
+    }else{
+        document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML + buttonBook;
+    }
 });
 
 $(document).on('click','#bookNow', function() {
@@ -788,6 +794,7 @@ $(document).on('click','#reservationHisBtn',function(e){
 $(document).on('click','#activeResBtn',function(e){
 	e.preventDefault();
 	var pomData;
+    alert($(this).val());
 	 $.ajax({
 			type: "GET",
 			url: $(this).val(),
@@ -798,7 +805,7 @@ $(document).on('click','#activeResBtn',function(e){
 			}
 	 });
 	 
-	 printReservationHistory(pomData);
+	 printActiveReservations(pomData);
 	 
 	 $('#profdiv').show();
 	 $('#profile').hide();
@@ -925,7 +932,9 @@ function printReservationHistory(data){
 function printActiveReservations(data){
 	var history = "";
 	var name = "";
+    alert("tu sam");
 	if(data!=null){
+        alert("imam sta da prikazem");
 		$.each(data, function(index, reservation) {
 			 $.ajax({
 					type: "GET",
