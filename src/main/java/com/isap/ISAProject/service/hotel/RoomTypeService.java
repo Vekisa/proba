@@ -19,15 +19,18 @@ import com.isap.ISAProject.model.hotel.Catalogue;
 import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.repository.hotel.RoomTypeRepository;
 
+import hotelInterf.RoomTypeServiceInterface;
+
 @Service
 @Transactional(readOnly = true)
-public class RoomTypeService {
+public class RoomTypeService implements RoomTypeServiceInterface {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
 	private RoomTypeRepository roomTypeRepository;
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public RoomType findById(long id) {
 		logger.info("> Room-type findById id:{}", id);
@@ -39,6 +42,7 @@ public class RoomTypeService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tip sobe sa zadatim id-em ne postoji");
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<RoomType> findAll(Pageable pageable) {
 		logger.info("> Room-type findAll");
@@ -50,6 +54,7 @@ public class RoomTypeService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tipovi soba ne postoje");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public RoomType save(RoomType roomType) {
 		logger.info("> Room-type create");
@@ -58,6 +63,7 @@ public class RoomTypeService {
 		return savedRoomType;
 	}
 	
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteById(long id) {
 		logger.info("> Room-type delete");
@@ -66,6 +72,7 @@ public class RoomTypeService {
 		logger.info("< Room-type delete");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public RoomType updateRoomTypeById(Long roomTypeId, RoomType newRoomType) {
 		logger.info("> Room-Type update");
@@ -78,6 +85,7 @@ public class RoomTypeService {
 		return oldRoomType;
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public Catalogue getCatalogue(Long roomTypeId) {
 		logger.info("> catalogue from room-type", roomTypeId);

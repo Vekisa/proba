@@ -23,9 +23,11 @@ import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.repository.hotel.ExtraOptionRepository;
 import com.isap.ISAProject.repository.hotel.RoomReservationRepository;
 
+import hotelInterf.RoomReservationServiceInterface;
+
 @Service
 @Transactional(readOnly = true)
-public class RoomReservationService {
+public class RoomReservationService implements RoomReservationServiceInterface {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -38,6 +40,7 @@ public class RoomReservationService {
 	@Autowired
 	private RoomService roomService;
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public RoomReservation findById(long id) {
 		logger.info("> Rezervacija sobe findById id:{}", id);
@@ -49,6 +52,7 @@ public class RoomReservationService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rezervacija sobe sa zadatim id-em ne postoji");
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<RoomReservation> findAll(Pageable pageable) {
 		logger.info("> Rezervacija sobe findAll");
@@ -60,6 +64,7 @@ public class RoomReservationService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rezervacije sobe ne postoje");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public RoomReservation save(RoomReservation roomReservation) {
 		logger.info("> Rezervacija sobe create");
@@ -68,6 +73,7 @@ public class RoomReservationService {
 		return savedRoomReservation;
 	}
 	
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public void deleteById(long id) {
 		logger.info("> Rezervacija sobe delete");
@@ -76,6 +82,7 @@ public class RoomReservationService {
 		logger.info("< Rezervacija sobe delete");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
 	public RoomReservation updateRoomReservationById(Long roomReservationId, RoomReservation newRoomReservation) {
 		logger.info("> Rezervacija sobe update");
@@ -94,6 +101,7 @@ public class RoomReservationService {
 		return oldRoomReservation;
 	}
 	
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public List<ExtraOption> getExtraOptions(Long id){
 		logger.info("> get extra-options for room-reservation");
@@ -106,6 +114,7 @@ public class RoomReservationService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Extra optioni za datu rezervaciju ne postoje");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public ExtraOption createExtraOption(Long roomReservationId, ExtraOption extraOption){
 		logger.info("> create extra-option for room-resevration");
@@ -117,6 +126,7 @@ public class RoomReservationService {
 		return extraOption;
 	}
 	
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public ExtraOption addExtraOption(Long id, Long extraOptionId) {
 		logger.info("> adding extra option to room with id {}", id);
@@ -131,12 +141,14 @@ public class RoomReservationService {
 		return option;
 	}
 	
-	private void recalculateReservationPrice(RoomReservation roomReservation) {
+	@Override
+	public void recalculateReservationPrice(RoomReservation roomReservation) {
 		roomReservation.setPrice(roomReservation.getRoom().getRoomType().getPricePerNight() * roomReservation.getNumberOfNights());
 		for(ExtraOption eo : roomReservation.getExtraOptions())
 			roomReservation.setPrice(roomReservation.getPrice() + eo.getPricePerDay() * roomReservation.getNumberOfNights());
 	}
 
+	@Override
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public void removeExtraOption(Long id, Long extraOptionId) {
 		logger.info("> removing extra option from room with id {}", id);
@@ -150,14 +162,16 @@ public class RoomReservationService {
 		this.save(roomReservation);
 	}
 	
-	private ExtraOption findExtraOption(Long extraOptionId) {
+	@Override
+	public ExtraOption findExtraOption(Long extraOptionId) {
 		logger.info("> fetching extra option with id {}", extraOptionId);
 		Optional<ExtraOption> option = optionsRepository.findById(extraOptionId);
 		logger.info("< extra option fetched");
 		if(option.isPresent()) return option.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested extra option doesn't exist.");
-		}
+	}
 
+	@Override
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
 	public Room getRoom(Long roomReservationId) {
 		logger.info("> room from room-reservation", roomReservationId);
@@ -170,6 +184,7 @@ public class RoomReservationService {
 			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Soba za rezervaciju nije postavljena");
 	}
 	
+	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public RoomReservation saveWithRoomId(Long roomId, Date begin, Date end) {	
 		logger.info("> create room reervation  with room", roomId);
@@ -191,6 +206,7 @@ public class RoomReservationService {
 		return roomReservation;
 	}
 	
+	@Override
 	public boolean checkIfRoomIsFree(Date start, Date end, Room room) {
 		Date reservedStart = null;
 		Date reservedEnd = null;
