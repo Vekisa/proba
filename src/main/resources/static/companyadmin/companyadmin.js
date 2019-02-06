@@ -5,7 +5,8 @@ var companyId;
 function load(){
 	$("#companyProfile").hide();
 	$("#collection").hide();
-	$("#profile").show();
+	$("#profile").hide();
+	$("#collection").hide();
 	$.ajax({
 		type: "GET",
 		url: "/users/registered/currentUser",
@@ -16,36 +17,42 @@ function load(){
   		},
 		success: function(data) {
 			if(data != null) {
-				$("#first_name").empty();
-				$("#first_name").append("<strong>First name:</strong> " + data.firstName);
-				$("#last_name").empty();
-				$("#last_name").append("<strong>Last name:</strong> " + data.lastName);
-				$("#email").empty();
-				$("#email").append("<strong>E-mail:</strong> " + data.email);
-				$("#city").empty();
-				$("#city").append("<strong>City:</strong> " + data.city);
-				$("#phone").empty();
-				$("#phone").append("<strong>Phone number:</strong> " + data.phoneNumber);
-				$("#username").text("Profile of user: " + data.username);
-				document.getElementById("user").innerHTML = data.username;
-				authority = data.authorities[0].authority;
-				if(authority == "HOTEL_ADMIN") {
-					document.getElementById("company").innerHTML = "Hotel";
-					$(document).attr("title", "Hotel admin page");
+				if(data.state == "INACTIVE") {
+					adminId = data.id;
+					loadProfileForm();
+				} else {
+					$("#first_name").empty();
+					$("#first_name").append("<strong>First name:</strong> " + data.firstName);
+					$("#last_name").empty();
+					$("#last_name").append("<strong>Last name:</strong> " + data.lastName);
+					$("#email").empty();
+					$("#email").append("<strong>E-mail:</strong> " + data.email);
+					$("#city").empty();
+					$("#city").append("<strong>City:</strong> " + data.city);
+					$("#phone").empty();
+					$("#phone").append("<strong>Phone number:</strong> " + data.phoneNumber);
+					$("#username").text("Profile of user: " + data.username);
+					document.getElementById("user").innerHTML = data.username;
+					authority = data.authorities[0].authority;
+					if(authority == "HOTEL_ADMIN") {
+						document.getElementById("company").innerHTML = "Hotel";
+						$(document).attr("title", "Hotel admin page");
+					}
+					if(authority == "AIRLINE_ADMIN") {
+					    document.getElementById("company").innerHTML = "Airline";
+					    $(document).attr("title", "Airline admin page");
+					}
+					if(authority == "RENT_A_CAR_ADMIN") {
+					    document.getElementById("company").innerHTML = "Rent-a-Car";
+					    $(document).attr("title", "Rent-a-Car admin page");
+					}				
+					adminId = data.id;
+					$("#profile").show();
 				}
-				if(authority == "AIRLINE_ADMIN") {
-				    document.getElementById("company").innerHTML = "Airline";
-				    $(document).attr("title", "Airline admin page");
-				}
-				if(authority == "RENT_A_CAR_ADMIN") {
-				    document.getElementById("company").innerHTML = "Rent-a-Car";
-				    $(document).attr("title", "Rent-a-Car admin page");
-				}				
-				adminId = data.id;
 			}
 		},
-		error: function() {
-			alert("Greska prilikom pribavljanja korisnika");
+		error: function(data) {
+			window.location.href = "signin.html";
 		}
 	});
 	$.ajax({
@@ -187,8 +194,10 @@ $(document).on('submit', '#profileForm', function(e) {
 		    		request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
 		  		},
 		  		success: function(data) {
-		  			if(data != null)
+		  			if(data != null) {
 		  				loadCollection();
+		  				$("#profile").hide();
+		  			}
 		  		}
 			});		
 		} else {
@@ -381,9 +390,11 @@ function printCompanyForm(data, url) {
 }
 
 $(document).on('click', '#logout', function(e) {
+	e.preventDefault();
 	$.ajax({
 		type: "POST",
 		url: "/users/registered/logout",
+		async: false,
 		beforeSend: function(request) {
 			request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
 		},
@@ -392,4 +403,22 @@ $(document).on('click', '#logout', function(e) {
 			window.location.href = "index.html";
 		}
 	});
+});
+
+$(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
+  
+    switch(jqxhr.status) {
+	    case 404:
+	    	 $("#error").html("Not found");
+	      break;
+	    case 204:
+	    	$("#error").html("No content");
+	      break;
+	    case 400:
+	    	$("#error").html("Bad request");
+	      break;
+	    default:
+	    	$("#error").html("Something went wrong");
+    }
+    $('#myModal').modal("show");
 });

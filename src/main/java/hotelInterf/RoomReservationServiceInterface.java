@@ -31,8 +31,6 @@ public interface RoomReservationServiceInterface {
 	
 	void removeExtraOption(Long id, Long extraOptionId);
 	
-	ExtraOption findExtraOption(Long extraOptionId);
-	
 	Room getRoom(Long roomReservationId); 
 	
 	RoomReservation saveWithRoomId(Long roomId, Date begin, Date end);

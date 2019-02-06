@@ -47,3 +47,7 @@
     top: 18%;
     left: 27%;
 }
+
+#myModal {
+	z-index: 10000;
+}

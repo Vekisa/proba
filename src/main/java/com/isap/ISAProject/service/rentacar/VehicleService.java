@@ -148,14 +148,13 @@ public class VehicleService implements VehicleServiceInterface {
 		Date reservedStart = null;
 		Date reservedEnd = null;
 		logger.info("< check if vehicle is free");
-		
 		if(start.after(end))
 			return false;
-	
 		for(VehicleReservation vehicleReservation :vehicle.getVehicleReservations()) {
 			reservedStart = vehicleReservation.getBeginDate();
 			reservedEnd = vehicleReservation.getEndDate();
-			if((start.after(reservedStart) && start.before(reservedEnd)) || (end.after(reservedStart) && end.before(reservedEnd)))
+			if((start.after(reservedStart) && start.before(reservedEnd)) || (end.after(reservedStart) && end.before(reservedEnd))
+					|| (start.before(reservedStart) && end.after(reservedEnd)))
 				return false;
 		}
 		return true;

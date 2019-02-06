@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.user.AuthorizationLevel;
 import com.isap.ISAProject.model.user.ConfirmationToken;
+import com.isap.ISAProject.model.user.ConfirmedReservation;
 import com.isap.ISAProject.model.user.FriendRequest;
 import com.isap.ISAProject.model.user.Friendship;
 import com.isap.ISAProject.model.user.RegisteredUser;
@@ -71,6 +72,14 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	
 		if(user.isPresent()) return user.get();
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested user doesn't exist.");
+	}
+	
+	@Transactional(readOnly = false)
+	public RegisteredUser save(RegisteredUser user) {
+		logger.info("> saving user with id {}", user.getId());
+		repository.save(user);
+		logger.info("< user saved");
+		return user;
 	}
 	
 	@Override
@@ -233,28 +242,31 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 	public List<Reservation> getReservationHistoryOfUser(Long id) {
 		logger.info("> fetching active reservations of user with id {}", id);
 		RegisteredUser user = this.findById(id);
-		List<Reservation> reservations = user.getConfirmedReservations();
-		List<Reservation> list = filterFinishedReservations(reservations);
+		List<Reservation> list = filterFinishedReservations(user.getConfirmedReservations());
 		logger.info("< active reservations fetched");
 		if(!list.isEmpty()) return list;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested reservations do not exist.");
 	}
 
-	private List<Reservation> filterActiveReservations(List<Reservation> reservations) {
+	private List<Reservation> filterActiveReservations(List<ConfirmedReservation> list) {
+		logger.info("> filtering active reservations");
 		List<Reservation> result = new ArrayList<Reservation>();
 		Date currentDate = new Date();
-		for(Reservation r : reservations)
-			if(r.getEndDate().after(currentDate))
-				result.add(r);
+		for(ConfirmedReservation confirmed : list)
+			if(confirmed.getReservation().getEndDate().after(currentDate))
+				result.add(confirmed.getReservation());
+		logger.info("< active reservations filtered");
 		return result;
 	}
 	
-	private List<Reservation> filterFinishedReservations(List<Reservation> reservations) {
+	private List<Reservation> filterFinishedReservations(List<ConfirmedReservation> list) {
+		logger.info("> filtering finished reservations");
 		List<Reservation> result = new ArrayList<Reservation>();
 		Date currentDate = new Date();
-		for(Reservation r : reservations)
-			if(r.getEndDate().before(currentDate))
-				result.add(r);
+		for(ConfirmedReservation confirmed : list)
+			if(confirmed.getReservation().getEndDate().before(currentDate))
+				result.add(confirmed.getReservation());
+		logger.info("< finished reservations filtered");
 		return result;
 	}
 	

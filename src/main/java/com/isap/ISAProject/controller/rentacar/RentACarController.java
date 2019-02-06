@@ -27,6 +27,7 @@ import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.model.rentacar.RentACar;
 import com.isap.ISAProject.model.rentacar.Vehicle;
+import com.isap.ISAProject.model.rentacar.VehicleReservation;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.service.rentacar.RentACarService;
 
@@ -182,6 +183,11 @@ public class RentACarController {
 	@RequestMapping(value = "/{id}/statistic", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<Long, Integer>> getStatisticForAirline(@PathVariable("id") Long id, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
 		return new ResponseEntity<Map<Long,Integer>>(service.getStatisticFor(id, new Date(begin), new Date(end)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/quicks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Resource<VehicleReservation>>> getQuickVehicleReservationsForRentACar(@PathVariable("id") Long id) {
+		return new ResponseEntity<List<Resource<VehicleReservation>>>(HATEOASImplementorRentacar.vehicleReservationLinksList(service.getQuickVehicleReservations(id)), HttpStatus.OK);
 	}
 	
 }

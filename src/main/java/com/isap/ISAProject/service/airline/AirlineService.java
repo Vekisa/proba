@@ -26,6 +26,7 @@ import com.isap.ISAProject.model.airline.FlightSeat;
 import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.LuggageInfo;
+import com.isap.ISAProject.model.airline.SeatType;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.repository.airline.AirlineRepository;
 import com.isap.ISAProject.repository.airline.FlightRepository;
@@ -274,6 +275,27 @@ public class AirlineService implements AirlineServiceInterface {
 		}
 		logger.info("< statistic calculated");
 		return statisticMap;
+	}
+
+	public List<FlightSeat> getQuicks(Long id) {
+		logger.info("> fetching seats on quick reservations");
+		Airline airline = this.findById(id);
+		List<FlightSeat> quickSeats = new ArrayList<>();
+		Date time = new Date();
+		for(Flight flight : airline.getFlights()) 
+			if(flight.getDepartureTime().after(time))
+				quickSeats.addAll(this.getQuickSeats(flight));			
+		logger.info("< seats fetched");
+		if(!quickSeats.isEmpty()) return quickSeats;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested seats do not exist.");
+	}
+
+	private List<FlightSeat> getQuickSeats(Flight flight) {
+		List<FlightSeat> list = new ArrayList<>();
+		for(FlightSeat fs : flight.getSeats())
+			if(fs.getType().equals(SeatType.QUICK_RESERVATION))
+				list.add(fs);
+		return list;
 	}
 
 }

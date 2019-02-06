@@ -28,6 +28,10 @@ public class FlightSeat {
 	@Column(nullable = false)
 	private SeatState state;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private SeatType type;
+	
 	@Column(nullable = false)
 	private int rNumber;
 
@@ -98,5 +102,9 @@ public class FlightSeat {
 	public void setLuggageInfo(LuggageInfo luggageInfo) { this.luggageInfo = luggageInfo; }
 
 	public boolean isTaken() { return this.getState().equals(SeatState.TAKEN); }
+
+	public SeatType getType() { return type; }
+
+	public void setType(SeatType type) { this.type = type; }
 	
 }

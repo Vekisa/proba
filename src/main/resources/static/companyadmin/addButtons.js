@@ -15,7 +15,8 @@ function addButtonsForHotel() {
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"updateCompany\"add> Update </button>";
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addRoomType\"add> Add type </button>";
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addFloor\"add> Add floor </button>";
-	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addOption\"add> Add option </button><br>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addOption\"add> Add option </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addQuickRoom\"add> Add quick reservation </button><br>";
 	document.getElementById("buttons").innerHTML = buttonsHTML;
 }
 
@@ -39,6 +40,7 @@ function addButtonsForRentACar() {
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"incomeRent\"add> Income </button>";
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"graphRent\"add> Graph </button>";
 	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"updateCompany\"add> Update </button>";
-	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addOffice\"add> Add office </button><br>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addOffice\"add> Add office </button>";
+	buttonsHTML += 	"<button class=\"btn btn-info btn-block custombutton\" id=\"addQuickVehicle\"add> Add quick reservation </button><br>";
 	document.getElementById("buttons").innerHTML = buttonsHTML;
 }

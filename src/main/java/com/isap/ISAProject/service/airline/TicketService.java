@@ -24,6 +24,7 @@ import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.repository.airline.TicketRepository;
+import com.isap.ISAProject.service.user.ReservationService;
 import com.isap.ISAProject.repository.user.RegisteredUserRepository;
 import com.isap.ISAProject.repository.user.ReservationRepository;
 import com.isap.ISAProject.service.user.RegisteredUserService;
@@ -39,7 +40,7 @@ public class TicketService implements TicketServiceInterface {
 	private TicketRepository repository;
 	
 	@Autowired
-	private ReservationRepository reservationRepository;
+	private ReservationService reservationService;
 	
 	@Autowired
 	private UserService userService;
@@ -53,7 +54,7 @@ public class TicketService implements TicketServiceInterface {
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<Ticket> findAll(Pageable pageable) {
-		logger.info("> fetch tickets at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
+		logger.info("> fetching tickets at page {} with page size {}", pageable.getPageNumber(), pageable.getPageSize());
 		Page<Ticket> tickets = repository.findAll(pageable);
 		logger.info("< tickets fetched");
 		return tickets.getContent();
@@ -62,7 +63,7 @@ public class TicketService implements TicketServiceInterface {
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Ticket findById(Long id) {
-		logger.info("> fetch ticket with id {}", id);
+		logger.info("> fetching ticket with id {}", id);
 		Optional<Ticket> ticket = repository.findById(id);
 		logger.info("< ticket fetched");
 		if(ticket.isPresent()) return ticket.get();
@@ -79,15 +80,34 @@ public class TicketService implements TicketServiceInterface {
 		RegisteredUser regUser = regUserService.findById(user.getId());
 		Reservation reservation = new Reservation();
 		reservation.setTicket(ticket);
+		reservation.setBeginDate(this.getDepartureTime(ticket));
+		reservation.setEndDate(this.getArrivalTime(ticket));
+		reservation.setPrice(0);
+		repository.save(ticket);
+		reservationService.create(reservation);
+		logger.info("< ticket saved");
+		return reservation;
+	}
+	
+	public Date getDepartureTime(Ticket ticket) {
+		return ticket.getSeats().get(0).getFlight().getDepartureTime();
+	}
+	
+	public Date getArrivalTime(Ticket ticket) {
+		return ticket.getSeats().get(0).getFlight().getArrivalTime();
+	}
+	
+	public Reservation createTicket() {
+		logger.info("> creating ticket");
+		Reservation reservation = new Reservation();
+		Ticket ticket = new Ticket();
+		reservation.setTicket(ticket);
 		reservation.setBeginDate(new Date());
 		reservation.setEndDate(new Date());
 		reservation.setPrice(0);
 		repository.save(ticket);
-		reservation.getConfirmedUsers().add(regUser);
-		reservationRepository.save(reservation);
-		regUser.getConfirmedReservations().add(reservation);
-		regUserRepository.save(regUser);
-		
+		reservationService.create(reservation);
+		logger.info("< ticket created");
 		logger.info("< ticket saved");
 		return reservation;
 	}
@@ -115,6 +135,7 @@ public class TicketService implements TicketServiceInterface {
 		Reservation reservation = ticket.getReservation();
 		if(reservation != null)
 			reservation.setPrice(reservation.getPrice() + seat.getPrice());
+		this.saveTicket(ticket);
 		logger.info("< seat added");
 		return seat;
 	}
@@ -145,7 +166,7 @@ public class TicketService implements TicketServiceInterface {
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public List<FlightSeat> getSeatsOfTicket(Long ticketId) {
-		logger.info("> fetching seats for airline with id {}", ticketId);
+		logger.info("> fetching seats for ticket with id {}", ticketId);
 		Ticket ticket = this.findById(ticketId);
 		List<FlightSeat> list = ticket.getSeats();
 		logger.info("< seats fetched");
@@ -156,9 +177,9 @@ public class TicketService implements TicketServiceInterface {
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public Flight getFlightOfTicket(Long ticketId) {
-		logger.info("> fetching ticket of seat with id {}", ticketId);
+		logger.info("> fetching flight of seat with id {}", ticketId);
 		Flight flight = repository.findFlightForTicketWithId(ticketId);
-		logger.info("< ticket fetched");
+		logger.info("< flight fetched");
 		if(flight != null) return flight;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Request flight doesn't exist.");
 	}

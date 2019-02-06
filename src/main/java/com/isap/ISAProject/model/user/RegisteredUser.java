@@ -38,12 +38,12 @@ public class RegisteredUser extends SystemUser {
 	private AuthorizationLevel authority;
 	
 	@JsonIgnore
-	@ManyToMany
-	private List<Reservation> confirmedReservations;
+	@OneToMany(mappedBy = "user")
+	private List<ConfirmedReservation> confirmedReservations;
 	
 	@JsonIgnore
-	@ManyToMany
-	private List<Reservation> pendingReservations;
+	@OneToMany(mappedBy = "user")
+	private List<PendingReservation> pendingReservations;
 	
 	@JsonIgnore
 	@Cascade(CascadeType.ALL)
@@ -124,10 +124,6 @@ public class RegisteredUser extends SystemUser {
 
 	public void setConfirmationToken(ConfirmationToken confirmationToken) { this.confirmationToken = confirmationToken; }
 
-	public List<Reservation> getConfirmedReservations() { return confirmedReservations; }
-
-	public List<Reservation> getPendingReservations() { return pendingReservations; }
-
 	public Passenger getPassenger() { return passenger; }
 
 	public void setPassenger(Passenger passenger) { this.passenger = passenger; }
@@ -143,5 +139,9 @@ public class RegisteredUser extends SystemUser {
 	public List<RentACarRating> getRentACarRatings() { return rentACarRatings; }
 
 	public List<VehicleRating> getVehicleRatings() { return vehicleRatings; }
+
+	public List<ConfirmedReservation> getConfirmedReservations() { return confirmedReservations; }
+
+	public List<PendingReservation> getPendingReservations() { return pendingReservations; }
 
 }

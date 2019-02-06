@@ -17,13 +17,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.isap.ISAProject.controller.user.HATEOASImplementorUsers;
 import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
-import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.service.rentacar.VehicleReservationService;
 
 import io.swagger.annotations.ApiOperation;
@@ -102,5 +101,11 @@ public class VehicleReservationController {
 		service.deleteVehicleReservation(id);
 		return ResponseEntity.ok().build();
 	}
+	
+	@RequestMapping(value = "/quicks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<VehicleReservation>> createQuickRoomReservation(@RequestParam("vehicle") Long vehicleId, @RequestBody @Valid VehicleReservation reservation) {
+		return new ResponseEntity<Resource<VehicleReservation>>(HATEOASImplementorRentacar.vehicleReservationLinks(service.saveQuickVehicleReservation(reservation, vehicleId)), HttpStatus.CREATED);
+	}
+	
 }
 

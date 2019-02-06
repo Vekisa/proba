@@ -3,6 +3,7 @@ package com.isap.ISAProject.service.rentacar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,4 +101,18 @@ public class VehicleReservationService implements VehicleReservationServiceInter
 		repository.delete(this.getVehicleReservationById(id));
 		logger.info("< vehicle reservation deleted");
 	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	public VehicleReservation saveQuickVehicleReservation(VehicleReservation vehicleReservation, Long id) {
+		Vehicle vehicle = vService.getVehicleById(id);
+		if(!vService.checkIfVehicleIsFree(vehicleReservation.getBeginDate(), vehicleReservation.getEndDate(), vehicle.getId())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Soba za dati period nije slobodna");
+		}
+		Long difference = vehicleReservation.getEndDate().getTime() - vehicleReservation.getBeginDate().getTime();
+		vehicleReservation.setPrice((int) TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS) * vehicle.getPricePerDay());
+		vehicleReservation.setVehicle(vehicle);
+		this.saveVehicleReservation(vehicleReservation);
+		return vehicleReservation;
+	}
+	
 }
