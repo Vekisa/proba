@@ -139,8 +139,8 @@ public class ReservationController {
 	}
 	
 	@RequestMapping(value = "/{id}/user", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Resource<Reservation>> addUserToReservation(@PathVariable(value = "id") Long id, @RequestParam("user") Long userId) {
-		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.addUserToReservation(id, userId)), HttpStatus.CREATED);
+	public ResponseEntity<Resource<Reservation>> addUserToReservation(@PathVariable(value = "id") Long id, @RequestParam("user") Long userId, @RequestParam("points") int points) {
+		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.addUserToReservation(id, userId, points)), HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/{id}/invite", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -161,6 +161,17 @@ public class ReservationController {
 	@RequestMapping(value = "/{id}/cancel", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Resource<Reservation>> cancelReservation(@PathVariable(value = "id") Long id, @RequestParam("user") Long userId) {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.cancelReservation(id, userId)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/factor", method = RequestMethod.POST)
+	public ResponseEntity<?> setDiscountFactor(@RequestParam("factor") int factor) {
+		reservationService.setDiscountFactor(factor);
+		return ResponseEntity.ok().build();
+	}
+	
+	@RequestMapping(value = "/factor", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Integer> getDiscountFactor() {
+		return new ResponseEntity<Integer>(reservationService.getDiscountFactor(), HttpStatus.OK);
 	}
 	
 }
