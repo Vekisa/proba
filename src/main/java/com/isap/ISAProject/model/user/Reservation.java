@@ -1,5 +1,6 @@
 package com.isap.ISAProject.model.user;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -9,9 +10,7 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -21,6 +20,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
@@ -56,26 +56,20 @@ public class Reservation {
 	@Column(nullable = false)
 	private Date endDate;
 	
-	@Cascade({CascadeType.PERSIST, CascadeType.MERGE})
-	@ManyToMany
-	@JoinTable(name = "confirmed_reservations",
-	   joinColumns = { @JoinColumn(name = "reservation_id") },
-    inverseJoinColumns = { @JoinColumn(name = "user_id")} )
-	private List<RegisteredUser> confirmedUsers;
+	@JsonIgnore
+	@Cascade(CascadeType.ALL)
+	@OneToMany(mappedBy = "reservation")
+	private List<ConfirmedReservation> confirmedReservations;
 	
-	@Cascade({CascadeType.PERSIST, CascadeType.MERGE})
-	@ManyToMany
-	@JoinTable(name = "rated_reservations",
-	   joinColumns = { @JoinColumn(name = "reservation_d") },
-    inverseJoinColumns = { @JoinColumn(name = "user_id")} )
-	private List<RegisteredUser> usersThatRated;
+	@JsonIgnore
+	@Cascade(CascadeType.ALL)
+	@OneToMany(mappedBy = "reservation", orphanRemoval = true)
+	private List<PendingReservation> pendingReservations;
 	
-	@Cascade({CascadeType.PERSIST, CascadeType.MERGE})
-	@ManyToMany
-	@JoinTable(name = "invited_reservations",
-	   joinColumns = { @JoinColumn(name = "reservation_id") },
-    inverseJoinColumns = { @JoinColumn(name = "user_id")} )
-	private List<RegisteredUser> invitedUsers;
+	public Reservation() {
+		confirmedReservations = new ArrayList<>();
+		pendingReservations = new ArrayList<>();
+	}
 	
 	public Ticket getTicket() { return ticket; }
 	
@@ -100,13 +94,11 @@ public class Reservation {
 	public Date getEndDate() { return endDate; }
 	
 	public void setEndDate(Date endDate) { this.endDate = endDate; }
-	
-	public List<RegisteredUser> getConfirmedUsers() { return confirmedUsers; }
-	
-	public List<RegisteredUser> getUsersThatRated() { return usersThatRated; }
-	
-	public List<RegisteredUser> getInvitedUsers() { return invitedUsers; }
 
 	public Long getId() { return this.id; }
+
+	public List<ConfirmedReservation> getConfirmedReservations() { return confirmedReservations; }
+
+	public List<PendingReservation> getPendingReservations() { return pendingReservations; }
 	
 }

@@ -42,7 +42,6 @@ public class VehicleReservation {
 	@Column(nullable = false)
 	private double price;
 	
-	@JsonIgnore
 	@ManyToOne
 	private Vehicle vehicle;
 	

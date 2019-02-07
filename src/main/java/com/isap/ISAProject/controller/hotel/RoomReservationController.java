@@ -60,7 +60,7 @@ public class RoomReservationController {
 	}
 	
 	//Kreiranje rezeracije
-	@RequestMapping(value="/create-with-room/{id}",method=RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value="/create-with-room/{id}",method=RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Kreira i memoriše rezervaciju sobe.", notes = "Povratna vrednost servisa je sačuvana rezervacija sobe.",
 			httpMethod = "POST", consumes = "application/json", produces = "application/json")
 	@ApiResponses(value = { 
@@ -160,6 +160,17 @@ public class RoomReservationController {
 	public ResponseEntity<?> removeExtraOptionFromRoomReservation(@PathVariable("id") Long id, @RequestParam("option") Long optionId) {
 		roomReservationService.removeExtraOption(id, optionId);
 		return ResponseEntity.ok().build();
+	}
+	
+	@RequestMapping(value = "/quicks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<RoomReservation>> createQuickRoomReservation(@RequestParam("room") Long roomId, @RequestBody @Valid RoomReservation reservation) {
+		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.saveQuickRoomReservation(reservation, roomId)), HttpStatus.CREATED);
+	}
+		
+	@RequestMapping(value = "/{id}/multiple_extra_options", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Resource<RoomReservation>> addMultipleExtraOptionsToRoomReservationWithId(@PathVariable("id") Long roomReservationId, @RequestBody List<Long> extraOptions) {
+		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.addMultipleExtraOptionsToRoomReservation(roomReservationId, extraOptions)), HttpStatus.CREATED);
+
 	}
 	
 }

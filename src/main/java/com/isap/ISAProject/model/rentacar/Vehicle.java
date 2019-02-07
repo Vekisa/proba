@@ -48,6 +48,7 @@ public class Vehicle extends RatableEntity{
 	@ManyToOne
 	private BranchOffice branchOffice;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy="vehicle")
 	private List<VehicleReservation> vehicleReservations = new ArrayList<>();
 	

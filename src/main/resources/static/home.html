@@ -88,6 +88,7 @@
 	 			<td align="center"><button id = "friendsReqBtn" class="btn btn-info btn-block"><span class="fa fa-user"></span> Friend Requests </button></td>
 	 			<td align="center"><button id = "reservationHisBtn" class="btn btn-info btn-block"><span class="fa fa-user"></span> Reservation History </button></td>
 	 			<td align="center"><button id = "activeResBtn" class="btn btn-info btn-block"><span class="fa fa-user"></span> Active Reservations </button></td>
+	 			<td align="center"><button id = "pendingResBtn" class="btn btn-info btn-block"><span class="fa fa-user"></span> Pending Reservations </button></td>
 	 		</tr>
 	 		<tr>
 	 			<td></td>
@@ -229,6 +230,13 @@
                   <input type="date" class="form-control reservationDates" id="endDate" placeholder="End date">
           		 	<img width ="24" height ="18" src="error.png" id ="errorIndicator">
           		 	<img src="ok.png" id ="okIndicator">
+                   <div class="dropdown show" id = "dropDown">
+					  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					    Extra Options
+					  </a>
+					  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" id="extraOptionsList">
+					  </div>
+					</div>
                 </div>
                   <button type="submit" id="addDate" class="btn btn-success btn-block" disabled ><span class="glyphicon glyphicon-off" value= ""></span> Add</button>
               </form>
@@ -264,6 +272,52 @@
           </div>	
         </div>
       </div> 
+      
+      <!-- Modal -->
+      <div class="modal fade" id="friendsModal" role="dialog" style="overflow:scroll;">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header" style="padding:35px 50px;" align="center">
+              <h4><span class="glyphicon glyphicon-lock"></span>Invite Friends</h4>
+            </div>
+            <div class="modal-body" style="padding:40px 50px;">
+              <form role="form">
+                <div class="form-group" id="friends">
+
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" id="cancelInvitingFriends" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
+            </div>
+          </div>	
+        </div>
+      </div> 
+      
+      <!-- Modal -->
+      <div class="modal fade" id="reservationModal" role="dialog" style="overflow:scroll;">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header" style="padding:35px 50px;" align="center">
+              <h4><span class="glyphicon glyphicon-lock"></span>Reservation</h4>
+            </div>
+            <div class="modal-body" style="padding:40px 50px;">
+              <form role="form">
+                <div class="form-group" id="reservation">
+
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" id="closeViewing" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span>Close</button>
+            </div>
+          </div>	
+        </div>
+      </div> 
                                                                     
   
   		<script src="http://www.openlayers.org/api/OpenLayers.js"></script>
@@ -286,6 +340,7 @@
 		    
 		    map.setCenter (lonLat, zoom);
 		  </script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 	</body>
 </html>

@@ -27,7 +27,8 @@ public class CerberusUserFactory {
 				user.getLastName(),
 				user.getCity(),
 				user.getPhoneNumber(),
-				authorities
+				authorities,
+				user.getState()
 		);
 	}
 }

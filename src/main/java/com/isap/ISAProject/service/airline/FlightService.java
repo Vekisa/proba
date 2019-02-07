@@ -24,6 +24,7 @@ import com.isap.ISAProject.model.airline.FlightSeat;
 import com.isap.ISAProject.model.airline.FlightSegment;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.SeatState;
+import com.isap.ISAProject.model.airline.SeatType;
 import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.airline.TripType;
 import com.isap.ISAProject.repository.airline.AirlineRepository;
@@ -227,6 +228,7 @@ public class FlightService implements FlightServiceInterface {
 					seat.setFlight(flight);
 					seat.setPrice(flight.getBasePrice() + fs.getCategory().getPrice());
 					seat.setCategory(fs.getCategory());
+					seat.setType(SeatType.REGULAR_SEAT);
 					flight.getSeats().add(seat);
 				}
 	}

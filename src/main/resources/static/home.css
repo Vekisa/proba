@@ -38,12 +38,21 @@ tr:hover{
 	opacity: 0.9;
 }
 
+#profiltable {
+	background-color: #f3f3f3;
+	opacity: 0.9;
+}
+
+#dropDown{
+	margin: 10px;
+}
+
 #profdiv{
 	position: absolute;
     top: 15%;
     left: 28%;
     width:40%;
-    height:75%;
+    min-height:75%;
 	border: 1px solid #ccc;
     border-radius: 10px;
 	background-color: #f3f3f3;
@@ -113,12 +122,17 @@ tr:hover{
   color: white;
 }
 
-#dateModal{
+#dateModal, {
     top: 30%;
     z-index: 9000;
 }
 
-#flightModal{
+#friendsModal{
+    top: 10%;
+    z-index: 9000;
+}
+
+#flightModal, #reservationModal{
 	top: 5%;
     z-index: 9000;
 }
@@ -128,4 +142,8 @@ tr:hover{
 	cursor: pointer;
 	height: 40px;
   	width: 40px;
+}
+
+#firstNameSort:hover, #lastNameSort:hover{
+    background: gray;
 }

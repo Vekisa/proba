@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.isap.ISAProject.model.user.UserState;
 
 public class CerberusUser implements UserDetails {
 	private static final long serialVersionUID = 1L;
@@ -19,6 +20,7 @@ public class CerberusUser implements UserDetails {
 	private String city;
 	private String phoneNumber;
 	private Collection<? extends GrantedAuthority> authorities;
+	private UserState state;
 	private Boolean accountNonExpired = true;
 	private Boolean accountNonLocked = true;
 	private Boolean credentialsNonExpired = true;
@@ -29,7 +31,7 @@ public class CerberusUser implements UserDetails {
 	}
 
 	public CerberusUser(Long id, String email, String username, String password, String firstName, String lastName,
-			String city, String phoneNumber, Collection<? extends GrantedAuthority> authorities) {
+			String city, String phoneNumber, Collection<? extends GrantedAuthority> authorities, UserState state) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -40,6 +42,7 @@ public class CerberusUser implements UserDetails {
 		this.city = city;
 		this.phoneNumber = phoneNumber;
 		this.authorities = authorities;
+		this.setState(state);
 	}
 
 	public Long getId() {
@@ -175,5 +178,13 @@ public class CerberusUser implements UserDetails {
 	@Override
 	public String toString() {
 		return "CerberusUser [username=" + username + ", password=" + password + "]";
+	}
+
+	public UserState getState() {
+		return state;
+	}
+
+	public void setState(UserState state) {
+		this.state = state;
 	}
 }

@@ -191,6 +191,7 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 		if(oldSeat.isTaken())
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested seat is taken.");
 		oldSeat.setPrice(newSeat.getPrice());
+		oldSeat.setType(newSeat.getType());
 		repository.save(oldSeat);
 		logger.info("< seat updated");
 		return oldSeat;

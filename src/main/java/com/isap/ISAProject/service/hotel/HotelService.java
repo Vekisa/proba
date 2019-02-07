@@ -350,5 +350,20 @@ public class HotelService implements HotelServiceInterface {
 		logger.info("< statistic calculated");
 		return statisticMap;
 	}
+
+	public List<RoomReservation> getQuickRoomReservations(Long id) {
+		logger.info("> fetching quick room reservations");
+		Hotel hotel = this.findById(id);
+		Date time = new Date();
+		List<RoomReservation> list = new ArrayList<>();
+		for(Floor floor : hotel.getFloors())
+			for(Room room : floor.getRooms())
+				for(RoomReservation roomReservation : room.getRoomReservations())
+					if(roomReservation.getBeginDate().after(time) && roomReservation.getReservation() == null)
+						list.add(roomReservation);
+		logger.info("< quick room reservations fetched");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested seats do not exist.");
+	}
 	
 }

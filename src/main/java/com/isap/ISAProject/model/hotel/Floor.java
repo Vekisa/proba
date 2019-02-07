@@ -26,7 +26,6 @@ public class Floor {
 	@Column(nullable = false)
 	private int number;
 	
-	@JsonIgnore
 	@ManyToOne
 	private Hotel hotel;
 	

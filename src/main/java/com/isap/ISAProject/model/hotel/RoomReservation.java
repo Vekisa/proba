@@ -49,7 +49,6 @@ public class RoomReservation {
 	@Column(nullable = false)
 	private double price;
 	
-	@JsonIgnore
 	@ManyToOne
 	private Room room;
 	

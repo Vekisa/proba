@@ -25,6 +25,7 @@ function createSeatsChart() {
 	});
 	flightHTML += "</select><br><br><div id=\"flightSeatsChart\"></div>";
 	document.getElementById("collection").innerHTML = flightHTML;
+	$("#collection").show();
 }
  
  $(document).on('change','#selectedFlight',function(e) {
@@ -64,6 +65,7 @@ function loadSeatsChartFor(id) {
   			}
   		}
 	});
+	$("#collection").show();
 }
 
 $(document).on('click','.btn-primary',function(e) {
@@ -109,12 +111,17 @@ function createFlightSeatForm(id) {
   		}
 	});
 	categoryHTML += "</select><br><br>";
+	let typeHTML = "Seat type: <select id=\"seatType\">";
+	typeHTML += "<option value=\"REGULAR_SEAT\">REGULAR_SEAT</option>";
+	typeHTML += "<option value=\"QUICK_RESERVATION\">QUICK_RESERVATION</option>";
+	typeHTML += "</select><br><br>";
 	let priceHTML = "Price: <input id=\"seatPrice\" type=\"text\"></form><br><br>";
 	let updateSeatHTML = "<button class=\"btn btn-info btn-block custombutton\" id=\"updateSeat\"> Update </button>";
 	let removeSeatHTML = "<button class=\"btn btn-info btn-block custombutton\" id=\"removeSeat\"> Remove </button><br>";
 	$("#flightSeatInfo").append(luggageInfoHTML);
 	$("#flightSeatInfo").append(categoryHTML);
 	$("#flightSeatInfo").append(priceHTML);
+	$("#flightSeatInfo").append(typeHTML);
 	$("#flightSeatInfo").append(updateSeatHTML);
 	$("#flightSeatInfo").append(removeSeatHTML);
 	$.ajax({
@@ -155,8 +162,10 @@ $(document).on('click','#updateSeat',function(e) {
   		}		
 	});
 	let price = $("#seatPrice").val();
+	let type = $("#seatType option:selected").val();
 	let newSeat = new Object();
 	newSeat.price = price;
+	newSeat.type = type;
 	let jsonBody = JSON.stringify(newSeat);
 	$.ajax({
 		type: "PUT",
@@ -185,14 +194,6 @@ $(document).on('click','#removeSeat',function(e) {
 	createSeatsChart();
 	loadSeatsChartFor(flight);
 })
-
-//$(document).on('click','.btn-primary',function(e) {
-//	$(this).removeClass('btn-primary').addClass('btn-success');
-//})
-
-//$(document).on('click','.btn-success',function(e) {
-//	$(this).removeClass('btn-success').addClass('btn-primary');
-//})
 
 function getMaxColValue(data) {
 	let maxValue = 0;

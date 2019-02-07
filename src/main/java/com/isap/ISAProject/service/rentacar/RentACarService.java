@@ -254,5 +254,20 @@ public class RentACarService implements RentACarServiceInterface {
 		logger.info("< statistic calculated");
 		return statisticMap;
 	}
+
+	public List<VehicleReservation> getQuickVehicleReservations(Long id) {
+		logger.info("> fetching quick vehicle reservations");
+		RentACar rentACar = this.getRentACarById(id);
+		Date time = new Date();
+		List<VehicleReservation> list = new ArrayList<>();
+		for(BranchOffice branchOffice : rentACar.getBranchOffices())
+			for(Vehicle vehicle : branchOffice.getVehicles())
+				for(VehicleReservation vehicleReservation : vehicle.getVehicleReservations())
+					if(vehicleReservation.getBeginDate().after(time) && vehicleReservation.getReservation() == null)
+						list.add(vehicleReservation);
+		logger.info("< quick vehicle reservations fetched");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested vehicles do not exist.");
+	}
 	
 }
