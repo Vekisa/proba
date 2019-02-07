@@ -184,10 +184,14 @@ public class ReservationService {
 
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	private void inviteUserToReservation(RegisteredUser user, List<RegisteredUser> friends, Reservation reservation) {
-		if(friends.contains(user))
+		if(friends.contains(user)) {
+			for(PendingReservation pending : user.getPendingReservations())
+				if(pending.getUser().equals(user))
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Friend already invited.");
 			reservation.getPendingReservations().add(new PendingReservation(user, reservation));
-		else
+		} else {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Owner is not friend with user with id " + user.getId());
+		}
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
@@ -280,6 +284,7 @@ public class ReservationService {
 		for(PendingReservation pending : reservation.getPendingReservations())
 			if(pending.getUser().equals(user)) {
 				forRemoval = pending;
+				forRemoval.setReservation(null);
 				break;
 			}
 		return reservation.getPendingReservations().remove(forRemoval);

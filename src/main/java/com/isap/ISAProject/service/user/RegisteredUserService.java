@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import com.isap.ISAProject.model.user.ConfirmationToken;
 import com.isap.ISAProject.model.user.ConfirmedReservation;
 import com.isap.ISAProject.model.user.FriendRequest;
 import com.isap.ISAProject.model.user.Friendship;
+import com.isap.ISAProject.model.user.PendingReservation;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.model.user.UserState;
@@ -296,6 +298,21 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 			return users;
 		
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Useri ne postoje");	
+	}
+
+	public List<Reservation> getPendingReservationsOfUser(Long userId) {
+		logger.info("> fetching pending reservations for user with id {}", userId);
+		RegisteredUser user = this.findById(userId);
+		List<Reservation> list = new ArrayList<>();
+		Date time = new Date();
+		for(PendingReservation pending : user.getPendingReservations()) {
+			long difference = time.getTime() - pending.getCreationTime().getTime();
+			if(((int) TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS)) < 3)
+				list.add(pending.getReservation());
+		}
+		logger.info("< reservations fetched");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Rezervacije ne postoje.");
 	}
 	
 }

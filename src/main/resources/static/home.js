@@ -85,6 +85,7 @@ $(document).on('click','#userName',function(e){
 	$('#friendsReqBtn').val(currentUser._links.friend_requests.href);
 	$('#reservationHisBtn').val(currentUser._links.reservations_history.href);
 	$('#activeResBtn').val(currentUser._links.active_reservations.href);
+	$('#pendingResBtn').val(currentUser._links.pending_reservations.href);
 });
 
 $(document).ready(function(){
@@ -1997,3 +1998,85 @@ function createRating(value){
         return "<img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\">";
     }
 }
+
+$(document).on('click', '#pendingResBtn', function(e) {
+	e.preventDefault();
+    loadPendingReservations();
+})
+
+function loadPendingReservations() {
+    var pomData;
+    $.ajax({
+			type: "GET",
+			url: "/users/registered/" + currentUser.id + "/pendingReservations",
+			dataType: "json",
+			async: false,
+			success: function(data){
+					pomData = data;
+			}
+	 });
+	 printPendingReservations(pomData);
+	 $('#profdiv').show();
+	 $('#profile').hide();
+}
+
+function printPendingReservations(data) {
+	var pendingHTML = "";
+	var name = "";
+    var vehicle = "";
+	if(data!=null){
+		$.each(data, function(index, reservation) {
+			 $.ajax({
+					type: "GET",
+					url:  reservation.links[1].href,
+					dataType: "json",
+					async: false,
+					success: function(data){
+						name = data.name;
+					}
+			 });
+			pendingHTML += "<tr>" + "<td scope=\"col\">" + reservation.beginDate.substring(0, 19).replace('T', '<br>') + "</td>" + "<td scope=\"col\">"+ reservation.endDate.substring(0, 19).replace('T', '<br>') + "</td>" +
+			"<td scope=\"col\">" + name + "</td>"
+            + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + reservation.id +"\" type=\"button\" class=\"btn btn-primary acceptPendingReservation\">Accept</button>" + "</td>"
+            + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + reservation.id +"\" type=\"button\" class=\"btn btn-danger cancelPendingReservation\">Cancel</button>" + "</td>"
+            + "</tr>";
+            
+		});
+	}
+	document.getElementById("profdiv").innerHTML = "<button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary backToProf\">Profile</button>" +
+		"<table class=\"table table-hover\"><thead>" +
+		"<tr>" + 
+	    "<th scope=\"col\">Begin Date</th>" +
+	    "<th scope=\"col\">End Date</th>" +
+	    "<th scope=\"col\">Location</th>" +
+		"</tr>" +
+		"</thead><tbody>" + pendingHTML + "</tbody></table>";
+}
+
+$(document).on('click', '.acceptPendingReservation', function(e) {
+	e.preventDefault();
+    var reservationId = $(this).val();
+     $.ajax({
+        type: "POST",
+        url:  "/reservations/" + reservationId +"/accept?user=" + currentUser.id,
+        dataType: "json",
+        async: false,
+        success: function(data){
+            loadPendingReservations();   
+        }
+	 }); 
+})
+
+$(document).on('click', '.cancelPendingReservation', function(e) {
+	e.preventDefault();
+    var reservationId = $(this).val();
+     $.ajax({
+        type: "POST",
+        url:  "/reservations/" + reservationId +"/decline?user=" + currentUser.id,
+        dataType: "json",
+        async: false,
+        success: function(data){
+            loadPendingReservations();   
+        }
+	 });
+})

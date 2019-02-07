@@ -117,6 +117,7 @@ public class TicketService implements TicketServiceInterface {
 		Ticket ticket = this.findById(ticketId);
 		FlightSeat seat = this.findSeatById(seatId);
 		if(seat.isTaken()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested seat is taken.");
+		if(seat.getFlight().getDepartureTime().before(new Date())) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request flight is unavailable.");
 		ticket.getSeats().add(seat);
 		ticket.setPrice(ticket.getPrice() + seat.getPrice());
 		ticket.setNumberOfSeats(ticket.getNumberOfSeats() + 1);

@@ -40,5 +40,7 @@ public class PendingReservation {
 	public Reservation getReservation() { return reservation; }
 
 	public Date getCreationTime() { return creationTime; }
+
+	public void setReservation(Reservation reservation) { this.reservation = reservation; }
 	
 }

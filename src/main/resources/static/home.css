@@ -38,6 +38,11 @@ tr:hover{
 	opacity: 0.9;
 }
 
+#profiltable {
+	background-color: #f3f3f3;
+	opacity: 0.9;
+}
+
 #dropDown{
 	margin: 10px;
 }

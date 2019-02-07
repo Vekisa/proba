@@ -118,6 +118,18 @@ public class RegisteredUserController {
 				return new ResponseEntity<List<Resource<Reservation>>>(HATEOASImplementorUsers.createReservationList(service.getActiveReservationsOfUser(userId)), HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/{id}/pendingReservations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća pozvane rezervacije za datog korisnika.", notes = "Povratna vrednost servisa je lista rezervacija na koje je korisnik pozvan.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content. Ne postoje takve rezervacije za datog korisnika."),
+			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
+			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
+	})
+	public ResponseEntity<List<Resource<Reservation>>> getPendingReservationsForUserWithId(@PathVariable("id") Long userId) {
+				return new ResponseEntity<List<Resource<Reservation>>>(HATEOASImplementorUsers.createReservationList(service.getPendingReservationsOfUser(userId)), HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/{id}/history", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraća istoriju rezervacija za datog korisnika.", notes = "Povratna vrednost servisa je lista istorije rezervacija (sve one koje su se završile).", httpMethod = "GET", produces = "application/json")
 	@ApiResponses(value = {

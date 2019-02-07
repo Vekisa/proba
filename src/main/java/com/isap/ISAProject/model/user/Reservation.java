@@ -63,7 +63,7 @@ public class Reservation {
 	
 	@JsonIgnore
 	@Cascade(CascadeType.ALL)
-	@OneToMany(mappedBy = "reservation")
+	@OneToMany(mappedBy = "reservation", orphanRemoval = true)
 	private List<PendingReservation> pendingReservations;
 	
 	public Reservation() {
