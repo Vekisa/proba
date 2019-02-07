@@ -60,7 +60,14 @@ public class VehicleReservation {
 		this.endDate = endDate;
 		this.vehicle = vehicle;
 	}
-	
+	public VehicleReservation(Long id, Date beginDate, Date endDate, double price) {
+		super();
+		this.id = id;
+		this.beginDate = beginDate;
+		this.endDate = endDate;
+		this.price = price;
+	}
+
 	public VehicleReservation() {
 		
 	}

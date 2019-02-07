@@ -21,7 +21,17 @@ public abstract class Company extends RatableEntity {
 	
 	@Column(nullable = false)
 	private String description;
+	
+	public Company(Long id, String name, String address, String description) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.address = address;
+		this.description = description;
+	}
 
+	public Company() {}
+	
 	public String getName() { return name; }
 	
 	public void setName(String name) { this.name = name; }
@@ -36,4 +46,7 @@ public abstract class Company extends RatableEntity {
 	
 	public Long getId() { return this.id; }
 
+	public void setId(Long id) {
+		this.id = id;
+	}
 }

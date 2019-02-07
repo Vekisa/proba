@@ -20,8 +20,7 @@ import com.isap.ISAProject.model.hotel.Hotel;
 import com.isap.ISAProject.model.hotel.Room;
 import com.isap.ISAProject.repository.hotel.FloorRepository;
 import com.isap.ISAProject.repository.hotel.RoomRepository;
-
-import hotelInterf.FloorServiceInterface;
+import com.isap.ISAProject.serviceInterface.hotel.FloorServiceInterface;
 
 @Service
 @Transactional(readOnly = true)

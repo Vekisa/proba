@@ -1,4 +1,4 @@
-package hotelInterf;
+package com.isap.ISAProject.serviceInterface.hotel;
 
 import java.util.List;
 

@@ -46,6 +46,12 @@ public class BranchOffice {
 	@Version
 	private Long version;
 	
+	public BranchOffice(Long id, String address) {
+		super();
+		this.id = id;
+		this.address = address;
+	}
+
 	public BranchOffice() {}
 	
 	public String getAddress() {
@@ -97,5 +103,9 @@ public class BranchOffice {
 	@Override
 	public String toString() {
 		return "BranchOffice [id=" + id + "]";
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 }

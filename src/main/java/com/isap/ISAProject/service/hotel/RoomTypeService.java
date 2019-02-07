@@ -18,8 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.isap.ISAProject.model.hotel.Catalogue;
 import com.isap.ISAProject.model.hotel.RoomType;
 import com.isap.ISAProject.repository.hotel.RoomTypeRepository;
-
-import hotelInterf.RoomTypeServiceInterface;
+import com.isap.ISAProject.serviceInterface.hotel.RoomTypeServiceInterface;
 
 @Service
 @Transactional(readOnly = true)

@@ -31,6 +31,10 @@ public class RentACar extends Company {
 	@OneToMany(mappedBy = "rentACar")
 	private List<RentACarRating> ratings;
 	
+	public RentACar(Long id, String name, String address, String description) {
+		super(id, name, address, description);
+	}
+
 	public RentACar() {
 		this.branchOffices = new ArrayList<>();
 	}
@@ -62,4 +66,6 @@ public class RentACar extends Company {
 	public String toString() {
 		return "RentACar [Id=" + getId() + "]";
 	}
+	
+	
 }

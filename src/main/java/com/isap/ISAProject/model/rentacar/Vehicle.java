@@ -58,6 +58,21 @@ public class Vehicle extends RatableEntity{
 	@Version
 	private Long version;
 	
+	public Vehicle() {}
+	
+	public Vehicle(Long id, double pricePerDay, double discount, String brand, String model, int productionYear,
+			String type, int seatsNumber) {
+		super();
+		this.id = id;
+		this.pricePerDay = pricePerDay;
+		this.discount = discount;
+		this.brand = brand;
+		this.model = model;
+		this.productionYear = productionYear;
+		this.type = type;
+		this.seatsNumber = seatsNumber;
+	}
+	
 	public double getPricePerDay() {
 		return pricePerDay;
 	}

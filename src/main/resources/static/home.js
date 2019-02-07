@@ -1338,6 +1338,38 @@ function printFlights(data){
 	document.getElementById("tablediv").innerHTML += flights;
 }
 
+function printFlights1(data){
+	
+	var flights = "";
+	var s = "";
+	if(data!=null){
+		$.each(data, function(index, flight) {
+			s += "<tr>" + "<td>" + flight.startDestination.name + "</td>" + "<td>"+ flight.finishDestination.name 
+			+ "</td>" + "<td>" + flight.transfers + "</td><td>" + flight.departureTime.substring(0, 19).replace('T', '<br>') + "</td><td>" + flight.arrivalTime.substring(0, 19).replace('T', '<br>') + "</td><td>"
+			+ flight.flightLength + "</td><td>" + flight.basePrice + "</td>"
+			+ "<td scope=\"col\"><button id = \"" + flight.links[0].href +"\" type=\"button\" class=\"btn btn-success bookflight\" value = \"" + flight.id +"\">Add to cart</button></td>"
+			+"</tr>";
+		});
+	}
+	
+	flights ="<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id =\"destbtn\">Destinations</button></div></div>" + "<div>" + 
+	"<hr>" + 
+	"<strong>Flights</strong>" +
+	"<hr>" +  "<table class=\"table table-hover\"><thead>" +
+		"<tr>" + 
+		"<th scope=\"col\">Start Destination</th>" +
+		"<th scope=\"col\">Finish Destination</th>" +
+		"<th scope=\"col\">Transfers</th>" +
+		"<th scope=\"col\">Departure Time</th>" +
+		"<th scope=\"col\">Arrival Time</th>" +
+		"<th scope=\"col\">Flight Length</th>" +
+		"<th scope=\"col\">Base Price</th>" +
+		"</tr>" +
+		"</thead><tbody>" + s + "</tbody></table>";
+	
+	document.getElementById("tablediv").innerHTML = flights;
+}
+
 function printBranchOffices(data){	
 	var pomDataBranchOffices;
 	$.ajax({
@@ -1417,7 +1449,7 @@ $(document).on('click', '#goSearch', function(e){
 	let endDate = new Date($('#endDateInput').val());
 	if($('#startDateInput').val() != "" && $('#endDateInput').val() != ""){
 		if(startDate < endDate){
-			search_rentacars();
+			search(selected_search_item);
 		}
 		else{
 			alert('Neispravno unet vremenski period!');
@@ -1430,14 +1462,23 @@ function search(company){
 	let parameters = [{"key": "name", "value": $('#nameInput').val()},
 		{"key": "locationName", "value": $('#locationInput1').val()}]
 	if($('#startDateInput').val() != ""){
-		parameters[2] = {"key": "startDate", "value": new Date($('#startDateInput').val()).toISOString()};
+		parameters[2] = {"key": "startDate", "value": new Date($('#startDateInput').val()).getTime()};
 	}
 	if($('#endDateInput').val() != ""){
-		parameters[3] = {"key": "endDate", "value": new Date($('#endDateInput').val()).toISOString()};
+		parameters[3] = {"key": "endDate", "value": new Date($('#endDateInput').val()).getTime()};
 	}
+	parameters[4] = {"key": "tripType", "value": $('#tripTypeSelect').find('option:selected').attr('value')};
+	parameters[5] = {"key": "category", "value": $('#flighClassInput').val()};
+	parameters[6] = {"key": "weight", "value": $('#LuggageWeightInput').val()};
+	parameters[7] = {"key": "personNum", "value": $('#personsNumberInput').val()};
+	parameters[8] = {"key": "airline", "value": $('#airlineIdFilter').val()};
+	parameters[9] = {"key": "priceBegin", "value": $('#priceBegin').val()};
+	parameters[10] = {"key": "priceEnd", "value": $('#priceEnd').val()};
+	parameters[11] = {"key": "durationBegin", "value": $('#durationBegin').val()};
+	parameters[12] = {"key": "durationEnd", "value": $('#durationEnd').val()};
 	let url;
 	for(i = 0; i < parameters.length; i++){
-		if(parameters[i].value != "" && parameters[i].value != undefined){
+		if(parameters[i] != undefined && parameters[i].value != "" && parameters[i].value != undefined){
 			url += '&' + parameters[i].key + '=' + parameters[i].value;
 		}
 	}
@@ -1472,7 +1513,6 @@ function search(company){
 		})
 	}
 }
-
 $(document).on('click','#addTicket',function(e){
     var x = document.getElementsByClassName("taken");
     var seats = new Array();

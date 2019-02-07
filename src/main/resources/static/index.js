@@ -580,8 +580,8 @@ function printFlights1(data){
 	let s = "";
 	if(data!=null){
 		$.each(data, function(index, flight) {
-			s += "<tr>" + "<td>" + flight.startDestination + "</td>" + "<td>"+ flight.finishDestination 
-			+ "</td>" + "<td>" + flight.transfers + "</td><td>" + flight.departureTime + "</td><td>" + flight.arrivalTime + "</td><td>"
+			s += "<tr>" + "<td>" + flight.startDestination.name + "</td>" + "<td>"+ flight.finishDestination.name 
+			+ "</td>" + "<td>" + flight.transfers + "</td><td>" + flight.departureTime.substring(0, 19).replace('T', '<br>') + "</td><td>" + flight.arrivalTime.substring(0, 19).replace('T', '<br>') + "</td><td>"
 			+ flight.flightLength + "</td><td>" + flight.basePrice + "</td>" + "</tr>";
 		});
 	}
@@ -600,7 +600,6 @@ function printFlights1(data){
 		"<th scope=\"col\">Base Price</th>" +
 		"</tr>" +
 		"</thead><tbody>" + s + "</tbody></table>";
-	
 	document.getElementById("tablediv").innerHTML = flights;
 }
 
@@ -685,7 +684,7 @@ $(document).on('click', '#goSearch', function(e){
 	let endDate = new Date($('#endDateInput').val());
 	if($('#startDateInput').val() != "" && $('#endDateInput').val() != ""){
 		if(startDate < endDate){
-			search_rentacars();
+			search(selected_search_item);
 		}
 		else{
 			alert('Neispravno unet vremenski period!');
@@ -698,14 +697,23 @@ function search(company){
 	let parameters = [{"key": "name", "value": $('#nameInput').val()},
 		{"key": "locationName", "value": $('#locationInput1').val()}]
 	if($('#startDateInput').val() != ""){
-		parameters[2] = {"key": "startDate", "value": new Date($('#startDateInput').val()).toISOString()};
+		parameters[2] = {"key": "startDate", "value": new Date($('#startDateInput').val()).getTime()};
 	}
 	if($('#endDateInput').val() != ""){
-		parameters[3] = {"key": "endDate", "value": new Date($('#endDateInput').val()).toISOString()};
+		parameters[3] = {"key": "endDate", "value": new Date($('#endDateInput').val()).getTime()};
 	}
+	parameters[4] = {"key": "tripType", "value": $('#tripTypeSelect').find('option:selected').attr('value')};
+	parameters[5] = {"key": "category", "value": $('#flighClassInput').val()};
+	parameters[6] = {"key": "weight", "value": $('#LuggageWeightInput').val()};
+	parameters[7] = {"key": "personNum", "value": $('#personsNumberInput').val()};
+	parameters[8] = {"key": "airline", "value": $('#airlineIdFilter').val()};
+	parameters[9] = {"key": "priceBegin", "value": $('#priceBegin').val()};
+	parameters[10] = {"key": "priceEnd", "value": $('#priceEnd').val()};
+	parameters[11] = {"key": "durationBegin", "value": $('#durationBegin').val()};
+	parameters[12] = {"key": "durationEnd", "value": $('#durationEnd').val()};
 	let url;
 	for(i = 0; i < parameters.length; i++){
-		if(parameters[i].value != "" && parameters[i].value != undefined){
+		if(parameters[i] != undefined && parameters[i].value != "" && parameters[i].value != undefined){
 			url += '&' + parameters[i].key + '=' + parameters[i].value;
 		}
 	}

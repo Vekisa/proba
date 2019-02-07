@@ -36,8 +36,7 @@ import com.isap.ISAProject.repository.hotel.HotelSpecifications;
 import com.isap.ISAProject.repository.hotel.RoomRepository;
 import com.isap.ISAProject.repository.hotel.RoomReservationRepository;
 import com.isap.ISAProject.repository.hotel.RoomReservationSpecifications;
-
-import hotelInterf.HotelServiceInterface;
+import com.isap.ISAProject.serviceInterface.hotel.HotelServiceInterface;
 
 @Service
 @Transactional(readOnly = true)

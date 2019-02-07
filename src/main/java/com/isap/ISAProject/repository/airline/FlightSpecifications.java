@@ -9,6 +9,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.isap.ISAProject.model.airline.Flight;
@@ -17,12 +19,13 @@ import com.isap.ISAProject.model.airline.TripType;
 
 public class FlightSpecifications {
 
+	private static Logger logger = LoggerFactory.getLogger(FlightSpecifications.class);
+
 	public static Specification<Flight> findByStartDestFinishDestDepTimeArrTimeTripType(String startDest,
 			String finishDest, Date depTime, Date arrTime, TripType tripType, String category,
 			String airlineName){
 		return new Specification<Flight>() {
 			private static final long serialVersionUID = 1L;
-
 			@Override
 			public Predicate toPredicate(Root<Flight> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
 				final Collection<Predicate> predicates = new ArrayList<Predicate>();
@@ -35,11 +38,11 @@ public class FlightSpecifications {
 					predicates.add(finishDestPredicate);
 				}
 				if(depTime != null) {
-					final Predicate depTimePredicate = criteriaBuilder.greaterThan(root.get("departureTime"), depTime);
+					final Predicate depTimePredicate = criteriaBuilder.greaterThanOrEqualTo(root.get("departureTime"), depTime);
 					predicates.add(depTimePredicate);
 				}
 				if(arrTime != null) {
-					final Predicate arrTimePredicate = criteriaBuilder.lessThan(root.get("arrivalTime"), arrTime);
+					final Predicate arrTimePredicate = criteriaBuilder.lessThanOrEqualTo(root.get("arrivalTime"), arrTime);
 					predicates.add(arrTimePredicate);
 				}
 				if(tripType != null) {
@@ -47,7 +50,7 @@ public class FlightSpecifications {
 					predicates.add(tripTypePredicate);
 				}
 				if(category != null) {
-					final Predicate categoryPredicate = criteriaBuilder.equal(root.join("category").get("name"), category);
+					final Predicate categoryPredicate = criteriaBuilder.like(root.join("category").get("name"), "%"+category+"%");
 					predicates.add(categoryPredicate);
 				}
 				if(airlineName != null) {
@@ -87,7 +90,7 @@ public class FlightSpecifications {
 		if (name == null) {
 			return null;
 		} else {
-			return (root, query, cb) -> cb.equal(root.join("startDestination").get("name"), name);
+			return (root, query, cb) -> cb.like(root.join("startDestination").get("name"), "%"+name+"%");
 		}
 	}
 
@@ -95,7 +98,7 @@ public class FlightSpecifications {
 		if (name == null) {
 			return null;
 		} else {
-			return (root, query, cb) -> cb.equal(root.join("finishDestination").get("name"), name);
+			return (root, query, cb) -> cb.like(root.join("finishDestination").get("name"), "%"+name+"%");
 		}
 	}
 

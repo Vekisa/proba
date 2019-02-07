@@ -271,10 +271,11 @@ public class FlightService implements FlightServiceInterface {
 	public List<Flight> search(Pageable pageable, String startDest, String finishDest, 
 			Date depTime, Date arrTime, TripType tripType, 
 			String category, Double weight, Integer personsNum, String airlaneName,
-			Double priceBegin, Double priceEnd, Long durationBegin, Long durationEnd) {
+			Double priceBegin, Double priceEnd, Double durationBegin, Double durationEnd) {
 		logger.info("> searching flights");
 		List<Flight> flights = repository.findAll(FlightSpecifications.findByStartDestFinishDestDepTimeArrTimeTripType(startDest, finishDest, depTime, arrTime, tripType, category, airlaneName));
 		logger.info("flights: " + flights);
+		logger.info("duzina za flights: " + flights.size());
 		List<FlightSeat> seats = new ArrayList<FlightSeat>();  
 		List<Flight> flights1 = flights;
 		Integer num = personsNum;
