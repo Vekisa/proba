@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -73,6 +74,9 @@ public class ReservationService {
 	
 	@Autowired
 	private EmailSenderService emailService;
+	
+	@Value("${discount.factor}") 
+	private int factor;
 	
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 	public Reservation findById(long id) {
@@ -150,11 +154,17 @@ public class ReservationService {
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-	public Reservation addUserToReservation(Long id, Long userId) {
+	public Reservation addUserToReservation(Long id, Long userId, int points) {
 		logger.info("> adding user to reservation with id {}", id);
 		Reservation reservation = this.findById(id);
 		RegisteredUser user = userService.findById(userId);
 		reservation.getConfirmedReservations().add(new ConfirmedReservation(user, reservation));
+		if(user.getBonusPoints() <= points) {
+			reservation.setPrice(reservation.getPrice() * (100 - points * this.getDiscountFactor()));
+			user.setBonusPoints(user.getBonusPoints() - points);
+		}
+		user.setBonusPoints(user.getBonusPoints() + (int) reservation.getTicket().getSeats().get(0).getFlight().getFlightLength() / 100);
+		if(user.getBonusPoints() > 15) user.setBonusPoints(15);
 		reservationRepository.save(reservation);
 		
 		emailService.sendReservationInfo(user, reservation);
@@ -213,6 +223,8 @@ public class ReservationService {
 		RegisteredUser user = userService.findById(userId);
 		if(!this.removeUserFromPendingReservations(reservation, user))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with id " + userId + " isn't invited.");
+		user.setBonusPoints(user.getBonusPoints() + (int) reservation.getTicket().getSeats().get(0).getFlight().getFlightLength() / 100);
+		if(user.getBonusPoints() > 15) user.setBonusPoints(15);
 		FlightSeat seat = getFreeSeat(reservation.getTicket());
 		if(user.getPassenger() == null)
 			user.setPassenger(this.createNewPassenger(user));
@@ -258,6 +270,8 @@ public class ReservationService {
 		if(!this.removeUserFromConfirmedReservations(reservation, user))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with id " + userId + " isn't on the reservation.");
 		this.removeUserFromSeat(reservation.getTicket(), user.getPassenger());
+		user.setBonusPoints(user.getBonusPoints() - (int) reservation.getTicket().getSeats().get(0).getFlight().getFlightLength() / 100);
+		if(user.getBonusPoints() < 0) user.setBonusPoints(0);
 		if(reservation.getConfirmedReservations().isEmpty()) {
 			logger.info("< reservation cancelled");
 			this.deleteById(id);
@@ -450,6 +464,17 @@ public class ReservationService {
 		reservationRepository.save(reservation);
 		logger.info("< reservation created");
 		return reservation;
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	public void setDiscountFactor(int factor) {
+		logger.info("> setting discount factor");
+		this.factor = factor;
+		logger.info("< discount factor set");
+	}
+
+	public int getDiscountFactor() {
+		return this.factor;
 	}
 	
 }
