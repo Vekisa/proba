@@ -1,5 +1,9 @@
-package com.isap.ISAProject.controller.rentacar;
+package com.isap.ISAProject.unit.controller.rentacar;
 
+import static com.isap.ISAProject.unit.constants.BranchOfficeConstants.DB_ADDRESS;
+import static com.isap.ISAProject.unit.constants.BranchOfficeConstants.DB_ID;
+import static com.isap.ISAProject.unit.constants.BranchOfficeConstants.NEW_ADDRESS;
+import static com.isap.ISAProject.unit.constants.BranchOfficeConstants.PAGE_SIZE;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -9,14 +13,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static com.isap.ISAProject.constants.RentACarConstants.DB_ADDRESS;
-import static com.isap.ISAProject.constants.RentACarConstants.DB_DESCRIPTION;
-import static com.isap.ISAProject.constants.RentACarConstants.DB_ID;
-import static com.isap.ISAProject.constants.RentACarConstants.DB_NAME;
-import static com.isap.ISAProject.constants.RentACarConstants.NEW_ADDRESS;
-import static com.isap.ISAProject.constants.RentACarConstants.NEW_DESCRIPTION;
-import static com.isap.ISAProject.constants.RentACarConstants.NEW_NAME;
-import static com.isap.ISAProject.constants.RentACarConstants.PAGE_SIZE;
 
 import java.nio.charset.Charset;
 
@@ -34,12 +30,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.isap.ISAProject.TestUtil;
-import com.isap.ISAProject.model.rentacar.RentACar;
+import com.isap.ISAProject.model.rentacar.BranchOffice;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class RentACarControllerTest {
-	private static final String URL_PREFIX = "/rent-a-cars";
+public class BranchOfficeControllerTest {
+	private static final String URL_PREFIX = "/branch_offices";
 
 	private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
@@ -55,33 +51,27 @@ public class RentACarControllerTest {
 	}
 	
 	@Test
-	public void testGetRentacarsPage() throws Exception {
+	public void testGetBranchOfficesPage() throws Exception {
 		mockMvc.perform(get(URL_PREFIX + "?page=0&size=" + PAGE_SIZE)).andExpect(status().isOk())
 		.andExpect(content().contentType(contentType)).andExpect(jsonPath("$", hasSize(PAGE_SIZE)))
 		.andExpect(jsonPath("$.[*].id").value(hasItem(DB_ID.intValue())))
-		.andExpect(jsonPath("$.[*].name").value(hasItem(DB_NAME)))
-		.andExpect(jsonPath("$.[*].address").value(hasItem(DB_ADDRESS)))
-		.andExpect(jsonPath("$.[*].description").value(hasItem(DB_DESCRIPTION)));
+		.andExpect(jsonPath("$.[*].address").value(hasItem(DB_ADDRESS)));
 	}
 	
 	@Test
-	public void testGetRentacar() throws Exception {
+	public void testGetBranchOffice() throws Exception {
 		mockMvc.perform(get(URL_PREFIX + "/" + DB_ID)).andExpect(status().isOk())
 		.andExpect(content().contentType(contentType))
 		.andExpect(jsonPath("$.id").value(DB_ID.intValue()))
-		.andExpect(jsonPath("$.name").value(DB_NAME))
-		.andExpect(jsonPath("$.address").value(DB_ADDRESS))
-		.andExpect(jsonPath("$.description").value(DB_DESCRIPTION));
+		.andExpect(jsonPath("$.address").value(DB_ADDRESS));
 	}
 	
 	@Test
 	@Transactional
 	@Rollback(true)
-	public void testSaveRentacar() throws Exception {
-		RentACar car = new RentACar();
-		car.setName(DB_NAME);
+	public void testSaveBranchOffice() throws Exception {
+		BranchOffice car = new BranchOffice();
 		car.setAddress(DB_ADDRESS);
-		car.setDescription(DB_DESCRIPTION);
 
 		String json = com.isap.ISAProject.TestUtil.json(car);
 		this.mockMvc.perform(post(URL_PREFIX).contentType(contentType).content(json)).andExpect(status().isCreated());
@@ -90,12 +80,10 @@ public class RentACarControllerTest {
 	@Test
 	@Transactional
 	@Rollback(true)
-	public void testUpdateRentacar() throws Exception {
-		RentACar car = new RentACar();
+	public void testUpdateBranchOffice() throws Exception {
+		BranchOffice car = new BranchOffice();
 		car.setId(DB_ID);
-		car.setName(NEW_NAME);
 		car.setAddress(NEW_ADDRESS);
-		car.setDescription(NEW_DESCRIPTION);
 
 		String json = TestUtil.json(car);
 		this.mockMvc.perform(put(URL_PREFIX).contentType(contentType).content(json)).andExpect(status().isOk());
@@ -104,7 +92,7 @@ public class RentACarControllerTest {
 	@Test
 	@Transactional
 	@Rollback(true)
-	public void testDeleteRentacar() throws Exception {
+	public void testDeleteBranchOffice() throws Exception {
 		this.mockMvc.perform(delete(URL_PREFIX + "/" + DB_ID)).andExpect(status().isOk());
 	}
 }

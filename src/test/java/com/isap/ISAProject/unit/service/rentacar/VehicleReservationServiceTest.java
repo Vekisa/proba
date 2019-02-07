@@ -1,14 +1,14 @@
-package com.isap.ISAProject.service.rentacar;
+package com.isap.ISAProject.unit.service.rentacar;
 
-import static com.isap.ISAProject.constants.VehicleReservationConstants.DB_ID;
-import static com.isap.ISAProject.constants.VehicleReservationConstants.DB_ID_TO_DELETE;
-import static com.isap.ISAProject.constants.VehicleReservationConstants.DB_BEGIN_DATE;
-import static com.isap.ISAProject.constants.VehicleReservationConstants.DB_END_DATE;
-import static com.isap.ISAProject.constants.VehicleReservationConstants.DB_PRICE;
-import static com.isap.ISAProject.constants.VehicleReservationConstants.NEW_BEGIN_DATE;
-import static com.isap.ISAProject.constants.VehicleReservationConstants.NEW_END_DATE;
-import static com.isap.ISAProject.constants.VehicleReservationConstants.NEW_PRICE;
-import static com.isap.ISAProject.constants.VehicleReservationConstants.PAGE_SIZE;
+import static com.isap.ISAProject.unit.constants.VehicleReservationConstants.DB_BEGIN_DATE;
+import static com.isap.ISAProject.unit.constants.VehicleReservationConstants.DB_END_DATE;
+import static com.isap.ISAProject.unit.constants.VehicleReservationConstants.DB_ID;
+import static com.isap.ISAProject.unit.constants.VehicleReservationConstants.DB_ID_TO_DELETE;
+import static com.isap.ISAProject.unit.constants.VehicleReservationConstants.DB_PRICE;
+import static com.isap.ISAProject.unit.constants.VehicleReservationConstants.NEW_BEGIN_DATE;
+import static com.isap.ISAProject.unit.constants.VehicleReservationConstants.NEW_END_DATE;
+import static com.isap.ISAProject.unit.constants.VehicleReservationConstants.NEW_PRICE;
+import static com.isap.ISAProject.unit.constants.VehicleReservationConstants.PAGE_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doNothing;

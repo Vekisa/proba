@@ -1,9 +1,13 @@
-package com.isap.ISAProject.controller.rentacar;
+package com.isap.ISAProject.unit.controller.rentacar;
 
-import static com.isap.ISAProject.constants.BranchOfficeConstants.DB_ADDRESS;
-import static com.isap.ISAProject.constants.BranchOfficeConstants.DB_ID;
-import static com.isap.ISAProject.constants.BranchOfficeConstants.NEW_ADDRESS;
-import static com.isap.ISAProject.constants.BranchOfficeConstants.PAGE_SIZE;
+import static com.isap.ISAProject.unit.constants.RentACarConstants.DB_ADDRESS;
+import static com.isap.ISAProject.unit.constants.RentACarConstants.DB_DESCRIPTION;
+import static com.isap.ISAProject.unit.constants.RentACarConstants.DB_ID;
+import static com.isap.ISAProject.unit.constants.RentACarConstants.DB_NAME;
+import static com.isap.ISAProject.unit.constants.RentACarConstants.NEW_ADDRESS;
+import static com.isap.ISAProject.unit.constants.RentACarConstants.NEW_DESCRIPTION;
+import static com.isap.ISAProject.unit.constants.RentACarConstants.NEW_NAME;
+import static com.isap.ISAProject.unit.constants.RentACarConstants.PAGE_SIZE;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -30,12 +34,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.isap.ISAProject.TestUtil;
-import com.isap.ISAProject.model.rentacar.BranchOffice;
+import com.isap.ISAProject.model.rentacar.RentACar;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class BranchOfficeControllerTest {
-	private static final String URL_PREFIX = "/branch_offices";
+public class RentACarControllerTest {
+	private static final String URL_PREFIX = "/rent-a-cars";
 
 	private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
@@ -51,27 +55,33 @@ public class BranchOfficeControllerTest {
 	}
 	
 	@Test
-	public void testGetBranchOfficesPage() throws Exception {
+	public void testGetRentacarsPage() throws Exception {
 		mockMvc.perform(get(URL_PREFIX + "?page=0&size=" + PAGE_SIZE)).andExpect(status().isOk())
 		.andExpect(content().contentType(contentType)).andExpect(jsonPath("$", hasSize(PAGE_SIZE)))
 		.andExpect(jsonPath("$.[*].id").value(hasItem(DB_ID.intValue())))
-		.andExpect(jsonPath("$.[*].address").value(hasItem(DB_ADDRESS)));
+		.andExpect(jsonPath("$.[*].name").value(hasItem(DB_NAME)))
+		.andExpect(jsonPath("$.[*].address").value(hasItem(DB_ADDRESS)))
+		.andExpect(jsonPath("$.[*].description").value(hasItem(DB_DESCRIPTION)));
 	}
 	
 	@Test
-	public void testGetBranchOffice() throws Exception {
+	public void testGetRentacar() throws Exception {
 		mockMvc.perform(get(URL_PREFIX + "/" + DB_ID)).andExpect(status().isOk())
 		.andExpect(content().contentType(contentType))
 		.andExpect(jsonPath("$.id").value(DB_ID.intValue()))
-		.andExpect(jsonPath("$.address").value(DB_ADDRESS));
+		.andExpect(jsonPath("$.name").value(DB_NAME))
+		.andExpect(jsonPath("$.address").value(DB_ADDRESS))
+		.andExpect(jsonPath("$.description").value(DB_DESCRIPTION));
 	}
 	
 	@Test
 	@Transactional
 	@Rollback(true)
-	public void testSaveBranchOffice() throws Exception {
-		BranchOffice car = new BranchOffice();
+	public void testSaveRentacar() throws Exception {
+		RentACar car = new RentACar();
+		car.setName(DB_NAME);
 		car.setAddress(DB_ADDRESS);
+		car.setDescription(DB_DESCRIPTION);
 
 		String json = com.isap.ISAProject.TestUtil.json(car);
 		this.mockMvc.perform(post(URL_PREFIX).contentType(contentType).content(json)).andExpect(status().isCreated());
@@ -80,10 +90,12 @@ public class BranchOfficeControllerTest {
 	@Test
 	@Transactional
 	@Rollback(true)
-	public void testUpdateBranchOffice() throws Exception {
-		BranchOffice car = new BranchOffice();
+	public void testUpdateRentacar() throws Exception {
+		RentACar car = new RentACar();
 		car.setId(DB_ID);
+		car.setName(NEW_NAME);
 		car.setAddress(NEW_ADDRESS);
+		car.setDescription(NEW_DESCRIPTION);
 
 		String json = TestUtil.json(car);
 		this.mockMvc.perform(put(URL_PREFIX).contentType(contentType).content(json)).andExpect(status().isOk());
@@ -92,7 +104,7 @@ public class BranchOfficeControllerTest {
 	@Test
 	@Transactional
 	@Rollback(true)
-	public void testDeleteBranchOffice() throws Exception {
+	public void testDeleteRentacar() throws Exception {
 		this.mockMvc.perform(delete(URL_PREFIX + "/" + DB_ID)).andExpect(status().isOk());
 	}
 }

@@ -1,22 +1,22 @@
-package com.isap.ISAProject.service.rentacar;
+package com.isap.ISAProject.unit.service.rentacar;
 
-import static com.isap.ISAProject.constants.VehicleConstants.DB_PRICE_PER_DAY;
-import static com.isap.ISAProject.constants.VehicleConstants.DB_DISCOUNT;
-import static com.isap.ISAProject.constants.VehicleConstants.DB_ID;
-import static com.isap.ISAProject.constants.VehicleConstants.DB_ID_TO_DELETE;
-import static com.isap.ISAProject.constants.VehicleConstants.DB_BRAND;
-import static com.isap.ISAProject.constants.VehicleConstants.DB_MODEL;
-import static com.isap.ISAProject.constants.VehicleConstants.DB_PROD_YEAR;
-import static com.isap.ISAProject.constants.VehicleConstants.DB_TYPE;
-import static com.isap.ISAProject.constants.VehicleConstants.DB_SEATS_NUMBER;
-import static com.isap.ISAProject.constants.VehicleConstants.NEW_PRICE_PER_DAY;
-import static com.isap.ISAProject.constants.VehicleConstants.NEW_DISCOUNT;
-import static com.isap.ISAProject.constants.VehicleConstants.NEW_BRAND;
-import static com.isap.ISAProject.constants.VehicleConstants.NEW_MODEL;
-import static com.isap.ISAProject.constants.VehicleConstants.NEW_PROD_YEAR;
-import static com.isap.ISAProject.constants.VehicleConstants.NEW_TYPE;
-import static com.isap.ISAProject.constants.VehicleConstants.NEW_SEATS_NUMBER;
-import static com.isap.ISAProject.constants.VehicleConstants.PAGE_SIZE;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.DB_BRAND;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.DB_DISCOUNT;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.DB_ID;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.DB_ID_TO_DELETE;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.DB_MODEL;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.DB_PRICE_PER_DAY;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.DB_PROD_YEAR;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.DB_SEATS_NUMBER;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.DB_TYPE;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.NEW_BRAND;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.NEW_DISCOUNT;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.NEW_MODEL;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.NEW_PRICE_PER_DAY;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.NEW_PROD_YEAR;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.NEW_SEATS_NUMBER;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.NEW_TYPE;
+import static com.isap.ISAProject.unit.constants.VehicleConstants.PAGE_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doNothing;
@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.isap.ISAProject.model.rentacar.Vehicle;
 import com.isap.ISAProject.repository.rentacar.VehicleRepository;
+import com.isap.ISAProject.service.rentacar.VehicleService;
 
 public class VehicleServiceTest {
 	@Mock

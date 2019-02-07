@@ -1,10 +1,10 @@
-package com.isap.ISAProject.service.rentacar;
+package com.isap.ISAProject.unit.service.rentacar;
 
-import static com.isap.ISAProject.constants.BranchOfficeConstants.DB_ADDRESS;
-import static com.isap.ISAProject.constants.BranchOfficeConstants.DB_ID;
-import static com.isap.ISAProject.constants.BranchOfficeConstants.DB_ID_TO_DELETE;
-import static com.isap.ISAProject.constants.BranchOfficeConstants.NEW_ADDRESS;
-import static com.isap.ISAProject.constants.BranchOfficeConstants.PAGE_SIZE;
+import static com.isap.ISAProject.unit.constants.BranchOfficeConstants.DB_ADDRESS;
+import static com.isap.ISAProject.unit.constants.BranchOfficeConstants.DB_ID;
+import static com.isap.ISAProject.unit.constants.BranchOfficeConstants.DB_ID_TO_DELETE;
+import static com.isap.ISAProject.unit.constants.BranchOfficeConstants.NEW_ADDRESS;
+import static com.isap.ISAProject.unit.constants.BranchOfficeConstants.PAGE_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doNothing;
@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.isap.ISAProject.model.rentacar.BranchOffice;
 import com.isap.ISAProject.repository.rentacar.BranchOfficeRepository;
+import com.isap.ISAProject.service.rentacar.BranchOfficeService;
 
 public class BranchOfficeServiceTest {
 	@Mock
