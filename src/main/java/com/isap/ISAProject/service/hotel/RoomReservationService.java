@@ -193,7 +193,7 @@ public class RoomReservationService implements RoomReservationServiceInterface {
 		roomReservation.setNumberOfNights((int) TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS));
 		roomReservation.setPrice(roomReservation.getNumberOfNights() * room.getRoomType().getPricePerNight());
 		room.getRoomReservations().add(roomReservation);
-		roomService.save(room);
+		//roomService.save(room);
 		logger.info("< create room reservation  with room");
 		this.save(roomReservation);
 		return roomReservation;

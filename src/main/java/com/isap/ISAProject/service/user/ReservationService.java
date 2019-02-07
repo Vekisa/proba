@@ -326,6 +326,9 @@ public class ReservationService {
 		RoomReservation roomReservation = roomReservationService.findById(roomReservationId);
 		reservation.setRoomReservation(roomReservation);
 		roomReservation.setReservation(reservation);
+		if(reservation.getEndDate().before(roomReservation.getEndDate()))
+			reservation.setEndDate(roomReservation.getEndDate());
+		reservation.setPrice(reservation.getPrice() + roomReservation.getPrice());
 		reservationRepository.save(reservation);
 		roomReservationService.save(roomReservation);
 		return reservation;
@@ -428,6 +431,9 @@ public class ReservationService {
 		VehicleReservation vr = vehicleReservationService.getVehicleReservationById(vrId);
 		r.setVehicleReservation(vr);
 		vr.setReservation(r);
+		if(r.getEndDate().before(vr.getEndDate()))
+			r.setEndDate(vr.getEndDate());
+		r.setPrice(r.getPrice() + vr.getPrice());
 		reservationRepository.save(r);
 		vehicleReservationService.saveVehicleReservation(vr);
 		return r;

@@ -64,7 +64,7 @@ public class ReservationController {
 	}
 	
 	//Povezivanje sa rezervacijom sobe
-	@RequestMapping(value= "/{id}/set-room-reservation/{idroom}", method=RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value= "/{id}/set-room-reservation/{idroom}", method=RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Vraca rezervaciju.", notes = "Povezuje rezervaciju sobe za glavnu rezervaciju",
 			httpMethod = "POST", consumes = "application/json", produces = "application/json")
 	@ApiResponses(value = { 

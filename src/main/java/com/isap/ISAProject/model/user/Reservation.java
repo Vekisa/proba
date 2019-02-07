@@ -57,10 +57,12 @@ public class Reservation {
 	private Date endDate;
 	
 	@JsonIgnore
+	@Cascade(CascadeType.ALL)
 	@OneToMany(mappedBy = "reservation")
 	private List<ConfirmedReservation> confirmedReservations;
 	
 	@JsonIgnore
+	@Cascade(CascadeType.ALL)
 	@OneToMany(mappedBy = "reservation")
 	private List<PendingReservation> pendingReservations;
 	

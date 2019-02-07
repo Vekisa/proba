@@ -71,6 +71,7 @@ $(document).on('click','#userName',function(e){
 	e.preventDefault();
 	$("#myMap").hide();
 	$("#tablediv").hide();
+    $('#profdiv').hide();
 	
 	$('#usernameP').text(currentUser.username);
 	$('#firstNameP').text(currentUser.firstName);
@@ -692,6 +693,7 @@ $(document).on('click','#bookNow', function() {
     if(room !== "null" && room !== undefined){
         let s = new Date(roomStartDate);
         let e = new Date(roomEndDate);
+        alert("usao u room");
         $.ajax({
             type: "POST",
             url: "room_reservations/create-with-room/" + room + "?begin=" + s.getTime() + "&end=" + e.getTime(),
@@ -699,14 +701,15 @@ $(document).on('click','#bookNow', function() {
             async: false,
             success: function(data){
                 roomReservation = data;
-                //alert("napravio room reservation");
+                alert("napravio room reservation");
+                alert(reservation.id + " " + roomReservation.id);
                  $.ajax({
                     type: "POST",
                     url: "/reservations/" + reservation.id + "/set-room-reservation/" + roomReservation.id, 
-                    contentType: "application/json",
+                    dataType: "json", 
                     async: false,
                     success: function(data){
-                        //alert("povezao sobu"); 
+                        alert("povezao sobu"); 
                     }
                 });
             }
@@ -719,7 +722,7 @@ $(document).on('click','#bookNow', function() {
                 type: "POST",
                 url: "/room_reservations/" + roomReservation.id + "/multiple_extra_options", 
                 contentType: "application/json",
-                data: "json",
+                dataType: "json",
                 data: JSON.stringify(extraOptions),
                 async: false,
                 success: function(data){
@@ -1046,11 +1049,15 @@ $(document).on('click','#reservationHisBtn',function(e){
 
 $(document).on('click','#activeResBtn',function(e){
 	e.preventDefault();
-	var pomData;
-    //alert($(this).val());
-	 $.ajax({
+    printActRes();
+});
+
+function printActRes(){
+    var pomData;
+    
+    $.ajax({
 			type: "GET",
-			url: $(this).val(),
+			url: "/users/registered/" + currentUser.id + "/activeReservations",
 			dataType: "json",
 			async: false,
 			success: function(data){
@@ -1062,8 +1069,7 @@ $(document).on('click','#activeResBtn',function(e){
 	 
 	 $('#profdiv').show();
 	 $('#profile').hide();
-	 
-});
+}
 
 function printFriends(data){
 	var friends = "";
@@ -1091,6 +1097,7 @@ function printFriends(data){
 $(document).on('click','.btnAcceptReq',function(e){
     e.preventDefault();
     $(this).prop("disabled",true);
+    $(this).next().prop("disabled",true);
     $.ajax({
 		type: "POST",
 		url: $(this).val(),
@@ -1099,6 +1106,7 @@ $(document).on('click','.btnAcceptReq',function(e){
 		success: function(data){
 			if(data!=null){
 				//alert("prihvatio");
+                
 			}
 		}
 	});
@@ -1107,6 +1115,7 @@ $(document).on('click','.btnAcceptReq',function(e){
 $(document).on('click','.btnDeclineReq',function(e){
     e.preventDefault();
     $(this).prop("disabled",true);
+    $(this).prev().prop("disabled",true);
     $.ajax({
 		type: "DELETE",
 		url: $(this).val(),
@@ -1135,13 +1144,13 @@ function printFriendRequests(data){
             valueBtnDecline = linkDecline.substring(0, linkDecline.length-1) + friendRequest.sender.id;
             
 			friendRequests += "<tr>" + "<td scope=\"col\">" + friendRequest.sender.firstName + "</td>" + "<td scope=\"col\">" + friendRequest.sender.lastName + "</td>" +
-			"<td scope=\"col\">" + friendRequest.requestTime + "</td>"
-            + "<td scope=\"col\">" + "<button value=\"" + valueBtnAccept + "\" type=\"button\" class=\"btn btn-success btnAcceptReq\">Accept</button>" + "</td>"
-            + "<td scope=\"col\">" + "<button value=\"" + valueBtnDecline + "\" type=\"button\" class=\"btn btn-danger btnDeclineReq\">Decline</button>" + "</td>"
-                + "</tr>";
+			"<td scope=\"col\">" + friendRequest.requestTime.substring(0, 19).replace('T', '<br>') + "</td>"
+            + "<td scope=\"col\">" + "<button value=\"" + valueBtnAccept + "\" type=\"button\" class=\"btn btn-success btnAcceptReq\">Accept</button>"
+            + "<button value=\"" + valueBtnDecline + "\" type=\"button\" class=\"btn btn-danger btnDeclineReq\">Decline</button>" + "</td>"
+            + "</tr>";
 		});
 	}
-	
+    
 	document.getElementById("profdiv").innerHTML = "<button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary backToProf\">Profile</button>" +
 		"<table class=\"table\"><thead>" +
 		"<tr>" + 
@@ -1168,7 +1177,7 @@ function printReservationHistory(data){
 			 });
 			 
 			history += "<tr>" + "<td scope=\"col\">" + reservation.beginDate.substring(0, 19).replace('T', '<br>') + "</td>" + "<td scope=\"col\">"+ reservation.endDate.substring(0, 19).replace('T', '<br>') + "</td>" +
-			"<td scope=\"col\">" + name + "</td>" + "</tr>";
+			"<td scope=\"col\">" + name + "</td>" + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + reservation.id +"\" type=\"button\" class=\"btn btn-warning viewReservationHis\">View</button>" + "</td>" + "</tr>";
 		});
 	}
 	
@@ -1185,13 +1194,15 @@ function printReservationHistory(data){
 function printActiveReservations(data){
 	var history = "";
 	var name = "";
+    var vehicle = "";
     //alert("tu sam");
+    
 	if(data!=null){
         //alert("imam sta da prikazem");
 		$.each(data, function(index, reservation) {
 			 $.ajax({
 					type: "GET",
-					url:  reservation._links.location.href,
+					url:  reservation.links[1].href,
 					dataType: "json",
 					async: false,
 					success: function(data){
@@ -1199,8 +1210,13 @@ function printActiveReservations(data){
 					}
 			 });
 			 
-			history += "<tr>" + "<td scope=\"col\">" + reservation.beginDate + "</td>" + "<td scope=\"col\">"+ reservation.endDate + "</td>" +
-			"<td scope=\"col\">" + name + "</td>" + "</tr>";
+			history += "<tr>" + "<td scope=\"col\">" + reservation.beginDate.substring(0, 19).replace('T', '<br>') + "</td>" + "<td scope=\"col\">"+ reservation.endDate.substring(0, 19).replace('T', '<br>') + "</td>" +
+			"<td scope=\"col\">" + name + "</td>"
+            + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + reservation.id +"\" type=\"button\" class=\"btn btn-warning viewReservation\">View</button>" + "</td>"
+            + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + reservation.id +"\" type=\"button\" class=\"btn btn-primary inviteReservation\">Invite</button>" + "</td>"
+            + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + reservation.id +"\" type=\"button\" class=\"btn btn-danger cancelReservation\">Cancel</button>" + "</td>"
+            + "</tr>";
+            
 		});
 	}
 	
@@ -1213,6 +1229,238 @@ function printActiveReservations(data){
 		"</tr>" +
 		"</thead><tbody>" + history + "</tbody></table>";
 }
+
+$(document).on('click','.viewReservationHis',function(e){
+     var id = $(this).val();
+    var reservation;
+    var flight;
+    $.ajax({
+        type: "GET",
+        url:  "/reservations/" + id,
+        dataType: "json",
+        async: false,
+        success: function(data){
+            reservation = data;
+        }
+	 }); 
+    
+    var htmlCode = ""
+    
+    if(reservation.ticket != null && reservation.ticket != "null"){
+        
+        $.ajax({
+            type: "GET",
+            url:  "/tickets/" + reservation.ticket.id + "/flight",
+            dataType: "json",
+            async: false,
+            success: function(data){
+                flight = data;
+            }
+	   }); 
+        
+        htmlCode += "<hr>" + 
+            "<strong>Flight</strong>" +
+            "<hr>" + "<pre><strong>From:</strong> " + flight.startDestination.name + "</pre>" + 
+                "<pre><strong>Destination:</strong> " + flight.finishDestination.name + "</pre>" +
+                "<pre><strong>Number Of Seats:</strong> " + reservation.ticket.numberOfSeats + "</pre>" +
+                "<pre><strong>Departure Time:</strong> " + flight.departureTime.substring(0, 19).replace('T', ' ') + "</pre>" +
+                "<pre><strong>Arrival Time:</strong> " + flight.arrivalTime.substring(0, 19).replace('T', ' ') + "</pre>" +
+                "<pre><strong>Price:</strong> " + reservation.ticket.price + "&euro;</pre>" +
+                "<pre><strong>Rate:</strong> " +
+                    "<input type=\"radio\" name=\"flight\" value=\"1\">1&nbsp;" +
+                    "<input type=\"radio\" name=\"flight\" value=\"2\">2&nbsp;" +
+                    "<input type=\"radio\" name=\"flight\" value=\"3\">3&nbsp;" +
+                    "<input type=\"radio\" name=\"flight\" value=\"4\">4&nbsp;" +
+                    "<input type=\"radio\" name=\"flight\" value=\"5\">5&nbsp;" +
+                    "<button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id=\"rateFlightBtn\">Rate!</button>"
+                + "</pre>" ;
+    }
+    
+    if(reservation.vehicleReservation != null && reservation.vehicleReservation != "null"){
+        htmlCode += "<hr>" + 
+            "<strong>Vehicle</strong>" +
+            "<hr>" + "<pre><strong>Brand:</strong> " + reservation.vehicleReservation.vehicle.brand + "</pre>" +
+                "<pre><strong>Model:</strong> " + reservation.vehicleReservation.vehicle.model + "</pre>" +
+                "<pre><strong>Type:</strong> " + reservation.vehicleReservation.vehicle.type + "</pre>" +
+                "<pre><strong>Begin Date:</strong> " + reservation.vehicleReservation.beginDate.substring(0, 19).replace('T', ' ') + "</pre>" + 
+                "<pre><strong>End Date:</strong> " + reservation.vehicleReservation.endDate.substring(0, 19).replace('T', ' ') + "</pre>" +
+                "<pre><strong>Price:</strong> " + reservation.vehicleReservation.price + "&euro;</pre>" +
+                "<pre><strong>Rate:</strong> " +
+                    "<input type=\"radio\" name=\"vehicle\" value=\"1\">1&nbsp;" +
+                    "<input type=\"radio\" name=\"vehicle\" value=\"2\">2&nbsp;" +
+                    "<input type=\"radio\" name=\"vehicle\" value=\"3\">3&nbsp;" +
+                    "<input type=\"radio\" name=\"vehicle\" value=\"4\">4&nbsp;" +
+                    "<input type=\"radio\" name=\"vehicle\" value=\"5\">5&nbsp;" +
+                    "<button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id=\"rateVehicleBtn\">Rate!</button>"
+                + "</pre>";
+    }
+    
+    if(reservation.roomReservation != null && reservation.roomReservation != "null"){
+        htmlCode += "<hr>" + 
+            "<strong>Room</strong>" +
+            "<hr>" + "<pre><strong>Hotel:</strong> " + reservation.roomReservation.room.floor.hotel.name + "</pre>" +
+                    "<pre><strong>Room Type:</strong> " + reservation.roomReservation.room.roomType.description + "</pre>" + 
+                    "<pre><strong>Begin Date:</strong> " + reservation.roomReservation.beginDate.substring(0, 19).replace('T', ' ') + "</pre>" + 
+                    "<pre><strong>End Date:</strong> " + reservation.roomReservation.endDate.substring(0, 19).replace('T', ' ') + "</pre>" +
+                    "<pre><strong>Price:</strong> " + reservation.roomReservation.price + "&euro;</pre>" + 
+                    "<pre><strong>Rate:</strong> " +
+                    "<input type=\"radio\" name=\"room\" value=\"1\">1&nbsp;" +
+                    "<input type=\"radio\" name=\"room\" value=\"2\">2&nbsp;" +
+                    "<input type=\"radio\" name=\"room\" value=\"3\">3&nbsp;" +
+                    "<input type=\"radio\" name=\"room\" value=\"4\">4&nbsp;" +
+                    "<input type=\"radio\" name=\"room\" value=\"5\">5&nbsp;" +
+                    "<button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id=\"rateRoomBtn\">Rate!</button>"
+                + "</pre>";
+;
+    }
+    
+    document.getElementById("reservation").innerHTML = htmlCode;
+    
+    $('#reservationModal').modal();
+    
+})
+
+$(document).on('click','.viewReservation',function(e){
+    var id = $(this).val();
+    var reservation;
+    var flight;
+    $.ajax({
+        type: "GET",
+        url:  "/reservations/" + id,
+        dataType: "json",
+        async: false,
+        success: function(data){
+            reservation = data;
+        }
+	 }); 
+    
+    var htmlCode = ""
+    
+    if(reservation.ticket != null && reservation.ticket != "null"){
+        
+        $.ajax({
+            type: "GET",
+            url:  "/tickets/" + reservation.ticket.id + "/flight",
+            dataType: "json",
+            async: false,
+            success: function(data){
+                flight = data;
+            }
+	   }); 
+        
+        htmlCode += "<hr>" + 
+            "<strong>Flight</strong>" +
+            "<hr>" + "<pre><strong>From:</strong> " + flight.startDestination.name + "</pre>" + 
+                "<pre><strong>Destination:</strong> " + flight.finishDestination.name + "</pre>" +
+                "<pre><strong>Number Of Seats:</strong> " + reservation.ticket.numberOfSeats + "</pre>" +
+                "<pre><strong>Departure Time:</strong> " + flight.departureTime.substring(0, 19).replace('T', ' ') + "</pre>" +
+                "<pre><strong>Arrival Time:</strong> " + flight.arrivalTime.substring(0, 19).replace('T', ' ') + "</pre>" +
+                "<pre><strong>Price:</strong> " + reservation.ticket.price + "&euro;</pre>";
+    }
+    
+    if(reservation.vehicleReservation != null && reservation.vehicleReservation != "null"){
+        htmlCode += "<hr>" + 
+            "<strong>Vehicle</strong>" +
+            "<hr>" + "<pre><strong>Brand:</strong> " + reservation.vehicleReservation.vehicle.brand + "</pre>" +
+                "<pre><strong>Model:</strong> " + reservation.vehicleReservation.vehicle.model + "</pre>" +
+                "<pre><strong>Type:</strong> " + reservation.vehicleReservation.vehicle.type + "</pre>" +
+                "<pre><strong>Begin Date:</strong> " + reservation.vehicleReservation.beginDate.substring(0, 19).replace('T', ' ') + "</pre>" + 
+                "<pre><strong>End Date:</strong> " + reservation.vehicleReservation.endDate.substring(0, 19).replace('T', ' ') + "</pre>" +
+                "<pre><strong>Price:</strong> " + reservation.vehicleReservation.price + "&euro;</pre>";
+    }
+    
+    if(reservation.roomReservation != null && reservation.roomReservation != "null"){
+        htmlCode += "<hr>" + 
+            "<strong>Room</strong>" +
+            "<hr>" + "<pre><strong>Hotel:</strong> " + reservation.roomReservation.room.floor.hotel.name + "</pre>" +
+                    "<pre><strong>Room Type:</strong> " + reservation.roomReservation.room.roomType.description + "</pre>" + 
+                    "<pre><strong>Begin Date:</strong> " + reservation.roomReservation.beginDate.substring(0, 19).replace('T', ' ') + "</pre>" + 
+                    "<pre><strong>End Date:</strong> " + reservation.roomReservation.endDate.substring(0, 19).replace('T', ' ') + "</pre>" +
+                    "<pre><strong>Price:</strong> " + reservation.roomReservation.price + "&euro;</pre>";
+;
+    }
+    
+    document.getElementById("reservation").innerHTML = htmlCode;
+    
+    $('#reservationModal').modal();
+});
+
+$(document).on('click','.inviteReservation',function(e){
+    //e.preventDefault();
+    var id = $(this).val();
+    $('#friendsModal').modal();
+    
+    $.ajax({
+        type: "GET",
+        url:  "/users/registered/" + currentUser.id + "/friends",
+        dataType: "json",
+        async: false,
+        success: function(data){
+            printFriendsToInvite(data);
+        }
+	 }); 
+});
+
+$(document).on('click','.cancelReservation',function(e){
+    e.preventDefault();
+    var reservationId = $(this).val();
+    alert("odustajem");
+    
+     $.ajax({
+        type: "POST",
+        url:  "/reservations/" + reservationId +"/cancel?user=" + currentUser.id,
+        dataType: "json",
+        async: false,
+        success: function(data){
+            alert("odustao");
+            printActRes();   
+        }
+	 }); 
+});
+
+function printFriendsToInvite(data){
+    
+    var friendsHTML = "";
+    
+    $.each(data,function(index,friend){
+        friendsHTML += "<tr>" + "<td scope=\"col\">" + friend.firstName + "</td>" + "<td scope=\"col\">" + friend.lastName + "</td>"
+            + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + friend.id +"\" type=\"button\" class=\"btn btn-primary inviteFriend\">Invite</button>" + "</td>"
+            + "</tr>";
+    });
+    
+    
+    var code = "<table class=\"table table-hover\"><thead>" +
+		"<tr>" + 
+	    "<th scope=\"col\">First Name</th>" +
+	    "<th scope=\"col\">Last Name</th>" +
+		"</tr>" +
+		"</thead><tbody>" + friendsHTML + "</tbody></table>";
+    
+     document.getElementById("friends").innerHTML = code;
+}
+
+$(document).on('click','.inviteFriend',function(e){
+    e.preventDefault();
+    var friendId = $(this).val();
+    var friendList = new Array();
+    friendList.push(friendId);
+    
+    alert("/reservations/" + currentUser.id + "/invite");
+    alert(friendList);
+    
+    $.ajax({
+        type: "POST",
+        url:  "/reservations/" + currentUser.id + "/invite",
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify(friendList),
+        async: false,
+        success: function(data){
+            alert("poslao invite");
+        }
+	 });
+    
+});
 
 $(document).on('click','#destbtn',function(e){
 	$("#myMap").hide();
