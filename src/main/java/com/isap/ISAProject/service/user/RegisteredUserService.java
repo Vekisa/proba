@@ -97,8 +97,9 @@ public class RegisteredUserService implements RegisteredUserServiceInterface {
 		oldUser.setUsername(newUser.getUsername());
 		BCryptPasswordEncoder bc = new BCryptPasswordEncoder();
 		oldUser.setPassword(bc.encode(newUser.getPassword()));
+		this.save(oldUser);
 		logger.info("< updated user");
-		return null;
+		return oldUser;
 	}
 
 	@Override

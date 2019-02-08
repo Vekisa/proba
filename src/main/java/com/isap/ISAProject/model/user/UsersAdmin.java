@@ -21,6 +21,12 @@ public class UsersAdmin extends SystemUser {
 	
 	public UsersAdmin() {}
 	
+	public UsersAdmin(String email, String username, String password, String firstName, String lastName, String city,
+			String phoneNumber) {
+		super(email, username, password, firstName, lastName, city, phoneNumber);
+		this.setAuthority(AuthorizationLevel.USERS_ADMIN);
+	}
+
 	@Override
 	public AuthorizationLevel getAuthority() { return this.authority; }
 

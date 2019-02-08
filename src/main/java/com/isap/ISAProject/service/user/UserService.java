@@ -23,6 +23,7 @@ import com.isap.ISAProject.model.user.AuthorizationLevel;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.model.user.ConfirmationToken;
 import com.isap.ISAProject.model.user.RegisteredUser;
+import com.isap.ISAProject.model.user.UserState;
 import com.isap.ISAProject.model.user.UsersAdmin;
 import com.isap.ISAProject.repository.user.CompanyAdminRepository;
 import com.isap.ISAProject.repository.user.ConfirmationTokenRepository;
@@ -70,6 +71,7 @@ public class UserService implements UserServiceInterface {
 		logger.info("> save admin with username {} and email {}", admin.getUsername(), admin.getEmail());
 		BCryptPasswordEncoder bc = new BCryptPasswordEncoder();
 		admin.setPassword(bc.encode(admin.getPassword()));
+		admin.setState(UserState.INACTIVE);
 		companyAdminsRepository.save(admin);
 		logger.info("< admin saved");
 		return admin;
@@ -80,6 +82,7 @@ public class UserService implements UserServiceInterface {
 	public UsersAdmin createUserAdmin(UsersAdmin admin) {
 		logger.info("> save admin with username {} and email {}", admin.getUsername(), admin.getEmail());
 		admin.setAuthority(AuthorizationLevel.USERS_ADMIN);
+		admin.setState(UserState.INACTIVE);
 		BCryptPasswordEncoder bc = new BCryptPasswordEncoder();
 		admin.setPassword(bc.encode(admin.getPassword()));
 		usersAdminsRepository.save(admin);
@@ -92,6 +95,7 @@ public class UserService implements UserServiceInterface {
 	public RegisteredUser createRegisteredUser(RegisteredUser user) {
 		logger.info("> save user with username {} and email {}", user.getUsername(), user.getEmail());
 		user.setAuthority(AuthorizationLevel.GUEST);
+		user.setState(UserState.INACTIVE);
 		BCryptPasswordEncoder bc = new BCryptPasswordEncoder();
 		user.setPassword(bc.encode(user.getPassword()));
 

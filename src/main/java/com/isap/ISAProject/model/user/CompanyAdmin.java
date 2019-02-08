@@ -36,6 +36,12 @@ public class CompanyAdmin extends SystemUser {
 		super(user);
 		this.setAuthority(authorization);
 	}
+	
+	public CompanyAdmin(String email, String username, String password, String firstName, String lastName, String city,
+			String phoneNumber, AuthorizationLevel authority, Long id) {
+		super(email, username, password, firstName, lastName, city, phoneNumber);
+		this.setAuthority(authority);
+	}
 
 	public Hotel getHotel() { return hotel; }
 
