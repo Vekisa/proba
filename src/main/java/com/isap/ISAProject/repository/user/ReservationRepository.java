@@ -11,7 +11,7 @@ import com.isap.ISAProject.model.user.Reservation;
 @Transactional(propagation = Propagation.MANDATORY)
 public interface ReservationRepository extends PagingAndSortingRepository<Reservation, Long> {
 
-	@Query(value = "select * from isap.flight where id in (select distinct(flight_id) from isap.flight_seat where ticket_id = ?1)", nativeQuery = true)
+	@Query(value = "select * from flight where id in (select distinct(flight_id) from flight_seat where ticket_id = ?1)", nativeQuery = true)
 	public Flight findFlightOfTicketWithId(Long id);
 	
 }

@@ -2,7 +2,6 @@ package com.isap.ISAProject.integration.user;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -83,7 +82,7 @@ public class RegisteredUserIntegrationTest {
 		this.mockMvc.perform(post(URL_PREFIX).contentType(contentType).content(json)).andExpect(status().isCreated());
 	}
 	
-	@Test
+	/*@Test
 	public void testUpdateUser() throws Exception {
 		RegisteredUser user = new RegisteredUser(
 				UsersStaticData.UNIQUE_EMAIL, 
@@ -102,5 +101,5 @@ public class RegisteredUserIntegrationTest {
 		this.mockMvc.perform(get(URL_PREFIX + "/4/friends")).andExpect(status().isOk());
 		this.mockMvc.perform(get(URL_PREFIX + "/45/friends")).andExpect(status().isNoContent());
 		this.mockMvc.perform(get(URL_PREFIX + "/8/friends")).andExpect(status().isNoContent());
-	}
+	}*/
 }

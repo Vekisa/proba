@@ -1,6 +1,6 @@
 package com.isap.ISAProject.unit.service.user;
 
-import static com.isap.ISAProject.unit.constants.RentACarConstants.PAGE_SIZE;
+import static com.isap.ISAProject.unit.constants.rentacar.RentACarConstants.PAGE_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;

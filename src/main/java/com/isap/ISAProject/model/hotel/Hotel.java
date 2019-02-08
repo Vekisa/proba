@@ -56,6 +56,10 @@ public class Hotel extends Company {
 		floors = new ArrayList<>();
 		extraOptions = new ArrayList<>();
 	}
+	
+	public Hotel(Long id, String name, String address, String description) {
+		super(id, name, address, description);
+	}
 
 	public List<Floor> getFloors() { return this.floors; }
 

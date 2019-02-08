@@ -21,11 +21,11 @@ public interface TicketRepository extends PagingAndSortingRepository<Ticket, Lon
 	Flight findFlightForTicketWithId(@Param("ticketId") Long ticketId);
 
 	@Modifying
-	@Query(value = "update isap.airline set rating = (select avg(rating) from isap.airline_rating where rating > 0 && airline_id = ?1) where id = ?1", nativeQuery = true)
+	@Query(value = "update airline set rating = (select avg(rating) from airline_rating where rating > 0 && airline_id = ?1) where id = ?1", nativeQuery = true)
 	void updateAirlineRating(Long airlineId);
 	
 	@Modifying
-	@Query(value = "update isap.flight set rating = (select avg(rating) from isap.flight_rating where rating > 0 && flight_id = ?1) where id = ?1", nativeQuery = true)
+	@Query(value = "update flight set rating = (select avg(rating) from flight_rating where rating > 0 && flight_id = ?1) where id = ?1", nativeQuery = true)
 	void updateFlightRating(Long airlineId);
 
 }

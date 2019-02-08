@@ -74,6 +74,22 @@ public class Flight extends RatableEntity{
 	@OneToMany(mappedBy = "flight")
 	List<FlightRating> ratings;
 
+	public Flight() {}
+	
+	public Flight(Long id, Location startDestination, Location finishDestination, int numberOfTransfers,
+			Date departureTime, Date arrivalTime, double flightLength, double basePrice, TripType tripType) {
+		super();
+		this.id = id;
+		this.startDestination = startDestination;
+		this.finishDestination = finishDestination;
+		this.numberOfTransfers = numberOfTransfers;
+		this.departureTime = departureTime;
+		this.arrivalTime = arrivalTime;
+		this.flightLength = flightLength;
+		this.basePrice = basePrice;
+		this.tripType = tripType;
+	}
+	
 	public Date getDepartureTime() { return departureTime; }
 
 	public void setDepartureTime(Date departureTime) { this.departureTime = departureTime; }

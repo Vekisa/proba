@@ -54,6 +54,13 @@ public class Room extends RatableEntity {
 		roomReservations = new ArrayList<>();
 	}
 
+	public Room(Long id, int numberOfBeds, Long version) {
+		super();
+		this.id = id;
+		this.numberOfBeds = numberOfBeds;
+		this.version = version;
+	}
+	
 	public Long getId() { return id; }
 
 	public int getNumberOfBeds() { return numberOfBeds; }
