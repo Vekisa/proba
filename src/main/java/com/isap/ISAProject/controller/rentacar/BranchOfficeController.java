@@ -11,6 +11,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,6 +66,7 @@ public class BranchOfficeController {
 			@ApiResponse(code = 201, message = "Created", response = BranchOffice.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđena filijala nije validna.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Object> createBranchOffice(@Valid @RequestBody BranchOffice bro) {
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(service.saveBranchOffice(bro).getId()).toUri();
 		return ResponseEntity.created(location).build();
@@ -77,6 +79,7 @@ public class BranchOfficeController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili filijala nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Filijala sa prosleđenim ID-em ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('RENT_A_CAR_ADMIN') AND @securityServiceImpl.hasAccessToBranchOffice(#broId)")
 	public ResponseEntity<Resource<BranchOffice>> updateBranchOffice(@PathVariable(value="id") Long broId, @Valid @RequestBody BranchOffice broDetails) {
 		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(service.updateBranchOffice(broId, broDetails)), HttpStatus.OK);
 	}
@@ -88,6 +91,7 @@ public class BranchOfficeController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Filijala sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('RENT_A_CAR_ADMIN') AND @securityServiceImpl.hasAccessToBranchOffice(#broId)")
 	public ResponseEntity<?> deleteBranchOfficeWithID(@PathVariable(value = "id") Long id){
 		service.deleteBranchOfficeWithId(id);
 		return ResponseEntity.ok().build();
@@ -112,6 +116,7 @@ public class BranchOfficeController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili informacija o vozilu nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Filijala sa prosleđenim ID-em ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('RENT_A_CAR_ADMIN') AND @securityServiceImpl.hasAccessToBranchOffice(#broId)")
 	public ResponseEntity<Resource<Vehicle>> addVehicleForBranchOfficeWithId(@PathVariable(value = "id") Long broId,
 			@Valid @RequestBody Vehicle vehicle) {
 		return new ResponseEntity<Resource<Vehicle>>(HATEOASImplementorRentacar.vehicleLinks(service.addVehicleForBranchOfficeWithId(broId, vehicle)), HttpStatus.CREATED);
@@ -124,6 +129,7 @@ public class BranchOfficeController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Vozilo ili filijala sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('RENT_A_CAR_ADMIN') AND @securityServiceImpl.hasAccessToBranchOffice(#broId)")
 	public ResponseEntity<?> deleteVehicleForBranchOfficeWithId(@PathVariable(value = "broId") Long broId, @Valid @RequestBody Vehicle vehicle){
 		service.deleteVehicleForBranchOfficeWithId(broId, vehicle);
 		return ResponseEntity.ok().build();
@@ -136,6 +142,7 @@ public class BranchOfficeController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Filijala ili destinacija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('RENT_A_CAR_ADMIN') AND @securityServiceImpl.hasAccessToBranchOffice(#broId)")
 	public ResponseEntity<Resource<BranchOffice>> setLocationOfBranchOffice(@PathVariable("id") Long id, @RequestParam("location") Long locationId) {
 		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(service.setLocationOfBranchOffice(id, locationId)), HttpStatus.OK);
 	}

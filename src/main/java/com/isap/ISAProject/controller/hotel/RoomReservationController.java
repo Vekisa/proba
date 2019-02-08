@@ -11,6 +11,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,6 +56,7 @@ public class RoomReservationController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Resource<RoomReservation>> createRoomReservation(@Valid @RequestBody RoomReservation roomReservation) {
 		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.save(roomReservation)), HttpStatus.CREATED);
 	}
@@ -68,6 +70,7 @@ public class RoomReservationController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToRoom(#roomReservationId)")
 	public ResponseEntity<Resource<RoomReservation>> createRoomReservationWithRoomId(@PathVariable(value="id") Long roomReservationId, 
 			@RequestParam("begin") Long begin, @RequestParam("end") Long end) {
 		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.saveWithRoomId(roomReservationId,new Date(begin),new Date(end))), HttpStatus.CREATED);
@@ -93,6 +96,7 @@ public class RoomReservationController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToRoomReservation(#roomReservationId)")
 	public ResponseEntity<?> deleteRoomReservationWithId(@PathVariable(value="id") Long roomReservationId){			
 		roomReservationService.deleteById(roomReservationId);
 		return ResponseEntity.ok().build();
@@ -107,6 +111,7 @@ public class RoomReservationController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToRoomReservation(#roomReservationId)")
 	public ResponseEntity<Resource<RoomReservation>> updateRoomResrvationWithId(@PathVariable(value = "id") Long roomReservationId,
 			@Valid @RequestBody RoomReservation newRoomReservation) {
 			return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.updateRoomReservationById(roomReservationId, newRoomReservation)), HttpStatus.OK);
@@ -133,6 +138,7 @@ public class RoomReservationController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToRoomReservation(#roomReservationId)")
 	public ResponseEntity<Resource<ExtraOption>> createExtraOptionForRoomReservationWithId(@PathVariable(value = "id") Long roomReservationId,
 			@Valid @RequestBody ExtraOption extraOption) {
 			return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(roomReservationService.createExtraOption(roomReservationId, extraOption)), HttpStatus.CREATED);
@@ -152,22 +158,26 @@ public class RoomReservationController {
 	}
 	
 	@RequestMapping(value = "/{id}/options", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<ExtraOption>> addExtraOptionToRoomReservationWithId(@PathVariable("id") Long id, @RequestParam("option") Long optionId) {
 		return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(roomReservationService.addExtraOption(id, optionId)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}/options", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<?> removeExtraOptionFromRoomReservation(@PathVariable("id") Long id, @RequestParam("option") Long optionId) {
 		roomReservationService.removeExtraOption(id, optionId);
 		return ResponseEntity.ok().build();
 	}
 	
 	@RequestMapping(value = "/quicks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToRoom(#roomId)")
 	public ResponseEntity<Resource<RoomReservation>> createQuickRoomReservation(@RequestParam("room") Long roomId, @RequestBody @Valid RoomReservation reservation) {
 		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.saveQuickRoomReservation(reservation, roomId)), HttpStatus.CREATED);
 	}
 		
 	@RequestMapping(value = "/{id}/multiple_extra_options", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToRoomReservation(#roomReservationId)")
 	public ResponseEntity<Resource<RoomReservation>> addMultipleExtraOptionsToRoomReservationWithId(@PathVariable("id") Long roomReservationId, @RequestBody List<Long> extraOptions) {
 		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.addMultipleExtraOptionsToRoomReservation(roomReservationId, extraOptions)), HttpStatus.CREATED);
 

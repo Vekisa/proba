@@ -18,6 +18,7 @@ public class CerberusUserFactory {
 			System.out.println("Doslo je do greske prilikom kreiranja autorizacije.");
 			authorities = null;
 		}
+		System.out.println("Iz faktorija: " + authorities);
 		return new CerberusUser(
 				user.getId(),
 				user.getEmail(),

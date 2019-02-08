@@ -13,6 +13,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,6 +70,7 @@ public class FlightController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili let nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Let sa traženim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToAirline(#id)")
 	public ResponseEntity<Resource<Flight>> createFlightForAirline(@RequestBody Flight flight, @RequestParam("airline") Long id, @RequestParam("destination") Long destinationId) {
 		return new ResponseEntity<Resource<Flight>>(HATEOASImplementorAirline.createFlight(service.createFlight(id, flight, destinationId)), HttpStatus.CREATED);
 	}
@@ -80,6 +82,7 @@ public class FlightController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili let nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToFlight(#flightId)")
 	public ResponseEntity<Resource<Flight>> updateFlightWithId(@PathVariable("id") Long flightId, @Valid @RequestBody Flight newFlight) {
 		return new ResponseEntity<Resource<Flight>>(HATEOASImplementorAirline.createFlight(service.updateFlight(flightId, newFlight)), HttpStatus.OK);
 	}
@@ -91,6 +94,7 @@ public class FlightController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Let sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToFlight(#flightId)")
 	public ResponseEntity<?> deleteFlightWithId(@PathVariable("id") Long flightId) {
 		service.deleteFlight(flightId);
 		return ResponseEntity.ok().build();
@@ -103,6 +107,7 @@ public class FlightController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Let ili destinacija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToFlight(#flightId)")
 	public ResponseEntity<Resource<Flight>> setFinishDestinationForFlightWithId(@PathVariable("id") Long flightId, @RequestParam("destinationId") Long destinationId) {
 		return new ResponseEntity<Resource<Flight>>(HATEOASImplementorAirline.createFlight(service.setFinishDestinationForFlight(destinationId, flightId)), HttpStatus.OK);
 	}
@@ -126,6 +131,7 @@ public class FlightController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili red nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Let sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToFlight(#flightId)")
 	public ResponseEntity<Resource<Flight>> addSeatToRowForFlightWithId(@PathVariable("id") Long flightId, @RequestParam("row") int row) {
 		return new ResponseEntity<Resource<Flight>>(HATEOASImplementorAirline.createFlight(service.addSeatToRowForFlight(row, flightId)), HttpStatus.CREATED);
 	}
@@ -138,6 +144,7 @@ public class FlightController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Let sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToFlight(#flightId)")
 	public ResponseEntity<List<Resource<Ticket>>> getTicketsForFlightWithId(@PathVariable("id") Long flightId) {
 		return new ResponseEntity<List<Resource<Ticket>>>(HATEOASImplementorAirline.createTicketsList(service.getTicketsForFlight(flightId)), HttpStatus.OK);
 	}
@@ -149,6 +156,7 @@ public class FlightController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Let ili konfiguraciju sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToFlight(#flightId)")
 	public ResponseEntity<Resource<Flight>> addConfigurationToFlightWithId(@PathVariable("id") Long flightId, @RequestParam("configId") Long configurationId) {
 		return new ResponseEntity<Resource<Flight>>(HATEOASImplementorAirline.createFlight(service.setConfigurationToFlight(configurationId, flightId)), HttpStatus.OK);
 	}

@@ -8,6 +8,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,6 +62,7 @@ public class TicketController {
 	@ApiResponses(value = {
 			@ApiResponse(code = 201, message = "Created", response = Ticket.class)
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<Reservation>> createNewTicket() {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(service.saveTicket(new Ticket())), HttpStatus.CREATED);
 	}
@@ -72,6 +74,7 @@ public class TicketController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Karta sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<?> deleteTicketWithId(@PathVariable("id") Long ticketId) {
 		service.deleteTicket(ticketId);
 		return ResponseEntity.ok().build();
@@ -84,11 +87,13 @@ public class TicketController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Karta sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("(hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToSeat(#id)) OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<FlightSeat>> addSeatToTicketWithId(@PathVariable("id") Long ticketId, @RequestParam("seatId") Long seatId) {
 		return new ResponseEntity<Resource<FlightSeat>>(HATEOASImplementorAirline.createFlightSeat(service.addSeatToTicket(seatId, ticketId)), HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/{id}/seats", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<Ticket>> addMultipleSeatsToTicketWithId(@PathVariable("id") Long ticketId, @RequestBody List<Long> seats) {
 		return new ResponseEntity<Resource<Ticket>>(HATEOASImplementorAirline.createTicket(service.addMultipleSeatsToTicket(ticketId, seats)), HttpStatus.CREATED);
 	}

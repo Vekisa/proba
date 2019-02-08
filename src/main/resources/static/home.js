@@ -962,6 +962,11 @@ $(document).on('click','#logout',function(e){
 		url: "/users/registered/logout",
 		type:"POST",
 		async: false,
+		beforeSend: function (xhr){ 
+            if (localStorage.token) {
+		            xhr.setRequestHeader('X-Auth-Token', localStorage.token);	            
+            } 
+        },
 		success: function(data){
 			localStorage.token = null;
             clearShoppingCart();

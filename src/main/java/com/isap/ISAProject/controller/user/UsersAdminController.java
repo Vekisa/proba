@@ -10,6 +10,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +41,7 @@ public class UsersAdminController {
 			@ApiResponse(code = 201, message = "Created", response = UsersAdmin.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni korisnik nije validan.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Resource<UsersAdmin>> createRegisteredUser(@RequestBody @Valid UsersAdmin admin) {
 		return new ResponseEntity<Resource<UsersAdmin>>(HATEOASImplementorUsers.createUsersAdmin(userService.createUserAdmin(admin)), HttpStatus.CREATED);
 	}
@@ -73,6 +75,7 @@ public class UsersAdminController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Admin korisnika sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<?> deleteUsersAdminWithId(@PathVariable("id") Long id) {
 		service.delete(id);
 		return ResponseEntity.ok().build();
@@ -85,6 +88,7 @@ public class UsersAdminController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili admin korisnika nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Admin korisnika sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Resource<UsersAdmin>> updateUsersAdminWithId(@PathVariable("id") Long id, @RequestBody @Valid UsersAdmin admin) {
 		return new ResponseEntity<Resource<UsersAdmin>>(HATEOASImplementorUsers.createUsersAdmin(service.update(id, admin)), HttpStatus.OK);
 	}

@@ -10,6 +10,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,12 +54,16 @@ public class RegisteredUserController {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/logout")
+	@PreAuthorize("hasAuthority('USERS_ADMIN') OR hasAuthority('REGULAR_USER') OR hasAuthority('AIRLINE_ADMIN') "
+			+ "OR hasAuthority('HOTEL_ADMIN') OR hasAuthority('RENT_A_CAR_ADMIN')")
 	public ResponseEntity<?> logout(){
 		userService.signout();
 		return ResponseEntity.ok().build();
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/currentUser")
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') OR hasAuthority('REGULAR_USER') OR hasAuthority('USERS_ADMIN') "
+			+ "OR hasAuthority('HOTEL_ADMIN') OR hasAuthority('RENT_A_CAR_ADMIN')")
 	public ResponseEntity<Resource<CerberusUser>> getDaHoney() {
 		return new ResponseEntity<Resource<CerberusUser>>(HATEOASImplementorUsers.createCerberusUser(userService.currentUser()), HttpStatus.OK);
 	}
@@ -102,6 +107,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili korisnik nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<RegisteredUser>> updateUserWithId(@PathVariable("id") Long userId, @Valid @RequestBody RegisteredUser newRegisteredUser) {
 			return new ResponseEntity<Resource<RegisteredUser>>(HATEOASImplementorUsers.createRegisteredUser(service.updateUser(userId, newRegisteredUser)), HttpStatus.OK);
 	}
@@ -114,6 +120,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<List<Resource<Reservation>>> getReservationsForUserWithId(@PathVariable("id") Long userId) {
 				return new ResponseEntity<List<Resource<Reservation>>>(HATEOASImplementorUsers.createReservationList(service.getActiveReservationsOfUser(userId)), HttpStatus.OK);
 	}
@@ -126,6 +133,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<List<Resource<Reservation>>> getPendingReservationsForUserWithId(@PathVariable("id") Long userId) {
 				return new ResponseEntity<List<Resource<Reservation>>>(HATEOASImplementorUsers.createReservationList(service.getPendingReservationsOfUser(userId)), HttpStatus.OK);
 	}
@@ -138,6 +146,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<List<Resource<Reservation>>> getReservationsHistoryForUserWithId(@PathVariable("id") Long userId) {
 				return new ResponseEntity<List<Resource<Reservation>>>(HATEOASImplementorUsers.createReservationList(service.getReservationHistoryOfUser(userId)), HttpStatus.OK);
 	}
@@ -161,6 +170,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<FriendRequest>> sendFriendRequest(@PathVariable("from") Long sendingUserId, @RequestParam("to") Long receivingUserId) {
 			return new ResponseEntity<Resource<FriendRequest>>(HATEOASImplementorUsers.createFriendRequest(service.sendFriendRequest(sendingUserId, receivingUserId)), HttpStatus.CREATED);
 	}
@@ -173,6 +183,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<List<Resource<FriendRequest>>> getSentFriendRequestsForUserWithId(@PathVariable("id") Long userId) {
 				return new ResponseEntity<List<Resource<FriendRequest>>>(HATEOASImplementorUsers.createFriendRequestList(service.getSentFriendRequestOfUser(userId)), HttpStatus.OK);
 	}
@@ -185,6 +196,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<List<Resource<Friendship>>> getFriendshipsForUserWithId(@PathVariable("id") Long userId) {
 				return new ResponseEntity<List<Resource<Friendship>>>(HATEOASImplementorUsers.createFriendshipList(service.getFriendshipsOfUser(userId)), HttpStatus.OK);
 	}
@@ -196,6 +208,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<Friendship>> acceptFriendRequest(@PathVariable(value = "self") Long receivingUserId, @RequestParam("from") Long sendingUserId) {
 			return new ResponseEntity<Resource<Friendship>>(HATEOASImplementorUsers.createFriendship(service.acceptFriendRequest(receivingUserId, sendingUserId)), HttpStatus.CREATED);
 	}
@@ -208,6 +221,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<List<Resource<RegisteredUser>>> getFriendsOfUser(@PathVariable("self") Long id) {
 		return new ResponseEntity<List<Resource<RegisteredUser>>>(HATEOASImplementorUsers.createRegisteredUserList(service.getFriends(id)), HttpStatus.OK);
 	}
@@ -220,6 +234,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request"),
 			@ApiResponse(code = 404, message = "Not Found")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<List<Resource<RegisteredUser>>> getRequestedUsersFromUser(@PathVariable("self") Long id) {
 		return new ResponseEntity<List<Resource<RegisteredUser>>>(HATEOASImplementorUsers.createRegisteredUserList(service.getRequestedUsers(id)), HttpStatus.OK);
 	}
@@ -231,6 +246,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<?> declineFriendRequest(@PathVariable("self") Long selfId, @RequestParam("friend") Long friendId) {
 		service.declineFriendRequest(selfId, friendId);
 		return ResponseEntity.ok().build();
@@ -243,6 +259,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<?> cancelFriendRequest(@PathVariable("self") Long selfId, @RequestParam("friend") Long friendId) {
 		service.declineFriendRequest(friendId, selfId);
 		return ResponseEntity.ok().build();
@@ -255,6 +272,7 @@ public class RegisteredUserController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Registrovani korisnik sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<?> removeFriend(@PathVariable("self") Long selfId, @RequestParam("friend") Long friendId) {
 		service.removeFriend(selfId, friendId);
 		return ResponseEntity.ok().build();
@@ -273,36 +291,42 @@ public class RegisteredUserController {
 	}
 	
 	@RequestMapping(value = "/{id}/rate-hotel", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<?> rateHotel(@PathVariable("id") Long id, @RequestParam("hotel") Long hotelId, @RequestParam("rating") int rating) {
 		ratingService.rateHotel(hotelId, rating, id);
 		return ResponseEntity.ok().build();
 	}
 	
 	@RequestMapping(value = "/{id}/rate-room", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<?> rateRoom(@PathVariable("id") Long id, @RequestParam("room") Long roomId, @RequestParam("rating") int rating) {
 		ratingService.rateRoom(roomId, rating, id);
 		return ResponseEntity.ok().build();
 	}
 	
 	@RequestMapping(value = "/{id}/rate-airline", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<?> rateAirline(@PathVariable("id") Long id, @RequestParam("airline") Long airlineId, @RequestParam("rating") int rating) {
 		ratingService.rateAirline(airlineId, rating, id);
 		return ResponseEntity.ok().build();
 	}
 	
 	@RequestMapping(value = "/{id}/rate-flight", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<?> rateFlight(@PathVariable("id") Long id, @RequestParam("flight") Long flightId, @RequestParam("rating") int rating) {
 		ratingService.rateFlight(flightId, rating, id);
 		return ResponseEntity.ok().build();
 	}
 	
 	@RequestMapping(value = "/{id}/rate-rent-a-car", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<?> rateRentACar(@PathVariable("id") Long id, @RequestParam("rentACar") Long rentACarId, @RequestParam("rating") int rating) {
 		ratingService.rateRentACar(rentACarId, rating, id);
 		return ResponseEntity.ok().build();
 	}
 	
 	@RequestMapping(value = "/{id}/rate-vehicle", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<?> rateVehicle(@PathVariable("id") Long id, @RequestParam("hotel") Long hotelId, @RequestParam("rating") int rating) {
 		ratingService.rateVehicle(hotelId, rating, id);
 		return ResponseEntity.ok().build();

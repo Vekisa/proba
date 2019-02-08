@@ -10,6 +10,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +41,7 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 204, message = "No Content. Lista je prazna."),
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN')")
 	public ResponseEntity<List<Resource<FlightConfiguration>>> getAllFlightConfigurations(Pageable pageable) {
 		return new ResponseEntity<List<Resource<FlightConfiguration>>>(HATEOASImplementorAirline.createFlightConfigurationsList(service.findAll(pageable)), HttpStatus.OK);
 	}
@@ -51,6 +53,7 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija (leta) sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToConfiguration(#configurationId)")
 	public ResponseEntity<Resource<FlightConfiguration>> getFlightConfigurationWithId(@PathVariable("id") Long configurationId) {
 		return new ResponseEntity<Resource<FlightConfiguration>>(HATEOASImplementorAirline.createFlightConfiguration(service.findById(configurationId)), HttpStatus.OK);
 	}
@@ -62,6 +65,7 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToConfiguration(#configurationId)")
 	public ResponseEntity<?> deleteFlightConfigurationWithId(@PathVariable("id") Long configurationId) {
 		service.deleteConfiguration(configurationId);
 		return ResponseEntity.ok().build();
@@ -75,6 +79,7 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija leta sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToConfiguration(#configurationId)")
 	public ResponseEntity<List<Resource<FlightSegment>>> getSegmentsForConfigurationWithId(@PathVariable("id") Long configurationId) {
 		return new ResponseEntity<List<Resource<FlightSegment>>>(HATEOASImplementorAirline.createFlightSegmentsList(service.getSegmentsForConfiguration(configurationId)), HttpStatus.OK);
 	}
@@ -86,6 +91,7 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili segment nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija leta sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToConfiguration(#configurationId)")
 	public ResponseEntity<Resource<FlightSegment>> createSegmentForConfigurationWithId(@PathVariable("id") Long configurationId, @Valid @RequestBody FlightSegment flightSegment, @RequestParam("category") Long categoryId) {
 		return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementorAirline.createFlightSegment(service.createSegmentForConfiguration(flightSegment, configurationId, categoryId)), HttpStatus.CREATED);
 	}
@@ -99,6 +105,7 @@ public class FlightConfigurationController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Konfiguracija leta sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToConfiguration(#configurationId)")
 	public ResponseEntity<Resource<Airline>> getAirlineForConfigurationWithId(@PathVariable("id") Long id) {
 		return new ResponseEntity<Resource<Airline>>(HATEOASImplementorAirline.createAirline(service.getAirlineForConfiguration(id)), HttpStatus.OK);
 	}

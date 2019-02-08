@@ -1,5 +1,6 @@
 package com.isap.ISAProject.model.user;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -39,24 +40,24 @@ public class RegisteredUser extends SystemUser {
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "user")
-	private List<ConfirmedReservation> confirmedReservations;
+	private List<ConfirmedReservation> confirmedReservations = new ArrayList<>();
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "user")
-	private List<PendingReservation> pendingReservations;
+	private List<PendingReservation> pendingReservations = new ArrayList<>();
 	
 	@JsonIgnore
 	@Cascade(CascadeType.ALL)
 	@OneToMany(mappedBy="sender", orphanRemoval = true)
-	private List<FriendRequest> sentRequests;
+	private List<FriendRequest> sentRequests = new ArrayList<>();
 	
 	@JsonIgnore
 	@OneToMany(mappedBy="receiver")
-	private List<FriendRequest> receivedRequests;
+	private List<FriendRequest> receivedRequests = new ArrayList<>();
 	
 	@JsonIgnore
 	@ManyToMany(mappedBy = "friends")
-	private List<Friendship> friendships;
+	private List<Friendship> friendships = new ArrayList<>();
 	
 	@JsonIgnore
 	@OneToOne
@@ -69,35 +70,41 @@ public class RegisteredUser extends SystemUser {
 	@JsonIgnore
 	@Cascade(CascadeType.ALL)
 	@OneToMany(mappedBy = "user")
-	private List<AirlineRating> airlineRatings;
+	private List<AirlineRating> airlineRatings = new ArrayList<>();
 	
 	@JsonIgnore
 	@Cascade(CascadeType.ALL)
 	@OneToMany(mappedBy = "user")
-	private List<FlightRating> flightRatings;
+	private List<FlightRating> flightRatings = new ArrayList<>();
 	
 	@JsonIgnore
 	@Cascade(CascadeType.ALL)
 	@OneToMany(mappedBy = "user")
-	private List<HotelRating> hotelRatings;
+	private List<HotelRating> hotelRatings = new ArrayList<>();
 	
 	@JsonIgnore
 	@Cascade(CascadeType.ALL)
 	@OneToMany(mappedBy = "user")
-	private List<RoomRating> roomRatings;
+	private List<RoomRating> roomRatings = new ArrayList<>();
 	
 	@JsonIgnore
 	@Cascade(CascadeType.ALL)
 	@OneToMany(mappedBy = "user")
-	private List<RentACarRating> rentACarRatings;
+	private List<RentACarRating> rentACarRatings = new ArrayList<>();
 	
 	@JsonIgnore
 	@Cascade(CascadeType.ALL)
 	@OneToMany(mappedBy = "user")
-	private List<VehicleRating> vehicleRatings;
+	private List<VehicleRating> vehicleRatings = new ArrayList<>();
 	
 	public RegisteredUser() {}
 	
+	public RegisteredUser(String email, String username, String password, String firstName, String lastName, String city,
+			String phoneNumber) {
+		super(email, username, password, firstName, lastName, city, phoneNumber);
+		this.setAuthority(AuthorizationLevel.REGULAR_USER);
+	}
+
 	public List<Friendship> getFriendships() { return friendships; }
 
 	public void setFriendships(List<Friendship> friendships) { this.friendships = friendships; }
