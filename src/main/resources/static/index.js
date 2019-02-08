@@ -159,7 +159,7 @@ function printListOfCompanies(data){
 	var s = "";
 	$.each(data, function(index, company) {
 		s += "<tr id = \"" + company.links[0].href + "\">" + "<th scope=\"row\">"+ index +"</th>" + "<td>" + company.name + "</td>" + "<td>"+ company.address
-		+ "</td>" + "<td>" + company.description + "</td></tr>";
+		+ "</td>" + "<td>" + company.description + "</td><td>" +  createRating(company.rating) + "</td></tr>";
 	});
 	document.getElementById("tablediv").innerHTML = "<table class=\"table table-hover\" id = \"table\"><thead>" +
 	    		"<tr>" + 
@@ -167,6 +167,7 @@ function printListOfCompanies(data){
 			      "<th scope=\"col\">Name</th>" +
 			      "<th scope=\"col\">Address</th>" +
 			      "<th scope=\"col\">Description</th>" +
+                  "<th scope=\"col\">Rating</th>" +
 	    		"</tr>" +
 	  		"</thead><tbody>" + s + "</tbody></table>";
 }
@@ -319,10 +320,12 @@ $(document).on('click','#tablebo tr', function() {
 	var vehicles = "";
 	
 	$.each(pomDataVehicles, function(index, vehicle) {
-		vehicles += "<td scope=\"col\">"+ vehicle.brand 
+		vehicles += "<tr>" + "<td scope=\"col\">"+ vehicle.brand 
 		+ "<td scope=\"col\">" + vehicle.model + "</td>"
 		+ "<td scope=\"col\">"+ vehicle.seatsNumber + "</td>" 
 		+ "<td scope=\"col\">"+ vehicle.type + "</td>"
+		+ "<td scope=\"col\">"+ vehicle.pricePerDay + "</td>"
+        + "<td scope=\"col\">"+ createRating(vehicle.rating) + "</td>"
 		+ "</td></tr>";
 	});
 	
@@ -332,6 +335,8 @@ $(document).on('click','#tablebo tr', function() {
 			    "<th scope=\"col\">Model</th>" +
 			    "<th scope=\"col\">Seats number</th>" +
 			    "<th scope=\"col\">Type</th>" +
+			    "<th scope=\"col\">Price per day(&euro;)</th>" +
+                "<th scope=\"col\">Rating</th>" +
 			    "<th scope=\"col\"></th>" +
 				"</tr>" +
 			"</thead><tbody>" + vehicles + "</tbody></table>";
@@ -383,13 +388,15 @@ function printRooms(data){
     $.each(data, function(index, room) {
 		rooms += "<tr>" + "<td scope=\"col\">"+ room.numberOfBeds + "</td>" 
 		+ "<td scope=\"col\">" + room.floor.number + "</td>"
+        + "<td scope=\"col\">" + createRating(room.rating) + "</td>"
 		+ "</tr>";
 	});
 	
-	var tabela = "<table class=\"table\" id = \"tablerooms\"><thead>" +
+	var tabela = "<table class=\"table\" id=\"tablerooms\"><thead>" +
 				"<tr>" + 
 			    "<th scope=\"col\">Number Of Beds</th>" +
 			    "<th scope=\"col\">Floor</th>" +
+                "<th scope=\"col\">Rating</th>" +
 				"</tr>" +
 			"</thead><tbody>" + rooms + "</tbody></table>";
 	
@@ -550,9 +557,9 @@ function printFlights(data){
 	let s = "";
 	if(pomDataFlights!=null){
 		$.each(pomDataFlights, function(index, flight) {
-			s += "<tr>" + "<td>" + flight.startDestination + "</td>" + "<td>"+ flight.finishDestination 
+			s += "<tr>" + "<td>" + flight.startDestination.name + "</td>" + "<td>"+ flight.finishDestination.name
 			+ "</td>" + "<td>" + flight.transfers + "</td><td>" + flight.departureTime + "</td><td>" + flight.arrivalTime + "</td><td>"
-			+ flight.flightLength + "</td><td>" + flight.basePrice + "</td>" + "</tr>";
+			+ flight.flightLength + "</td><td>" + flight.basePrice + "</td>" + "<td scope=\"col\">" + createRating(flight.rating) + "</td>" + "</tr>";
 		});
 	}
 	
@@ -568,6 +575,7 @@ function printFlights(data){
 		"<th scope=\"col\">Arrival Time</th>" +
 		"<th scope=\"col\">Flight Length</th>" +
 		"<th scope=\"col\">Base Price</th>" +
+		"<th scope=\"col\">Rating</th>" +
 		"</tr>" +
 		"</thead><tbody>" + s + "</tbody></table>";
 	
@@ -747,4 +755,18 @@ function search(company){
 			}
 		})
 	}
+}
+
+function createRating(value){
+    if(value < 1.5){
+        return "<img src=\"star.png\">";
+    }else if(value >= 1.5 &&  value < 2.5){
+        return "<img src=\"star.png\"><img src=\"star.png\">";
+    }else if(value >= 2.5 &&  value < 3.5){
+        return "<img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\">";
+    }else if(value >= 3.5 && value < 4.5){
+        return "<img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\">";
+    }else if(value > 4.5){
+        return "<img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\"><img src=\"star.png\">";
+    }
 }

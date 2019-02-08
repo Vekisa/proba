@@ -248,6 +248,7 @@ function printCompanyForm(currComp) {
 }
 
 $(document).on('click', '#logout', function(e) {
+	e.preventDefault();
 	$.ajax({
 		type: "POST",
 		url: "/users/registered/logout",

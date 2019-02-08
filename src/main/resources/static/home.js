@@ -2173,6 +2173,7 @@ function printFlights(data){
 		"<th scope=\"col\">Flight Length</th>" +
 		"<th scope=\"col\">Base Price</th>" +
         "<th scope=\"col\">Trip Type</th>" +
+        "<th scope=\"col\">Rating</th>" +
 		"</tr>" +
 		"</thead><tbody>" + s + "</tbody></table>";
 	
@@ -2188,6 +2189,7 @@ function printFlights1(data){
 			s += "<tr>" + "<td>" + flight.startDestination.name + "</td>" + "<td>"+ flight.finishDestination.name 
 			+ "</td>" + "<td>" + flight.transfers + "</td><td>" + flight.departureTime.substring(0, 19).replace('T', '<br>') + "</td><td>" + flight.arrivalTime.substring(0, 19).replace('T', '<br>') + "</td><td>"
 			+ flight.flightLength + "</td><td>" + flight.basePrice + "</td>"
+			+ "<td scope=\"col\">" + createRating(flight.rating) + "</td>"
 			+ "<td scope=\"col\"><button id = \"" + flight.links[0].href +"\" type=\"button\" class=\"btn btn-success bookflight\" value = \"" + flight.id +"\">Add to cart</button></td>"
 			+"</tr>";
 		});
@@ -2205,6 +2207,7 @@ function printFlights1(data){
 		"<th scope=\"col\">Arrival Time</th>" +
 		"<th scope=\"col\">Flight Length</th>" +
 		"<th scope=\"col\">Base Price</th>" +
+		"<th scope=\"col\">Rating</th>" +
 		"</tr>" +
 		"</thead><tbody>" + s + "</tbody></table>";
 	
