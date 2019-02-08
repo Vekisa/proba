@@ -77,7 +77,7 @@ public class VehicleReservationController {
 			@ApiResponse(code = 201, message = "Created", response = VehicleReservation.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđena rezervacija nije validna.")
 	})
-	@PreAuthorize("hasAuthority('RENT_A_CAR_ADMIN') AND @securityServiceImpl.hasAccessToVehicle(#id)")
+	@PreAuthorize("(hasAuthority('RENT_A_CAR_ADMIN') AND @securityServiceImpl.hasAccessToVehicle(#id)) OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<VehicleReservation>> createVehicleReservation(@PathParam("vehicleId") Long vehicleId, @PathParam("beginDate") Long beginDate, @PathParam("endDate") Long endDate) {
 		return new ResponseEntity<Resource<VehicleReservation>>(HATEOASImplementorRentacar.vehicleReservationLinks(service.createVehicleReservationWithVehicleAndDates(vehicleId, new Date(beginDate), new Date(endDate))),HttpStatus.CREATED);
 	}

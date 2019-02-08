@@ -683,20 +683,21 @@ function printSC(){
             document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML + extraOptionsHTML + "<hr>" + select + "<hr>" + inputPoints + buttonBook  + "<hr>";
         }
     }
-    
-    $.ajax({
-		  url: "/seats/" + $('#seatSelect').val() + "/luggageInfo",
-		  type:"GET",
-		  success: function(data){
-              if(data == null){
-                  //alert("nemaaaaa");
-                  $('#luggageSelect').val(-1);
-              }else{
-                  //alert("imaaaaa " + data.id);
-                $('#luggageSelect').val(data.id);
-              }           
-		  }
-	   });
+    if(flight != null && flight != "null" && flight != undefined){
+        $.ajax({
+              url: "/seats/" + $('#seatSelect').val() + "/luggageInfo",
+              type:"GET",
+              success: function(data){
+                  if(data == null){
+                      //alert("nemaaaaa");
+                      $('#luggageSelect').val(-1);
+                  }else{
+                      //alert("imaaaaa " + data.id);
+                    $('#luggageSelect').val(data.id);
+                  }           
+              }
+           });
+    }
 }
 
 $(document).on('click','#shoppingcart',function(e){
@@ -951,7 +952,7 @@ $.ajaxSetup({
         cache:false,
         beforeSend: function (xhr){ 
             if (localStorage.token) {
-		            xhr.setRequestHeader('X-Auth-Token', localStorage.token);	            
+		            xhr.setRequestHeader('X-Auth-Token', localStorage.token);
             } 
         }
 });

@@ -70,7 +70,7 @@ public class RoomReservationController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
-	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToRoom(#roomReservationId)")
+	@PreAuthorize("(hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToRoom(#roomReservationId)) OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<RoomReservation>> createRoomReservationWithRoomId(@PathVariable(value="id") Long roomReservationId, 
 			@RequestParam("begin") Long begin, @RequestParam("end") Long end) {
 		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.saveWithRoomId(roomReservationId,new Date(begin),new Date(end))), HttpStatus.CREATED);
@@ -177,7 +177,7 @@ public class RoomReservationController {
 	}
 		
 	@RequestMapping(value = "/{id}/multiple_extra_options", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToRoomReservation(#roomReservationId)")
+	@PreAuthorize("(hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToRoomReservation(#roomReservationId)) OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<RoomReservation>> addMultipleExtraOptionsToRoomReservationWithId(@PathVariable("id") Long roomReservationId, @RequestBody List<Long> extraOptions) {
 		return new ResponseEntity<Resource<RoomReservation>>(HATEOASImplementorHotel.createRoomReservation(roomReservationService.addMultipleExtraOptionsToRoomReservation(roomReservationId, extraOptions)), HttpStatus.CREATED);
 
