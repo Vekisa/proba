@@ -30,7 +30,6 @@ public class BranchOffice {
 	@Column(nullable = false)
 	private String address;
 	
-	@JsonIgnore
 	@ManyToOne
 	private RentACar rentACar;
 	

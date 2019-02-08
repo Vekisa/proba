@@ -2,6 +2,8 @@ package com.isap.ISAProject.service.airline;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -22,9 +24,16 @@ import com.isap.ISAProject.model.airline.Airline;
 import com.isap.ISAProject.model.airline.Coordinates;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.Location;
+import com.isap.ISAProject.model.hotel.Floor;
 import com.isap.ISAProject.model.hotel.Hotel;
+import com.isap.ISAProject.model.hotel.Room;
+import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
+import com.isap.ISAProject.model.rentacar.RentACar;
+import com.isap.ISAProject.model.rentacar.Vehicle;
+import com.isap.ISAProject.model.rentacar.VehicleReservation;
 import com.isap.ISAProject.repository.airline.LocationRepository;
+import com.isap.ISAProject.repository.hotel.HotelRepository;
 import com.isap.ISAProject.serviceInterface.airline.LocationServiceInterface;
 
 @Service
@@ -34,6 +43,9 @@ public class LocationService implements LocationServiceInterface {
 
 	@Autowired
 	private LocationRepository repository;
+	
+	@Autowired
+	private HotelRepository hotelRepository;
 
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -200,6 +212,41 @@ public class LocationService implements LocationServiceInterface {
 		logger.info("< hotels fetched");
 		if(!hotels.isEmpty()) return hotels;
 		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested hotels do not exist.");
+	}
+	
+	public List<RoomReservation> getQuickRoomReservations(Long id) {
+		logger.info("> fetching quick room reservations");
+		List<Hotel> hotels = this.getHotelsOnLocation(id);
+		System.out.println("hoteli: " + hotels.size());
+		Date time = new Date();
+		List<RoomReservation> list = new ArrayList<>();
+		
+		for(Hotel hotel : hotels) {	
+			for(Floor floor : hotel.getFloors())
+				for(Room room : floor.getRooms())
+					for(RoomReservation roomReservation : room.getRoomReservations())
+						if(roomReservation.getBeginDate().after(time) && roomReservation.getReservation() == null)
+							list.add(roomReservation);
+		}
+		logger.info("< quick room reservations fetched");
+		System.out.println("rezervacije: " + list.size());
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested seats do not exist.");
+	}
+	
+	public List<VehicleReservation> getQuickVehicleReservations(Long id){
+		logger.info("> fetching quick vehicle reservations");
+		List<BranchOffice> branchOffices = this.getBranchOfficesOnLocation(id);
+		Date time = new Date();
+		List<VehicleReservation> list = new ArrayList<>();
+		for(BranchOffice branchOffice : branchOffices)
+			for(Vehicle vehicle : branchOffice.getVehicles())
+				for(VehicleReservation vehicleReservation : vehicle.getVehicleReservations())
+					if(vehicleReservation.getBeginDate().after(time) && vehicleReservation.getReservation() == null)
+						list.add(vehicleReservation);
+		logger.info("< quick vehicle reservations fetched");
+		if(!list.isEmpty()) return list;
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested vehicles do not exist.");
 	}
 
 }

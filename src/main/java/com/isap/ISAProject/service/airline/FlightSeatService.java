@@ -23,8 +23,11 @@ import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.LuggageInfo;
 import com.isap.ISAProject.model.airline.Passenger;
 import com.isap.ISAProject.model.airline.Ticket;
+import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.repository.airline.FlightSeatCategoryRepository;
 import com.isap.ISAProject.repository.airline.FlightSeatsRepository;
+import com.isap.ISAProject.repository.airline.PassengerRepository;
+import com.isap.ISAProject.service.user.ReservationService;
 import com.isap.ISAProject.serviceInterface.airline.FlightSeatServiceInterface;
 
 @Service
@@ -37,6 +40,12 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	
 	@Autowired
 	private FlightSeatCategoryRepository categoriesRepository;
+	
+	@Autowired
+	private PassengerRepository passengerRepository;
+	
+	@Autowired
+	private ReservationService reservationService;
 	
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -119,6 +128,32 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 		repository.save(seat);
 		logger.info("< passenger set");
 		return seat;
+	}
+	
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	public FlightSeat setPassengerToSeatWithValues(Long reservationId, String firstName, String lastName, Long passport) {
+		logger.info("> setting passenger to seat with id {}", reservationId);
+		Reservation reservation = reservationService.findById(reservationId);
+		FlightSeat flightSeat = null;
+		for(FlightSeat fs : reservation.getTicket().getSeats()) {
+			if(fs.getPassenger() == null) {
+				flightSeat = fs;
+				break;
+			}
+		}
+		if(flightSeat == null)
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nema slobodnog mesta");
+		
+		Passenger passenger = new Passenger();
+		passenger.setFirstName(firstName);
+		passenger.setLastName(lastName);
+		passenger.setPassportNumber(passport);
+		flightSeat.setPassenger(passenger);
+		passenger.getFlightSeats().add(flightSeat);
+		repository.save(flightSeat);
+		passengerRepository.save(passenger);
+		logger.info("< passenger set");
+		return flightSeat;
 	}
 	
 	private Passenger findPassengerById(Long id) {

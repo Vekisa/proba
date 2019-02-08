@@ -40,5 +40,7 @@ public class ConfirmedReservation {
 	public Reservation getReservation() { return reservation; }
 
 	public Date getConfirmationTime() { return confirmationTime; }
+
+	public void setReservation(Reservation reservation) { this.reservation = reservation; }
 	
 }

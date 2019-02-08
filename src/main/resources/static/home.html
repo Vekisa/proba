@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+	<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="UTF-8">
@@ -31,10 +31,32 @@
           			<div class="dropdown-divider"></div>
           			<a class="dropdown-item" href="" id = "hotel">Hotel</a>
        			 </div>
-       			 <li class="nav-item active">
-        			<a class="nav-link" href="" id="allUsers">Users<span class="sr-only">(current)</span></a>
-     			 </li>
       		</li>
+            <li class="nav-item active">
+                <a class="nav-link" href="" id="allUsers">Users<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item dropdown" id = "suggestedItems">
+        			<a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          			Suggested
+        			</a>
+        		<div class="dropdown-menu" aria-labelledby="navbarDropdown" >
+          			<a class="nav-link" href="" id="suggestedRent">Rent A Cars<span class="sr-only">(current)</span></a>
+          			<div class="dropdown-divider"></div>
+          			<a class="nav-link" href="" id="suggestedHotel">Hotels<span class="sr-only">(current)</span></a>
+       			 </div>
+      		</li>
+                
+            <li class="nav-item dropdown" id="quickReservations">
+        			<a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          			QuickReservations
+        			</a>
+        		<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          			<a class="nav-link" href="" id="quickResRoom">Room<span class="sr-only">(current)</span></a>
+          			<a class="nav-link" href="" id="quickResVehicle">Vehicle<span class="sr-only">(current)</span></a>
+          			<a class="nav-link" href="" id="quickResFlight">Flight<span class="sr-only">(current)</span></a>
+       			 </div>
+      		</li>
+            
     	</ul>
    		 <form class="form-inline my-2 my-lg-0">
 	 		<ul class="navbar-nav mr-auto">
@@ -314,6 +336,37 @@
             </div>
             <div class="modal-footer">
               <button type="submit" id="closeViewing" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span>Close</button>
+            </div>
+          </div>	
+        </div>
+      </div> 
+      
+      <!-- Modal -->
+      <div class="modal fade" id="modalPassengers" role="dialog" style="overflow:scroll;">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header" style="padding:35px 50px;" align="center">
+              <h4><span class="glyphicon glyphicon-lock"></span>Passengers</h4>
+            </div>
+            <div class="modal-body" style="padding:40px 50px;">
+              <form role="form">
+                <div class="form-group" id="passengers">
+
+                </div>
+                <div class="form-group" id="addPassFields">
+                    <form>
+                        <label>First Name:&nbsp;</label><input type="text" id="smallFN" required><br>
+                        <label>Last Name:&nbsp;</label><input type="text" id="smallLN" required><br>
+                        <label>Passport Number:&nbsp;</label><input type="number" id="smallN" required><br>
+                        <button type="submit" class="btn btn-primary" id="smallAddBtn">Add</button>
+                    </form>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" id="closePassengers" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span>Close</button>
             </div>
           </div>	
         </div>

@@ -1,5 +1,6 @@
 	package com.isap.ISAProject.model.airline;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -19,7 +20,6 @@ import com.isap.ISAProject.model.user.RegisteredUser;
 @Table(name = "passenger")
 public class Passenger {
 
-	@JsonIgnore
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -32,7 +32,6 @@ public class Passenger {
 	@OneToMany(mappedBy = "passenger")
 	private List<FlightSeat> seats;
 
-	@JsonIgnore
 	@OneToOne
 	private RegisteredUser user;
 	
@@ -44,6 +43,10 @@ public class Passenger {
 
 	@Column(nullable = false, unique = true)
 	private Long passportNumber;
+	
+	public Passenger() {
+		seats = new ArrayList<>();
+	}
 	
 	public String getFirstName() { return this.firstName; }
 
@@ -61,6 +64,8 @@ public class Passenger {
 
 	public Long getId() { return this.id; }
 
+	public RegisteredUser getUser() { return this.user; }
+	
 	public void setUser(RegisteredUser user) { this.user = user; }
 
 }

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import com.isap.ISAProject.model.airline.FlightSeat;
 import com.isap.ISAProject.model.airline.FlightSeatCategory;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.LuggageInfo;
+import com.isap.ISAProject.model.airline.SeatState;
 import com.isap.ISAProject.model.airline.SeatType;
 import com.isap.ISAProject.model.user.CompanyAdmin;
 import com.isap.ISAProject.repository.airline.AirlineRepository;
@@ -286,16 +288,29 @@ public class AirlineService implements AirlineServiceInterface {
 			if(flight.getDepartureTime().after(time))
 				quickSeats.addAll(this.getQuickSeats(flight));			
 		logger.info("< seats fetched");
-		if(!quickSeats.isEmpty()) return quickSeats;
-		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested seats do not exist.");
+		//if(!quickSeats.isEmpty()) 
+		return quickSeats;
+		//throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested seats do not exist.");
 	}
 
 	private List<FlightSeat> getQuickSeats(Flight flight) {
 		List<FlightSeat> list = new ArrayList<>();
 		for(FlightSeat fs : flight.getSeats())
-			if(fs.getType().equals(SeatType.QUICK_RESERVATION))
+			if(fs.getType().equals(SeatType.QUICK_RESERVATION) && fs.getState().equals(SeatState.FREE))
 				list.add(fs);
 		return list;
+	}
+	
+	public List<FlightSeat> getAllQuicks(){
+		List<FlightSeat> flightSeats = new ArrayList<>();
+		
+		for(Airline airline : repository.findAll()) {
+			flightSeats.addAll(this.getQuicks(airline.getId()));
+		}
+		
+		if(flightSeats.isEmpty())
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested seats do not exist.");
+		return flightSeats;
 	}
 
 }
