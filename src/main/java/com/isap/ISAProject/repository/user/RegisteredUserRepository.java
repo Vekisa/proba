@@ -16,8 +16,8 @@ public interface RegisteredUserRepository extends PagingAndSortingRepository<Reg
 
 	public RegisteredUser findByEmail(String email);
 	
-	@Query(value = "select * from isap.registered_user where id in (select user_id from isap.friendships_between_users where friendship_id in "
-			+ "(select friendship_id from isap.friendships_between_users where user_id = ?1) and user_id != ?1)", nativeQuery = true)
+	@Query(value = "select * from registered_user where id in (select user_id from friendships_between_users where friendship_id in "
+			+ "(select friendship_id from friendships_between_users where user_id = ?1) and user_id != ?1)", nativeQuery = true)
 	public List<RegisteredUser> findFriendsOfUser(Long id);
 	
 }

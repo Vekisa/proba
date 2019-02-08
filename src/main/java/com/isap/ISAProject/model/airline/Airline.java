@@ -55,6 +55,12 @@ public class Airline extends Company {
 	@OneToMany(mappedBy = "airline")
 	private List<AirlineRating> ratings;
 	
+	public Airline() {}
+	
+	public Airline(Long id, String name, String address, String description) {
+		super(id, name, address, description);
+	}
+
 	public List<LuggageInfo> getLuggageInfos() { return luggageInfos; }
 	
 	public Location getLocation() { return this.location; }

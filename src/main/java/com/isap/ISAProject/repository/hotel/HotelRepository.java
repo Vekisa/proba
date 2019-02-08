@@ -14,11 +14,11 @@ import com.isap.ISAProject.model.hotel.Hotel;
 public interface HotelRepository extends PagingAndSortingRepository<Hotel, Long>, JpaSpecificationExecutor<Hotel> {
 
 	@Modifying
-	@Query(value = "update isap.hotel set rating = (select avg(rating) from isap.hotel_rating where rating > 0 && hotel_id = ?1) where id = ?1", nativeQuery = true)
+	@Query(value = "update hotel set rating = (select avg(rating) from hotel_rating where rating > 0 && hotel_id = ?1) where id = ?1", nativeQuery = true)
 	void updateHotelRating(Long hotelId);
 
 	@Modifying
-	@Query(value = "update isap.room set rating = (select avg(rating) from isap.room_rating where rating > 0 && room_id = ?1) where id = ?1", nativeQuery = true)
+	@Query(value = "update room set rating = (select avg(rating) from room_rating where rating > 0 && room_id = ?1) where id = ?1", nativeQuery = true)
 	void updateRoomRating(Long roomId);
 	
 }

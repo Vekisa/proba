@@ -15,11 +15,11 @@ public interface RentACarRepository extends PagingAndSortingRepository<RentACar,
 	List<RentACar> findByName(String name);
 
 	@Modifying
-	@Query(value = "update isap.vehicle set rating = (select avg(rating) from isap.vehicle_rating where rating > 0 && vehicle_id = ?1) where id = ?1", nativeQuery = true)
+	@Query(value = "update vehicle set rating = (select avg(rating) from vehicle_rating where rating > 0 && vehicle_id = ?1) where id = ?1", nativeQuery = true)
 	void updateVehicleRating(Long vehicleId);
 
 	@Modifying
-	@Query(value = "update isap.rent_a_car set rating = (select avg(rating) from isap.rentacar_rating where rating > 0 && rentacar_id = ?1) where id = ?1", nativeQuery = true)
+	@Query(value = "update rent_a_car set rating = (select avg(rating) from rentacar_rating where rating > 0 && rentacar_id = ?1) where id = ?1", nativeQuery = true)
 	void updateRentACarRating(Long rentACarId);
 
 }

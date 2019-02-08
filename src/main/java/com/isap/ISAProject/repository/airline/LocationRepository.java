@@ -14,15 +14,15 @@ import com.isap.ISAProject.model.airline.Location;
 public interface LocationRepository extends JpaRepository<Location, Long> {
 
 	@Modifying
-	@Query(value = "update isap.airline set location_id = null where location_id = ?1", nativeQuery = true)
+	@Query(value = "update airline set location_id = null where location_id = ?1", nativeQuery = true)
 	public void removeSelfFromAirlines(Long id);
 
 	@Modifying
-	@Query(value = "update isap.branch_office set location_id = null where location_id = ?1", nativeQuery = true)
+	@Query(value = "update branch_office set location_id = null where location_id = ?1", nativeQuery = true)
 	public void removeSelfFromBranchOffices(Long destinationId);
 
 	@Modifying
-	@Query(value = "update isap.hotel set location_id = null where location_id = ?1", nativeQuery = true)
+	@Query(value = "update hotel set location_id = null where location_id = ?1", nativeQuery = true)
 	public void removeSelfFromHotels(Long destinationId);
 	
 	List<Location> findByName(String name);

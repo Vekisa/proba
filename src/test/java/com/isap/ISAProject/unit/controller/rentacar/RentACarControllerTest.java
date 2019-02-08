@@ -1,14 +1,6 @@
 package com.isap.ISAProject.unit.controller.rentacar;
 
-import static com.isap.ISAProject.unit.constants.RentACarConstants.DB_ADDRESS;
-import static com.isap.ISAProject.unit.constants.RentACarConstants.DB_DESCRIPTION;
-import static com.isap.ISAProject.unit.constants.RentACarConstants.DB_ID;
-import static com.isap.ISAProject.unit.constants.RentACarConstants.DB_NAME;
-import static com.isap.ISAProject.unit.constants.RentACarConstants.NEW_ADDRESS;
-import static com.isap.ISAProject.unit.constants.RentACarConstants.NEW_DESCRIPTION;
-import static com.isap.ISAProject.unit.constants.RentACarConstants.NEW_ID;
-import static com.isap.ISAProject.unit.constants.RentACarConstants.NEW_NAME;
-import static com.isap.ISAProject.unit.constants.RentACarConstants.PAGE_SIZE;
+import static com.isap.ISAProject.unit.constants.rentacar.RentACarConstants.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

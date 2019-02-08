@@ -1,4 +1,4 @@
-package com.isap.ISAProject.unit.constants;
+package com.isap.ISAProject.unit.constants.rentacar;
 
 public class RentACarConstants {
 	public static final int PAGE_SIZE = 3;
