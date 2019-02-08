@@ -20,11 +20,12 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.isap.ISAProject.model.RatableEntity;
 import com.isap.ISAProject.model.rating.FlightRating;
 
 @Entity
 @Table(name = "flight")
-public class Flight {
+public class Flight extends RatableEntity{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -112,6 +113,10 @@ public class Flight {
 	public void setAirline(Airline airline) { this.airline = airline;}
 	
 	public Airline getAirline() { return this.airline; }
+	
+	public void setTripType(TripType tripType) { this.tripType = tripType;}
+	
+	public TripType getTripType() { return this.tripType; }
 
 	@Override
 	public String toString() {

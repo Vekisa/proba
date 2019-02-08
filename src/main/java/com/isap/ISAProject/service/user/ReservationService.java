@@ -114,7 +114,6 @@ public class ReservationService {
 		if(vehicleReservation != null) {
 			reservation.setVehicleReservation(vehicleReservation);
 			//TODO: otkomentarisati
-			//vehicleReservation.setReservation(reservation);
 			vehicleReservationService.saveVehicleReservation(vehicleReservation);
 		}
 		if(roomReservation != null) {
@@ -128,9 +127,6 @@ public class ReservationService {
 		
 		ticketService.saveTicket(ticket);
 		
-		//reservation.setPrice(ticket.getPrice() + vehicleReservation.getPrice() + roomReservation.getRoom().getRoomType().getPricePerNight() *
-		//		getDifferenceDays(roomReservation.getBeginDate(), roomReservation.getEndDate()));
-		
 		reservationRepository.save(reservation);
 		
 		logger.info("< Reservation create");
@@ -142,9 +138,12 @@ public class ReservationService {
 		logger.info("> Reservation delete");
 		Reservation reservation = this.findById(id);
 		checkIfReservationCanBeCancelled(reservation.getBeginDate());
-		ticketService.deleteTicket(reservation.getTicket().getId());
-		vehicleReservationService.deleteVehicleReservation(reservation.getVehicleReservation().getId());
-		roomReservationService.deleteById(reservation.getRoomReservation().getId());
+		if(reservation.getTicket() != null)
+			ticketService.deleteTicket(reservation.getTicket().getId());
+		if(reservation.getVehicleReservation() != null)
+			vehicleReservationService.deleteVehicleReservation(reservation.getVehicleReservation().getId());
+		if(reservation.getVehicleReservation() != null)
+			roomReservationService.deleteById(reservation.getRoomReservation().getId());
 		reservationRepository.delete(reservation);
 		logger.info("< Reservation delete");
 	}
@@ -173,7 +172,7 @@ public class ReservationService {
 		flightSeatsRepository.save(seat);
 		
 		if(user.getBonusPoints() <= points) {
-			reservation.setPrice(reservation.getPrice() * (100 - points * this.getDiscountFactor()));
+			reservation.setPrice(reservation.getPrice() * (100 - points * this.getDiscountFactor())/100);
 			user.setBonusPoints(user.getBonusPoints() - points);
 		}
 		user.setBonusPoints(user.getBonusPoints() + (int) reservation.getTicket().getSeats().get(0).getFlight().getFlightLength() / 100);
@@ -288,8 +287,8 @@ public class ReservationService {
 		if(user.getBonusPoints() < 0) user.setBonusPoints(0);
 		if(reservation.getConfirmedReservations().isEmpty()) {
 			logger.info("< reservation cancelled");
-			this.deleteById(id);
-			return null;
+			this.deleteById(reservation.getId());
+			return new Reservation();
 		} else {
 			reservationRepository.save(reservation);
 			logger.info("< reservation cancelled");
@@ -299,12 +298,16 @@ public class ReservationService {
 	
 	private boolean removeUserFromConfirmedReservations(Reservation reservation, RegisteredUser user) {
 		ConfirmedReservation forRemoval = null;
-		for(ConfirmedReservation confirmed : reservation.getConfirmedReservations())
+		for(ConfirmedReservation confirmed : reservation.getConfirmedReservations()) {
 			if(confirmed.getUser().equals(user)) {
 				forRemoval = confirmed;
-				forRemoval.setReservation(null);
 				break;
 			}
+		}
+		if(forRemoval == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nisam nasao usera");
+		}
+
 		return reservation.getConfirmedReservations().remove(forRemoval);
 	}
 	

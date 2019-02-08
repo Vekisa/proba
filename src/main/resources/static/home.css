@@ -20,6 +20,7 @@
     border-radius: 10px;
     background-color: #f3f3f3;
     opacity: 0.9;
+    z-index: 500;
 }
 
 tr:hover{
@@ -36,6 +37,7 @@ tr:hover{
     border-radius: 10px;
 	background-color: #f3f3f3;
 	opacity: 0.9;
+    z-index: 500;
 }
 
 #profiltable {
@@ -57,6 +59,7 @@ tr:hover{
     border-radius: 10px;
 	background-color: #f3f3f3;
 	opacity: 0.9;
+    z-index: 500;
 }
 
 #profimg{

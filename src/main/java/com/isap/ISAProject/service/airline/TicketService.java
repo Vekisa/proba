@@ -22,6 +22,7 @@ import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.SeatState;
 import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.user.Reservation;
+import com.isap.ISAProject.repository.airline.FlightSeatsRepository;
 import com.isap.ISAProject.repository.airline.TicketRepository;
 import com.isap.ISAProject.repository.user.ReservationRepository;
 import com.isap.ISAProject.service.user.ReservationService;
@@ -40,6 +41,9 @@ public class TicketService implements TicketServiceInterface {
 	
 	@Autowired
 	private ReservationService reservationService;
+	
+	@Autowired
+	private FlightSeatsRepository flightSeatsRepository;
 	
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
@@ -107,6 +111,12 @@ public class TicketService implements TicketServiceInterface {
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public void deleteTicket(Long ticketId) {
 		logger.info("> deleting ticket with id {}", ticketId);
+		Ticket ticket = this.findById(ticketId);
+		for(FlightSeat fs : ticket.getSeats()) {
+			fs.setTicket(null);
+			fs.setState(SeatState.FREE);
+			flightSeatsRepository.save(fs); 
+		}
 		repository.deleteById(ticketId);
 		logger.info("< ticket deleted");
 	}

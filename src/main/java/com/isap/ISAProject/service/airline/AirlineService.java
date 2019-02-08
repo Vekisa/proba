@@ -288,9 +288,7 @@ public class AirlineService implements AirlineServiceInterface {
 			if(flight.getDepartureTime().after(time))
 				quickSeats.addAll(this.getQuickSeats(flight));			
 		logger.info("< seats fetched");
-		//if(!quickSeats.isEmpty()) 
 		return quickSeats;
-		//throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Requested seats do not exist.");
 	}
 
 	private List<FlightSeat> getQuickSeats(Flight flight) {

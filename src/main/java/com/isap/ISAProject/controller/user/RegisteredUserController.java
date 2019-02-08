@@ -308,4 +308,9 @@ public class RegisteredUserController {
 		return ResponseEntity.ok().build();
 	}
 	
+	@RequestMapping(value = "/{id}/bonus_points", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Integer> rateVehicle(@PathVariable("id") Long id ) {
+		return new ResponseEntity<Integer>(ratingService.getBonusPoints(id), HttpStatus.OK);
+	}
+	
 }

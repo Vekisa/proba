@@ -70,7 +70,7 @@ $(document).on('click','#airline',function(e){
 $(document).on('click','#about',function(e){
 	e.preventDefault();
 	$("#myMap").hide();
-	document.getElementById("tablediv").innerHTML ="Ovo je nas predivni about. Samo cu reci - Napusite mi se kurca svi sa softa."
+	document.getElementById("tablediv").innerHTML ="Nas about";
 });
 
 $(document).on('click','#airbtn',function(e){

@@ -307,5 +307,5 @@ public class FlightService implements FlightServiceInterface {
 		logger.info("< flights found");
 		return konacna;
 	}
-	
+
 }

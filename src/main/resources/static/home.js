@@ -20,6 +20,7 @@ var rentACarRate;
 var vehicleRate;
 var hotelRate;
 var roomRate;
+var points = 0;
 
 function clearShoppingCart(){
     localStorage.setItem("vehicleC", null);
@@ -43,7 +44,7 @@ function load(){
 			type: "GET",
 			url: "users/registered/currentUser",
 			beforeSend: function(xhr) {
-		          if (localStorage.token) {
+		          if(localStorage.token) {
 		            xhr.setRequestHeader('X-Auth-Token', localStorage.token);	            
 		          }
 		    },
@@ -130,15 +131,51 @@ $(document).ready(function(){
                     }else{
                         $("#addDate").prop( "disabled", true );
                         $("#okIndicator").hide();
-                        $("#errorIndicator").show();
+                        $("#errorIndicator").show(); 
                     }
                         
 		        }
 	       });
         }
     });
+    
+    $(document).on('change','#luggageSelect',function(e){
+        //alert("promenio se");
+        //alert($(this).val());
+        //alert($(this).attr("class"));
+        
+    });
+    
+    $(document).on('change','#seatSelect',function(e){
+        //alert("promenio se 2");
+        //alert($(this).val());
+        //alert($(this).attr("class"));
+        $.ajax({
+		  url: "/seats/" + $(this).val() + "/luggageInfo",
+		  type:"GET",
+		  success: function(data){
+              if(data == null){
+                  //alert("nemaaaaa");
+                  $('#luggageSelect').val(-1);
+              }else{
+                  //alert("imaaaaa " + data.id);
+                $('#luggageSelect').val(data.id);
+              }           
+		  }
+	   });
+    });
 });
 
+$(document).on('click','#addLuggageInfo',function(e){
+    //alert("/seats/" + $('#seatSelect').val() + "/luggageInfo?luggageId="+ $('#luggageSelect').val());
+    $.ajax({
+		  url: "/seats/" + $('#seatSelect').val() + "/luggageInfo?luggageId="+ $('#luggageSelect').val(),
+		  type:"PUT",
+		  success: function(data){   
+              //alert("postavio");
+		  }
+	});
+});
 
 
 $(document).on('click','#addDate',function(e){
@@ -457,8 +494,10 @@ function printSC(){
     var a = 0;
     var b = 0;
     var buttonBook = "<hr>" + "<button type=\"button\" class=\"btn btn-success\" id=\"bookNow\">Book Now</button>" ;
+    var airline;
     
     var vehicleHTML = "";
+    var select = "";
     if(vehicle != null && vehicle != "null" && vehicle != undefined){   
         $.ajax({
             type: "GET",
@@ -585,12 +624,51 @@ function printSC(){
                     + "<td scope=\"col\">" + "<button type=\"button\" class=\"btn btn-danger\" id=\"removeFlightFromSC\">Remove</button>" + "</td>"
                     + "</tr>"     
                 + "</tbody></table>";
+                airline = data.airline.id;
             }
         });
         
+        var luggageSelect = "<option value=\"-1\"></option>";
         
+        $.ajax({
+            type: "GET",
+            url: "/airlines/" + airline + "/luggageInfos",
+            async: false,
+            success: function(data){
+                //alert("dobio luggage");
+                $.each(data,function(index, lugg){
+                   luggageSelect += "<option value=\"" + lugg.id + "\">" + lugg.minWeight + "kg - " + lugg.maxWeight + "kg  " + lugg.price + "&euro;&nbsp;&nbsp;</option>"
+                });
+            }
+        });
+        
+        var seatsSelect = "";
+        
+        $.each(seats,function(index,seat){
+            seatsSelect += "<option value=\"" + seat + "\">" + seat +"</option>";
+        });
+    
+        select = "<label>Seat:&nbsp;</label><select style=\"width: 150px\" id=\"luggageSelect\" class=\"" + 10 + "\"> " + luggageSelect  + "</select><br><label>Luggage:&nbsp;</label><select id=\"seatSelect\" style=\"width: 50px\" class=\"" + 20 + "\">" + seatsSelect + 
+            "</select><br>"
+            + "<button type=\"button\" class=\"btn btn-primary\" id=\"addLuggageInfo\">Set</button>";
         
     }
+    
+    var inputPoints="";
+    
+    if(a != 0){
+         $.ajax({
+            type: "GET",
+            url: "/users/registered/" + currentUser.id + "/bonus_points",
+            async: false,
+            success: function(data){
+                points = data;
+                //alert("poeni" + data);
+                inputPoints = "<label>Bonus Points:</label><br><input type=\"number\" id =\"pointsInput\" name=\"points\" min=\"0\" max=\"" + data  +"\" step=\"1\" value=\"0\">";
+            }
+        });
+    }
+    
     
     if(a == 0){
         if(b == 0){
@@ -600,11 +678,25 @@ function printSC(){
         }
     }else{
         if(b == 0){
-            document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML + buttonBook;
+            document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML + "<hr><br>" + select + "<hr>" + inputPoints + buttonBook + "<hr>";
         }else{
-            document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML + extraOptionsHTML + buttonBook;
+            document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>" + flightHTML +  vehicleHTML + roomHTML + extraOptionsHTML + "<hr>" + select + "<hr>" + inputPoints + buttonBook  + "<hr>";
         }
     }
+    
+    $.ajax({
+		  url: "/seats/" + $('#seatSelect').val() + "/luggageInfo",
+		  type:"GET",
+		  success: function(data){
+              if(data == null){
+                  //alert("nemaaaaa");
+                  $('#luggageSelect').val(-1);
+              }else{
+                  //alert("imaaaaa " + data.id);
+                $('#luggageSelect').val(data.id);
+              }           
+		  }
+	   });
 }
 
 $(document).on('click','#shoppingcart',function(e){
@@ -667,7 +759,7 @@ $(document).on('click','#bookNow', function() {
   		},
 		success: function(data){
             reservation = data;
-            alert("dobio nazad rezervaciju " + reservation.id)
+            //alert("dobio nazad rezervaciju " + reservation.id)
         }
     });
     
@@ -682,7 +774,7 @@ $(document).on('click','#bookNow', function() {
         dataType: "json",
         async: false,
 		success: function(data){
-            alert("dodao sedista");
+            //alert("dodao sedista");
         }
     });
     
@@ -697,14 +789,14 @@ $(document).on('click','#bookNow', function() {
             async: false,
             success: function(data){
                 vehicleReservation = data;
-                alert("napravio vehicle reservation");
+                //alert("napravio vehicle reservation");
                 $.ajax({
                     type: "POST",
                     url: "/reservations/" + reservation.id + "/set-vehicle-reservation/" + vehicleReservation.id,
                     contentType: "application/json",
                     async: false,
                     success: function(data){
-                        alert("povezao vozilo");
+                        //alert("povezao vozilo");
                     }
                 });
             }
@@ -717,7 +809,7 @@ $(document).on('click','#bookNow', function() {
     if(room !== "null" && room !== undefined){
         let s = new Date(roomStartDate);
         let e = new Date(roomEndDate);
-        alert("usao u room");
+        //alert("usao u room");
         $.ajax({
             type: "POST",
             url: "room_reservations/create-with-room/" + room + "?begin=" + s.getTime() + "&end=" + e.getTime(),
@@ -725,15 +817,15 @@ $(document).on('click','#bookNow', function() {
             async: false,
             success: function(data){
                 roomReservation = data;
-                alert("napravio room reservation");
-                alert(reservation.id + " " + roomReservation.id);
+                //alert("napravio room reservation");
+                //alert(reservation.id + " " + roomReservation.id);
                  $.ajax({
                     type: "POST",
                     url: "/reservations/" + reservation.id + "/set-room-reservation/" + roomReservation.id, 
                     dataType: "json", 
                     async: false,
                     success: function(data){
-                        alert("povezao sobu"); 
+                        //alert("povezao sobu"); 
                     }
                 });
             }
@@ -750,13 +842,23 @@ $(document).on('click','#bookNow', function() {
                 data: JSON.stringify(extraOptions),
                 async: false,
                 success: function(data){
-                    alert("ubacio extra optione"); 
+                    //alert("ubacio extra optione"); 
                 }
             });
         }
         
        
     }
+    
+    
+    var pointsUser = 0;
+    
+    if($('#pointsInput').val() > points){
+        pointsUser = points;
+    }else{
+        pointsUser = $('#pointsInput').val();
+    }
+    
     
     $.ajax({
         type: "GET",
@@ -768,14 +870,14 @@ $(document).on('click','#bookNow', function() {
         },
         success: function(data){
             if(data!=null){
-                alert("vratio usera");
+                //alert("vratio usera");
                 $.ajax({
                     type: "POST",
-                    url: "/reservations/" + reservation.id + "/user?user=" + data.id, 
+                    url: "/reservations/" + reservation.id + "/user?user=" + data.id + "&points=" + pointsUser, 
                     contentType: "application/json",
                     async: false,
                     success: function(data2){
-                        alert("postavio usera"); 
+                        //alert("postavio usera"); 
                     }
                 });
             }
@@ -843,6 +945,15 @@ $(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
             $('#myModal').modal("show");
     }
     
+});
+
+$.ajaxSetup({
+        cache:false,
+        beforeSend: function (xhr){ 
+            if (localStorage.token) {
+		            xhr.setRequestHeader('X-Auth-Token', localStorage.token);	            
+            } 
+        }
 });
 
 $(document).on('click','#logout',function(e){
@@ -1326,7 +1437,7 @@ function printPassengers(data){
 $(document).on('click','.removePassenger',function(e){
     var reservationId = $("#closePassengers").val();
     var passengerId = $(this).val();
-    alert("Brisem iz rezervacije: " + reservationId + " passengera: " + passengerId);
+    //alert("Brisem iz rezervacije: " + reservationId + " passengera: " + passengerId);
      $.ajax({
         type: "POST",
         url:  "/reservations/" + reservationId + "/delete_passenger/" + passengerId,
@@ -1341,7 +1452,7 @@ $(document).on('click','.removePassenger',function(e){
 $(document).on('click','#smallAddBtn',function(e){
     e.preventDefault();
     var reservationId = $(this).val();
-    alert("/seats/" + reservationId + "/passenger_values?firstName=" + $('#smallFN').val() + "&lastName=" + $('#smallLN').val() +"&passport=" + $('#smallN').val());
+    //alert("/seats/" + reservationId + "/passenger_values?firstName=" + $('#smallFN').val() + "&lastName=" + $('#smallLN').val() +"&passport=" + $('#smallN').val());
     $.ajax({
         type: "PUT",
         url:  "/seats/" + reservationId + "/passenger_values?firstName=" + $('#smallFN').val() + "&lastName=" + $('#smallLN').val() +"&passport=" + $('#smallN').val(),
@@ -1457,7 +1568,7 @@ $(document).on('click','.viewReservationHis',function(e){
 $(document).on('click','#rateRoomBtn',function(e){
     var rating = $('[name=room]:checked').val();
     
-    alert("/users/registered/" + currentUser.id + "/rate-room?room=" + roomRate + "&rating=" + rating);
+    //alert("/users/registered/" + currentUser.id + "/rate-room?room=" + roomRate + "&rating=" + rating);
     
     if($('#cbRateHotel').is(':checked')){
         $.ajax({
@@ -1465,7 +1576,7 @@ $(document).on('click','#rateRoomBtn',function(e){
             url:  "/users/registered/" + currentUser.id + "/rate-hotel?hotel=" + hotelRate + "&rating=" + rating,
             async: false,
             success: function(data){
-                alert("hotel ocenjen");
+                //alert("hotel ocenjen");
             }
 	   }); 
     }
@@ -1476,7 +1587,7 @@ $(document).on('click','#rateRoomBtn',function(e){
             url:  "/users/registered/" + currentUser.id + "/rate-room?room=" + roomRate + "&rating=" + rating,
             async: false,
             success: function(data){
-                alert("room ocenjen");
+                //alert("room ocenjen");
             }
 	   }); 
     }
@@ -1486,16 +1597,16 @@ $(document).on('click','#rateRoomBtn',function(e){
 $(document).on('click','#rateVehicleBtn',function(e){
     var rating = $('[name=vehicle]:checked').val();
     
-    alert("/users/registered/" + currentUser.id + "/rate-vehicle?vehicle=" + vehicleRate + "&rating=" + rating);
+    //alert("/users/registered/" + currentUser.id + "/rate-vehicle?vehicle=" + vehicleRate + "&rating=" + rating);
     
     if($('#cbRateRent').is(':checked')){
-        alert("ocenjujem vehicle")
+        //alert("ocenjujem vehicle")
         $.ajax({
             type: "POST",
             url:  "/users/registered/" + currentUser.id + "/rate-rent-a-car?rentACar=" + rentACarRate + "&rating=" + rating,
             async: false,
             success: function(data){
-                alert("rent ocenjen");
+                //alert("rent ocenjen");
             }
 	   }); 
     }
@@ -1506,7 +1617,7 @@ $(document).on('click','#rateVehicleBtn',function(e){
             url:  "/users/registered/" + currentUser.id + "/rate-vehicle?hotel=" + vehicleRate + "&rating=" + rating,
             async: false,
             success: function(data){
-                alert("vehicle ocenjen");
+                //alert("vehicle ocenjen");
             }
 	   }); 
     }
@@ -1515,7 +1626,7 @@ $(document).on('click','#rateVehicleBtn',function(e){
 
 $(document).on('click','#rateFlightBtn',function(e){
     var rating = $('[name=flight]:checked').val();
-    alert("/users/registered/" + currentUser.id + "/rate-airline?airline=" + $(this).val() + "&rating=" + rating);
+    //alert("/users/registered/" + currentUser.id + "/rate-airline?airline=" + $(this).val() + "&rating=" + rating);
     
     if($('#cbRateAirline').is(':checked')){
         $.ajax({
@@ -1523,7 +1634,7 @@ $(document).on('click','#rateFlightBtn',function(e){
             url:  "/users/registered/" + currentUser.id + "/rate-airline?airline=" + airlineRate + "&rating=" + rating,
             async: false,
             success: function(data){
-                alert("airline ocenjen");
+                //alert("airline ocenjen");
             }
 	   }); 
     }
@@ -1534,7 +1645,7 @@ $(document).on('click','#rateFlightBtn',function(e){
             url:  "/users/registered/" + currentUser.id + "/rate-flight?flight=" + flightRate + "&rating=" + rating,
             async: false,
             success: function(data){
-                alert("flight ocenjen");
+                //alert("flight ocenjen");
             }
 	   }); 
     }
@@ -1624,7 +1735,7 @@ $(document).on('click','.inviteReservation',function(e){
 $(document).on('click','.cancelReservation',function(e){
     e.preventDefault();
     var reservationId = $(this).val();
-    alert("odustajem");
+    //alert("odustajem");
     
      $.ajax({
         type: "POST",
@@ -1632,7 +1743,7 @@ $(document).on('click','.cancelReservation',function(e){
         dataType: "json",
         async: false,
         success: function(data){
-            alert("odustao");
+            //alert("odustao");
             printActRes();   
         }
 	 }); 
@@ -1665,8 +1776,8 @@ $(document).on('click','.inviteFriend',function(e){
     var friendList = new Array();
     friendList.push(friendId);
     
-    alert("/reservations/" + currentUser.id + "/invite");
-    alert(friendList);
+    //alert("/reservations/" + currentUser.id + "/invite");
+    //alert(friendList);
     
     $.ajax({
         type: "POST",
@@ -1676,7 +1787,7 @@ $(document).on('click','.inviteFriend',function(e){
         data: JSON.stringify(friendList),
         async: false,
         success: function(data){
-            alert("poslao invite");
+            //alert("poslao invite");
         }
 	 });
     
@@ -2169,6 +2280,10 @@ $(document).on('click', '#airline-search', function(event){
 
 $(document).on('click', '#goSearch', function(e){
 	e.preventDefault();
+    $("#tablediv").show();
+	$("#myMap").hide();
+	$("#profile").hide();
+	$('#profdiv').hide();
 	let startDate = new Date($('#startDateInput').val());
 	let endDate = new Date($('#endDateInput').val());
 	if($('#startDateInput').val() != "" && $('#endDateInput').val() != ""){
@@ -2207,7 +2322,7 @@ function search(company){
 		}
 	}
     
-    alert(url);
+    //alert(url);
 	if(company == "rentacar"){
 		$.ajax({
 			method: 'GET',
@@ -2377,7 +2492,7 @@ $(document).on('click','.bookQuickReservationRoomBtn',function(e){
   		},
 		success: function(data){
             reservation = data;
-            alert("dobio nazad rezervaciju " + reservation.id)
+            //alert("dobio nazad rezervaciju " + reservation.id)
         }
     });
     
@@ -2389,7 +2504,7 @@ $(document).on('click','.bookQuickReservationRoomBtn',function(e){
         dataType: "json",
         async: false,
 		success: function(data){
-            alert("dodao sedista");
+            //alert("dodao sedista");
         }
     });
     
@@ -2399,7 +2514,7 @@ $(document).on('click','.bookQuickReservationRoomBtn',function(e){
         dataType: "json", 
         async: false,
         success: function(data){
-            alert("povezao sobu"); 
+            //alert("povezao sobu"); 
         }
     });
     
@@ -2409,7 +2524,7 @@ $(document).on('click','.bookQuickReservationRoomBtn',function(e){
         contentType: "application/json",
         async: false,
         success: function(data2){
-            alert("postavio usera"); 
+            //alert("postavio usera"); 
         }
     });
     
@@ -2500,15 +2615,17 @@ function printQuickRoomReservations(){
 
 function printQRR(data){
     var roomReservations = "";
-    $.each(data,function(index, roomReservation){
-        roomReservations += "<tr>" + "<td scope=\"col\">" + roomReservation.room.floor.hotel.name + "</td>" 
-                + "<td scope=\"col\">" + roomReservation.beginDate.substring(0, 19).replace('T', '<br>') + "</td>"
-                + "<td scope=\"col\">" + roomReservation.endDate.substring(0, 19).replace('T', '<br>') + "</td>"
-                + "<td scope=\"col\">" + roomReservation.price + "</td>"
-                + "<td scope=\"col\">" + roomReservation.room.roomType.pricePerNight + "</td>"
-                + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + roomReservation.id + "\" type=\"button\" class=\"btn btn-primary bookQuickReservationRoomBtn\">Book</button>" + "</td>"
-                + "</tr>";
-    });
+    if(data != null && data != "null" && data != "undefined" && data != undefined){
+        $.each(data,function(index, roomReservation){
+            roomReservations += "<tr>" + "<td scope=\"col\">" + roomReservation.room.floor.hotel.name + "</td>" 
+                    + "<td scope=\"col\">" + roomReservation.beginDate.substring(0, 19).replace('T', '<br>') + "</td>"
+                    + "<td scope=\"col\">" + roomReservation.endDate.substring(0, 19).replace('T', '<br>') + "</td>"
+                    + "<td scope=\"col\">" + roomReservation.price + "</td>"
+                    + "<td scope=\"col\">" + roomReservation.room.roomType.pricePerNight + "</td>"
+                    + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + roomReservation.id + "\" type=\"button\" class=\"btn btn-primary bookQuickReservationRoomBtn\">Book</button>" + "</td>"
+                    + "</tr>";
+        });
+    }
     
     document.getElementById("tablediv").innerHTML =
             "<table class=\"table table-hover\"><thead>" +

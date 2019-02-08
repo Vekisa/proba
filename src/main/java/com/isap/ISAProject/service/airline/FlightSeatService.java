@@ -81,8 +81,14 @@ public class FlightSeatService implements FlightSeatServiceInterface {
 	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	public FlightSeat setLuggageInfoForSeat(Long flightSeatId, Long luggageInfoId) {
 		logger.info("> setting luggage info to seat with id {}", flightSeatId);
-		LuggageInfo luggageInfo = this.findLuggageInfoById(luggageInfoId);
 		FlightSeat seat = this.findById(flightSeatId);
+		if(luggageInfoId == -1) {
+			seat.getLuggageInfo().getSeats().remove(seat.getLuggageInfo());
+			seat.setLuggageInfo(null);
+			repository.save(seat);
+			return seat;
+		}
+		LuggageInfo luggageInfo = this.findLuggageInfoById(luggageInfoId);
 		if(!seat.getFlight().getAirline().equals(luggageInfo.getAirline()))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Luggage info doesn't belong to the same airline as the flight of this seat.");
 		setLuggageInfoForSeat(luggageInfo, seat);

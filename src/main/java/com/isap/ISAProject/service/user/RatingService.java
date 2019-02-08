@@ -41,20 +41,21 @@ public class RatingService implements RatingServiceInterface {
 		Date time = new Date();
 		for(ConfirmedReservation confirmed : user.getConfirmedReservations())
 			if(confirmed.getReservation().getRoomReservation() != null)
-				if(confirmed.getReservation().getEndDate().after(time) &&
+				if(confirmed.getReservation().getEndDate().before(time) &&
 						confirmed.getReservation().getRoomReservation().getRoom().getFloor().getHotel().getId() == hotelId) {
 					for(HotelRating hotelRating : user.getHotelRatings())
 						if(hotelRating.getHotel().getId() == hotelId) {
 							hotelRating.setRating(rating);
-							ratingRepository.updateHotelRating(hotelId);
 							userService.save(user);
+							ratingRepository.updateHotelRating(hotelId);
 							logger.info("< hotel rated");
 							return;
 						}
 					HotelRating hotelRating = new HotelRating(user, confirmed.getReservation().getRoomReservation().getRoom().getFloor().getHotel());
 					hotelRating.setRating(rating);
-					ratingRepository.updateHotelRating(hotelId);
+					user.getHotelRatings().add(hotelRating);
 					userService.save(user);
+					ratingRepository.updateHotelRating(hotelId);
 					logger.info("< hotel rated");
 					return;
 				}
@@ -69,20 +70,21 @@ public class RatingService implements RatingServiceInterface {
 		Date time = new Date();
 		for(ConfirmedReservation confirmed : user.getConfirmedReservations())
 			if(confirmed.getReservation().getRoomReservation() != null)
-				if(confirmed.getReservation().getEndDate().after(time) &&
+				if(confirmed.getReservation().getEndDate().before(time) &&
 						confirmed.getReservation().getRoomReservation().getRoom().getId() == roomId) {
 					for(RoomRating roomRating : user.getRoomRatings())
 						if(roomRating.getRoom().getId() == roomId) {
 							roomRating.setRating(rating);
-							ratingRepository.updateRoomRating(roomId);
 							userService.save(user);
+							ratingRepository.updateRoomRating(roomId);
 							logger.info("< room rated");
 							return;
 						}
 					RoomRating roomRating = new RoomRating(user, confirmed.getReservation().getRoomReservation().getRoom());
 					roomRating.setRating(rating);
-					ratingRepository.updateRoomRating(roomId);
+					user.getRoomRatings().add(roomRating);
 					userService.save(user);
+					ratingRepository.updateRoomRating(roomId);
 					logger.info("< room rated");
 					return;
 				}
@@ -90,26 +92,28 @@ public class RatingService implements RatingServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public void rateAirline(Long airlineId, int rating, Long id) {
 		logger.info("> rating airline with id {}", airlineId);
 		RegisteredUser user = userService.findById(id);
 		Date time = new Date();
 		for(ConfirmedReservation confirmed : user.getConfirmedReservations())
 			if(confirmed.getReservation().getTicket() != null)
-				if(confirmed.getReservation().getEndDate().after(time) &&
+				if(confirmed.getReservation().getEndDate().before(time) &&
 						confirmed.getReservation().getTicket().getSeats().get(0).getFlight().getAirline().getId() == airlineId) {
 					for(AirlineRating airlineRating : user.getAirlineRatings())
 						if(airlineRating.getAirline().getId() == airlineId) {
 							airlineRating.setRating(rating);
-							ratingRepository.updateAirlineRating(airlineId);
 							userService.save(user);
+							ratingRepository.updateAirlineRating(airlineId);
 							logger.info("< airline rated");
 							return;
 						}
 					AirlineRating airlineRating = new AirlineRating(user, confirmed.getReservation().getTicket().getSeats().get(0).getFlight().getAirline());
 					airlineRating.setRating(rating);
-					ratingRepository.updateAirlineRating(airlineId);
+					user.getAirlineRatings().add(airlineRating);
 					userService.save(user);
+					ratingRepository.updateAirlineRating(airlineId);
 					logger.info("< airline rated");
 					return;
 				}
@@ -117,26 +121,28 @@ public class RatingService implements RatingServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public void rateFlight(Long flightId, int rating, Long id) {
 		logger.info("> rating flight with id {}", flightId);
 		RegisteredUser user = userService.findById(id);
 		Date time = new Date();
 		for(ConfirmedReservation confirmed : user.getConfirmedReservations())
 			if(confirmed.getReservation().getTicket() != null)
-				if(confirmed.getReservation().getEndDate().after(time) &&
+				if(confirmed.getReservation().getEndDate().before(time) &&
 						confirmed.getReservation().getTicket().getSeats().get(0).getFlight().getId() == flightId) {
 					for(FlightRating flightRating : user.getFlightRatings())
 						if(flightRating.getFlight().getId() == flightId) {
 							flightRating.setRating(rating);
-							ratingRepository.updateFlightRating(flightId);
 							userService.save(user);
+							ratingRepository.updateFlightRating(flightId);
 							logger.info("< flight rated");
 							return;
 						}
 					FlightRating flightRating = new FlightRating(user, confirmed.getReservation().getTicket().getSeats().get(0).getFlight());
 					flightRating.setRating(rating);
-					ratingRepository.updateFlightRating(flightId);
+					user.getFlightRatings().add(flightRating);
 					userService.save(user);
+					ratingRepository.updateFlightRating(flightId);
 					logger.info("< flight rated");
 					return;
 				}
@@ -144,26 +150,28 @@ public class RatingService implements RatingServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public void rateRentACar(Long rentACarId, int rating, Long id) {
 		logger.info("> rating rent-a-car with id {}", rentACarId);
 		RegisteredUser user = userService.findById(id);
 		Date time = new Date();
 		for(ConfirmedReservation confirmed : user.getConfirmedReservations())
 			if(confirmed.getReservation().getVehicleReservation() != null)
-				if(confirmed.getReservation().getEndDate().after(time) &&
+				if(confirmed.getReservation().getEndDate().before(time) &&
 						confirmed.getReservation().getVehicleReservation().getVehicle().getBranchOffice().getRentACar().getId() == rentACarId) {
 					for(RentACarRating rentACarRating : user.getRentACarRatings())
 						if(rentACarRating.getRentACar().getId() == rentACarId) {
 							rentACarRating.setRating(rating);
-							ratingRepository.updateRentACarRating(rentACarId);
 							userService.save(user);
+							ratingRepository.updateRentACarRating(rentACarId);
 							logger.info("< rent-a-car rated");
 							return;
 						}
 					RentACarRating rentACarRating = new RentACarRating(user, confirmed.getReservation().getVehicleReservation().getVehicle().getBranchOffice().getRentACar());
 					rentACarRating.setRating(rating);
-					ratingRepository.updateRentACarRating(rentACarId);
+					user.getRentACarRatings().add(rentACarRating);
 					userService.save(user);
+					ratingRepository.updateRentACarRating(rentACarId);
 					logger.info("< rent-a-car rated");
 					return;
 				}
@@ -171,30 +179,41 @@ public class RatingService implements RatingServiceInterface {
 	}
 
 	@Override
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public void rateVehicle(Long vehicleId, int rating, Long id) {
 		logger.info("> rating vehicle with id {}", vehicleId);
 		RegisteredUser user = userService.findById(id);
 		Date time = new Date();
 		for(ConfirmedReservation confirmed : user.getConfirmedReservations())
 			if(confirmed.getReservation().getVehicleReservation() != null)
-				if(confirmed.getReservation().getEndDate().after(time) &&
+				if(confirmed.getReservation().getEndDate().before(time) &&
 						confirmed.getReservation().getVehicleReservation().getVehicle().getId() == vehicleId) {
 					for(VehicleRating vehicleRating : user.getVehicleRatings())
 						if(vehicleRating.getVehicle().getId() == vehicleId) {
 							vehicleRating.setRating(rating);
-							ratingRepository.updateVehicleRating(vehicleId);
 							userService.save(user);
+							ratingRepository.updateVehicleRating(vehicleId);
 							logger.info("< vehicle rated");
 							return;
 						}
 					VehicleRating vehicleRating = new VehicleRating(user, confirmed.getReservation().getVehicleReservation().getVehicle());
 					vehicleRating.setRating(rating);
-					ratingRepository.updateVehicleRating(vehicleId);
+					user.getVehicleRatings().add(vehicleRating);
 					userService.save(user);
+					ratingRepository.updateVehicleRating(vehicleId);
 					logger.info("< vehicle rated");
 					return;
 				}
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested vehicle can't be rated by this user.");
+	}
+	
+	public Integer getBonusPoints(Long id) {
+		logger.info("> getting bonus points with id {}", id);
+		RegisteredUser user = userService.findById(id);
+		if(user == null)
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User ne postoji");
+		logger.info("> getting bonus points");
+		return user.getBonusPoints();
 	}
 	
 }
