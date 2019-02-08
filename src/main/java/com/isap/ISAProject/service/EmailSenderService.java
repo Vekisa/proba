@@ -13,8 +13,8 @@ import com.isap.ISAProject.model.user.Reservation;
 
 @Service("emailSenderService")
 public class EmailSenderService {
-
-    private JavaMailSender javaMailSender;
+	
+    public JavaMailSender javaMailSender;
 
     @Autowired
     public EmailSenderService(JavaMailSender javaMailSender) {

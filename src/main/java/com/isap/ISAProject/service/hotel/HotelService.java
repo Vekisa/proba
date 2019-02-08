@@ -266,7 +266,7 @@ public class HotelService implements HotelServiceInterface {
 		for(Floor floor : hotel.getFloors())
 			for(Room room : floor.getRooms())
 				for(RoomReservation reservation : room.getRoomReservations())
-					if(reservation.getBeginDate().after(beginDate) && reservation.getEndDate().before(endDate))
+					if(reservation.getBeginDate().after(beginDate) && reservation.getEndDate().before(endDate) && reservation.getReservation() != null)
 						if(incomeMap.containsKey(reservation.getBeginDate().getTime())) {
 							incomeMap.put(reservation.getBeginDate().getTime(), incomeMap.get(reservation.getBeginDate().getTime()) + reservation.getPrice());
 						} else {
@@ -335,7 +335,7 @@ public class HotelService implements HotelServiceInterface {
 		for(Floor floor : hotel.getFloors())
 			for(Room room : floor.getRooms())
 				for(RoomReservation reservation : room.getRoomReservations())
-					if(reservation.getEndDate().after(beginDate) && reservation.getBeginDate().before(endDate)) {
+					if(reservation.getEndDate().after(beginDate) && reservation.getBeginDate().before(endDate) && reservation.getReservation() != null) {
 						if(statisticMap.containsKey(reservation.getBeginDate().getTime())) {
 							statisticMap.put(reservation.getBeginDate().getTime(), statisticMap.get(reservation.getBeginDate().getTime()) + reservation.getNumberOfGuests());
 						} else {

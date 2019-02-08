@@ -1,0 +1,3 @@
+INSERT INTO rent_a_car (id, rating, version, address, description, name) VALUES (1, 0, 0, '52337 Logan Point', 'Automated bifurcated matrices', 'Reichel-Braun');
+INSERT INTO rent_a_car (id, rating, version, address, description, name) VALUES (2, 0, 0, '205 Shoshone Way', 'Seamless neutral database', 'Smitham, Zulauf and Lebsack');
+INSERT INTO rent_a_car (id, rating, version, address, description, name) VALUES (3, 0, 0, '5 Gale Pass', 'Business-focused user-facing capability', 'Corwin, Dietrich and Gerlach');
