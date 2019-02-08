@@ -12,6 +12,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,6 +70,7 @@ public class AirlineController {
 			@ApiResponse(code = 201, message = "Created", response = Airline.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđena avio kompanija nije validna.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Resource<Airline>> createAirline(@Valid @RequestBody Airline airline, @RequestParam("destination") Long id) {
 		return new ResponseEntity<Resource<Airline>>(HATEOASImplementorAirline.createAirline(service.saveAirline(airline, id)), HttpStatus.CREATED);
 	}
@@ -80,6 +82,7 @@ public class AirlineController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili avio kompaniju nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToAirline(#airlineId)")
 	public ResponseEntity<Resource<Airline>> updateAirlineWithId(@PathVariable(value = "id") Long airlineId, @Valid @RequestBody Airline newAirline) {
 		return new ResponseEntity<Resource<Airline>>(HATEOASImplementorAirline.createAirline(service.updateAirline(airlineId, newAirline)), HttpStatus.OK);
 	}
@@ -91,6 +94,7 @@ public class AirlineController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija ili destinacija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("(hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToAirline(#airlineId)) OR hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Resource<Airline>> changeLocationOfAirline(@PathVariable("id") Long airlineId, @RequestParam("destination") Long id) {
 		return new ResponseEntity<Resource<Airline>>(HATEOASImplementorAirline.createAirline(service.changeLocationOfAirline(airlineId, id)), HttpStatus.OK);
 	}
@@ -102,6 +106,7 @@ public class AirlineController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<?> deleteAirlineWithId(@PathVariable(value = "id") Long airlineId) {
 		service.deleteAirline(airlineId);
 		return ResponseEntity.ok().build();
@@ -114,6 +119,7 @@ public class AirlineController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<Airline>> addRatingToAirlineWithId(@PathVariable(value = "id") Long airlineId, @RequestParam("rating") int rating) {
 		return ResponseEntity.ok().build();
 	}
@@ -137,6 +143,7 @@ public class AirlineController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili informacija o prtljagu nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToAirline(#airlineId)")
 	public ResponseEntity<Resource<LuggageInfo>> createLuggageInfoForAirlineWithId(@PathVariable(value = "id") Long airlineId,
 			@Valid @RequestBody LuggageInfo luggageInfo) {
 			return new ResponseEntity<Resource<LuggageInfo>>(HATEOASImplementorAirline.createLuggageInfo(service.addLuggageInfoToAirline(airlineId, luggageInfo)),
@@ -151,6 +158,7 @@ public class AirlineController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToAirline(#airlineId)")
 	public ResponseEntity<List<Resource<FlightConfiguration>>> getFlightConfigurationsForAirlineWithId(@PathVariable(value = "id") Long airlineId) {
 		return new ResponseEntity<List<Resource<FlightConfiguration>>>(HATEOASImplementorAirline.createFlightConfigurationsList(service.getFlightConfigurationsForAirline(airlineId)), HttpStatus.OK);
 	}
@@ -162,6 +170,7 @@ public class AirlineController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili konfiguracija leta nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToAirline(#airlineId)")
 	public ResponseEntity<Resource<FlightConfiguration>> createFlightConfigurationForAirlineWithId(@PathVariable(value = "id") Long airlineId) {
 		return new ResponseEntity<Resource<FlightConfiguration>>(HATEOASImplementorAirline.createFlightConfiguration(service.addFlightConfigurationToAirline(airlineId, new FlightConfiguration())), HttpStatus.CREATED);
 	}
@@ -174,6 +183,7 @@ public class AirlineController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToAirline(#airlineId)")
 	public ResponseEntity<List<Resource<FlightSeatCategory>>> getFlightSeatCategoriesForAirlineWithId(@PathVariable(value = "id") Long airlineId) {
 		return new ResponseEntity<List<Resource<FlightSeatCategory>>>(HATEOASImplementorAirline.createFlightSeatCategoriesList(service.getFlightSeatCategoriesForAirline(airlineId)), HttpStatus.OK);
 	}
@@ -185,6 +195,7 @@ public class AirlineController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili kategorija sedišta nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToAirline(#airlineId)")
 	public ResponseEntity<Resource<FlightSeatCategory>> createFlightSeatCategoryForAirlineWithId(@PathVariable(value = "id") Long airlineId, @Valid @RequestBody FlightSeatCategory category) {
 			return new ResponseEntity<Resource<FlightSeatCategory>>(HATEOASImplementorAirline.createFlightSeatCategory(service.addFlightSeatCategoryToAirline(airlineId, category)), HttpStatus.CREATED);
 	}
@@ -197,6 +208,7 @@ public class AirlineController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<List<Resource<CompanyAdmin>>> getAdminsOfAirlineWithId(@PathVariable("id") Long id) {
 		return new ResponseEntity<List<Resource<CompanyAdmin>>>(HATEOASImplementorUsers.createCompanyAdminsList(service.getAdminsOfAirline(id)), HttpStatus.OK);
 	}
@@ -231,21 +243,25 @@ public class AirlineController {
 	}
 	
 	@RequestMapping(value = "/{id}/income", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToAirline(#id)")
 	public ResponseEntity<Map<Long, Double>> getIncomeForAirline(@PathVariable("id") Long id, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
 		return new ResponseEntity<Map<Long,Double>>(service.getIncomeFor(id, new Date(begin), new Date(end)), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{id}/statistic", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToAirline(#id)")
 	public ResponseEntity<Map<Long, Integer>> getStatisticForAirline(@PathVariable("id") Long id, @RequestParam("begin") Long begin, @RequestParam("end") Long end) {
 		return new ResponseEntity<Map<Long,Integer>>(service.getStatisticFor(id, new Date(begin), new Date(end)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}/quicks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<List<Resource<FlightSeat>>> getQuickFlights(@PathVariable("id") Long id) {
 		return new ResponseEntity<List<Resource<FlightSeat>>>(HATEOASImplementorAirline.createFlightSeatsList(service.getQuicks(id)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/all-quicks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('REGULAR_USER')")
 	public ResponseEntity<List<Resource<FlightSeat>>> getAllQuicks() {
 		return new ResponseEntity<List<Resource<FlightSeat>>>(HATEOASImplementorAirline.createFlightSeatsList(service.getAllQuicks()), HttpStatus.OK);
 	}

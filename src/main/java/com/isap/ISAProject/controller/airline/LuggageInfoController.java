@@ -10,6 +10,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,6 +62,7 @@ public class LuggageInfoController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili avio kompaniju nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToLuggage(#luggageInfoId)")
 	public ResponseEntity<Resource<LuggageInfo>> updateLuggageInfoWithId(@PathVariable(value = "id") Long luggageInfoId, @Valid @RequestBody LuggageInfo newLuggageInfo) {
 		return new ResponseEntity<Resource<LuggageInfo>>(HATEOASImplementorAirline.createLuggageInfo(service.updateLuggageInfo(luggageInfoId, newLuggageInfo)), HttpStatus.OK);
 	}
@@ -72,6 +74,7 @@ public class LuggageInfoController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Informacija o prtljagu sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToLuggage(#luggageInfoId)")
 	public ResponseEntity<?> deleteLuggageInfoWithId(@PathVariable(value = "id") Long luggageInfoId) {
 		service.deleteLuggageInfo(luggageInfoId);
 		return ResponseEntity.ok().build();

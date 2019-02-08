@@ -10,6 +10,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +60,7 @@ public class ReservationController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Resource<Reservation>> createReservation(@Valid @RequestBody Reservation reservation, @Valid @RequestBody Ticket ticket,
 			@Valid @RequestBody VehicleReservation vehicleReservation, @Valid @RequestBody RoomReservation roomReservation) {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.save(reservation,ticket,
@@ -74,6 +76,7 @@ public class ReservationController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN') OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<Reservation>> addRoomReservationToReservationWitdId(@PathVariable(value="id") Long reservationId, 
 			@PathVariable(value="idroom") Long roomReservationId) {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.addRoomReservationToReservationWitdId(reservationId, roomReservationId)), HttpStatus.OK);
@@ -88,6 +91,7 @@ public class ReservationController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN') OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<Reservation>> addVehicleReservationToReservationWitdId(@PathVariable(value="id") Long reservationId, 
 			@PathVariable(value="idvehicle") Long vehicleReservationId) {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.addVehicleReservationToReservationWithId(reservationId, vehicleReservationId)), HttpStatus.OK);
@@ -114,6 +118,7 @@ public class ReservationController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN') OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<?> deleteReservationWithId(@PathVariable(value="id") Long reservationId){
 		reservationService.deleteById(reservationId);
 		return ResponseEntity.ok().build();
@@ -132,6 +137,7 @@ public class ReservationController {
 	}	
 	
 	@RequestMapping(value = "/{id}/room-reservation", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("(hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToRoom(#roomId)) OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<Reservation>> addRoomReservation(@PathVariable("id") Long id, @RequestParam("room") Long roomId, @Valid @RequestBody RoomReservation roomReservation) {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.addRoomReservationToReservation(id, roomId, roomReservation)), HttpStatus.CREATED);
 	}
@@ -141,26 +147,31 @@ public class ReservationController {
 	}
 	
 	@RequestMapping(value = "/{id}/user", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('USERS_ADMIN') OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<Reservation>> addUserToReservation(@PathVariable(value = "id") Long id, @RequestParam("user") Long userId, @RequestParam("points") int points) {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.addUserToReservation(id, userId, points)), HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/{id}/invite", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('USERS_ADMIN') OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<Reservation>> inviteUserToReservation(@PathVariable(value = "id") Long id, @RequestBody List<Long> users) {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.inviteUsersToReservation(id, users)), HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/{id}/decline", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('USERS_ADMIN') OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<Reservation>> declineReservationInvite(@PathVariable(value = "id") Long id, @RequestParam("user") Long userId) {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.declineInvitation(id, userId)), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}/accept", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('USERS_ADMIN') OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<Reservation>> acceptInvite(@PathVariable(value = "id") Long id, @RequestParam("user") Long userId) {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.acceptInvitation(id, userId)), HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/{id}/cancel", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('USERS_ADMIN') OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<Reservation>> cancelReservation(@PathVariable(value = "id") Long id, @RequestParam("user") Long userId) {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.cancelReservation(id, userId)), HttpStatus.OK);
 	}
@@ -181,11 +192,13 @@ public class ReservationController {
 	}
 	
 	@RequestMapping(value = "/{id}/delete_passenger/{idpass}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('USERS_ADMIN') OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Passenger> deletePassenger(@PathVariable(value = "id") Long id, @PathVariable(value = "idpass") Long passengerId) {
 		return new ResponseEntity<Passenger>(reservationService.deletePassenger(id,passengerId), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/factor", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<?> setDiscountFactor(@RequestParam("factor") int factor) {
 		reservationService.setDiscountFactor(factor);
 		return ResponseEntity.ok().build();

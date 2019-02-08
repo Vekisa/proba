@@ -10,6 +10,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,6 +55,7 @@ public class ExtraOptionController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Resource<ExtraOption>> createExtraOption(@Valid @RequestBody ExtraOption extraOption) {
 		return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(extraOptionService.save(extraOption)), HttpStatus.CREATED);
 	}
@@ -80,6 +82,7 @@ public class ExtraOptionController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToOption(#extraOptionId)")
 	public ResponseEntity<?> deleteExtraOptionWithId(@PathVariable(value="id") Long extraOptionId){	
 		extraOptionService.deleteById(extraOptionId);
 		return ResponseEntity.ok().build();
@@ -94,6 +97,7 @@ public class ExtraOptionController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToOption(#extraOptionId)")
 	public ResponseEntity<Resource<ExtraOption>> updateExtraOptionWithId(@PathVariable(value = "id") Long extraOptionId,
 			@Valid @RequestBody ExtraOption newExtraOption) {
 			return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(extraOptionService.updateExtraOptionById(extraOptionId, newExtraOption)), HttpStatus.OK);

@@ -10,6 +10,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,6 +54,7 @@ public class FloorController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Resource<Floor>> createFloor(@Valid @RequestBody Floor floor) {
 		return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(floorService.save(floor)), HttpStatus.CREATED);
 	}
@@ -78,6 +80,7 @@ public class FloorController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToFloor(#floorId)")
 	public ResponseEntity<?> deleteFloorWithId(@PathVariable(value="id") Long floorId){
 		floorService.deleteById(floorId);
 		return ResponseEntity.ok().build();
@@ -92,6 +95,7 @@ public class FloorController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToFloor(#floorId)")
 	public ResponseEntity<Resource<Floor>> updateFloorWithId(@PathVariable(value = "id") Long floorId,
 			@Valid @RequestBody Floor newFloor) {
 			return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(floorService.updateFloorById(floorId, newFloor)), HttpStatus.OK);
@@ -119,6 +123,7 @@ public class FloorController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToFloor(#floorId)")
 	public ResponseEntity<Resource<Room>> createRoomForFloorWithId(@PathVariable(value = "id") Long floorId,
 			@Valid @RequestBody Room room) {
 			return new ResponseEntity<Resource<Room>>(HATEOASImplementorHotel.createRoom(floorService.createRoom(floorId, room)), HttpStatus.CREATED);	

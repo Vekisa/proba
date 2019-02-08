@@ -10,6 +10,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +43,7 @@ public class CompanyAdminController {
 			@ApiResponse(code = 201, message = "Created", response = CompanyAdmin.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni korisnik nije validan.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Resource<CompanyAdmin>> createRegisteredUser(@RequestBody @Valid CompanyAdmin admin) {
 		return new ResponseEntity<Resource<CompanyAdmin>>(HATEOASImplementorUsers.createCompanyAdmin(userService.createCompanyAdmin(admin)), HttpStatus.CREATED);
 	}
@@ -75,6 +77,7 @@ public class CompanyAdminController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili admin kompanije nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Admin kompanije sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN') OR @securityServiceImpl.isCurrentAdmin(#id)")
 	public ResponseEntity<Resource<CompanyAdmin>> updateAdminWithId(@PathVariable("id") Long id, @RequestBody @Valid CompanyAdmin admin) {
 		return new ResponseEntity<Resource<CompanyAdmin>>(HATEOASImplementorUsers.createCompanyAdmin(service.updateAdmin(id, admin)), HttpStatus.OK);
 	}
@@ -86,6 +89,7 @@ public class CompanyAdminController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Admin kompanije sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<?> deleteCompanyAdminWithId(@PathVariable("id") Long id) {
 		service.delete(id);
 		return ResponseEntity.ok().build();
@@ -98,6 +102,7 @@ public class CompanyAdminController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili nivo autorizacije nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Admin kompanije sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Resource<CompanyAdmin>> setAuthorizationForAdminWithId(@PathVariable("id") Long id, @RequestParam("authorization") AuthorizationLevel authorization) {
 		return new ResponseEntity<Resource<CompanyAdmin>>(HATEOASImplementorUsers.createCompanyAdmin(service.setAuthorization(id, authorization)), HttpStatus.OK);
 	}
@@ -109,6 +114,7 @@ public class CompanyAdminController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Admin kompanije ili kompanija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Resource<CompanyAdmin>> setCompanyForAdminWithId(@PathVariable("id") Long id, @RequestParam("company") Long companyId) {
 		return new ResponseEntity<Resource<CompanyAdmin>>(HATEOASImplementorUsers.createCompanyAdmin(service.setCompany(id, companyId)), HttpStatus.OK);
 	}

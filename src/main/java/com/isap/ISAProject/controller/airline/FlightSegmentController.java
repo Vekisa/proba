@@ -10,6 +10,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,6 +62,7 @@ public class FlightSegmentController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili segment nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Segment (leta) sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToSegment(#segmentId)")
 	public ResponseEntity<Resource<FlightSegment>> updateFlightSegmentWithId(@PathVariable("id") Long segmentId, @Valid @RequestBody FlightSegment newSegment) {
 			return new ResponseEntity<Resource<FlightSegment>>(HATEOASImplementorAirline.createFlightSegment(service.updateSegment(segmentId, newSegment)), HttpStatus.OK);
 	}
@@ -72,6 +74,7 @@ public class FlightSegmentController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Segment sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToSegment(#segmentId)")
 	public ResponseEntity<?> deleteFlightSegmentWithId(@PathVariable("id") Long segmentId) {
 		service.deleteSegment(segmentId);
 		return ResponseEntity.ok().build();

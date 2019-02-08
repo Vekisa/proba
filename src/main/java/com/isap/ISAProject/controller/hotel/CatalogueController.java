@@ -10,6 +10,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,6 +55,7 @@ public class CatalogueController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN')")
 	public ResponseEntity<Resource<Catalogue>> createCatalogue(@Valid @RequestBody Catalogue catalogue) {
 		return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(catalogueService.save(catalogue)), HttpStatus.CREATED);
 	}
@@ -79,6 +81,7 @@ public class CatalogueController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN')")
 	public ResponseEntity<?> deleteCatalogueWithId(@PathVariable(value="id") Long catalogueId){		
 		catalogueService.deleteById(catalogueId);
 		return ResponseEntity.ok().build();
@@ -93,6 +96,7 @@ public class CatalogueController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToCatalog(#catalogueId)")
 	public ResponseEntity<Resource<Catalogue>> updateCatalogueWithId(@PathVariable(value = "id") Long catalogueId,
 			@Valid @RequestBody Catalogue newCatalogue) {
 			return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(catalogueService.updateCatalogueById(catalogueId, newCatalogue)), HttpStatus.OK);
@@ -120,6 +124,7 @@ public class CatalogueController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToCatalog(#catalogueId)")
 	public ResponseEntity<Resource<RoomType>> createRoomTypeForCatalogueWithId(@PathVariable(value = "id") Long catalogueId,
 			@Valid @RequestBody RoomType roomType) {
 			return new ResponseEntity<Resource<RoomType>>(HATEOASImplementorHotel.createRoomType(catalogueService.createRoomType(catalogueId, roomType)), HttpStatus.CREATED);

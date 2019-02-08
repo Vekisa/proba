@@ -396,7 +396,7 @@ $(document).on('click', '#logout', function(e) {
 		url: "/users/registered/logout",
 		async: false,
 		beforeSend: function(request) {
-			request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
+			request.setRequestHeader("X-Auth-Token", localStorage.token);
 		},
 		success: function() {
 			localStorage.removeItem("token");
@@ -404,6 +404,17 @@ $(document).on('click', '#logout', function(e) {
 		}
 	});
 });
+
+$.ajaxSetup(
+    {
+        cache:false,
+        beforeSend: function (xhr){ 
+            if (localStorage.token) {
+		            xhr.setRequestHeader('X-Auth-Token', localStorage.token);	            
+            } 
+        }
+    }
+);
 
 $(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
   
