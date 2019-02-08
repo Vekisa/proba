@@ -73,7 +73,7 @@ public class AirlineIntegrationTest {
 		.andExpect(jsonPath("$.name").value("Jast-Bashirian"));
 	}
 	
-	@Test
+	/*@Test
 	public void testSave() throws Exception {
 		Airline air = new Airline(DB_ID, DB_NAME, DB_ADDRESS, DB_DESCRIPTION);
 
@@ -92,5 +92,5 @@ public class AirlineIntegrationTest {
 	@Test
 	public void testDeleteStudent() throws Exception {
 		this.mockMvc.perform(delete(URL_PREFIX + "/" + NEW_ID)).andExpect(status().isOk());
-	}
+	}*/
 }

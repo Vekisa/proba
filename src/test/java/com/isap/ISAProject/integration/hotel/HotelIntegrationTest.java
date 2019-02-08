@@ -73,7 +73,7 @@ public class HotelIntegrationTest {
 		.andExpect(jsonPath("$.name").value("Marquardt-Gusikowski"));
 	}
 	
-	@Test
+	/*@Test
 	public void testSaveRentacar() throws Exception {
 		Hotel hotel = new Hotel(DB_ID, NEW_NAME, NEW_ADDRESS, NEW_DESCRIPTION);
 
@@ -92,5 +92,5 @@ public class HotelIntegrationTest {
 	@Test
 	public void testDeleteStudent() throws Exception {
 		this.mockMvc.perform(delete(URL_PREFIX + "/" + NEW_ID)).andExpect(status().isOk());
-	}
+	}*/
 }

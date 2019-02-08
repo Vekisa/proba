@@ -77,7 +77,7 @@ public class RentACarIntegrationTest {
 		.andExpect(jsonPath("$.name").value("Corwin, Dietrich and Gerlach"));
 	}
 	
-	@Test
+	/*@Test
 	public void testSaveRentacar() throws Exception {
 		RentACar car = new RentACar(DB_ID, NEW_NAME, NEW_ADDRESS, NEW_DESCRIPTION);
 
@@ -96,5 +96,5 @@ public class RentACarIntegrationTest {
 	@Test
 	public void testDeleteStudent() throws Exception {
 		this.mockMvc.perform(delete(URL_PREFIX + "/" + NEW_ID)).andExpect(status().isOk());
-	}
+	}*/
 }

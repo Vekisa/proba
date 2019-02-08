@@ -58,11 +58,11 @@ public class LocationIntegrationTest {
 		.andExpect(jsonPath("$[0].id").value(1));
 	}
 	
-	@Test
+	/*@Test
 	public void testSave() throws Exception {
 		Location room = new Location(4l, DB_VERSION, DB_NAME);
 
 		String json = com.isap.ISAProject.TestUtil.json(room);
 		this.mockMvc.perform(post(URL_PREFIX).contentType(contentType).content(json)).andExpect(status().isCreated());
-	}
+	}*/
 }

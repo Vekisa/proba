@@ -63,7 +63,7 @@ public class RoomIntegrationTest {
 		.andExpect(jsonPath("$.numberOfBeds").value(4));
 	}
 	
-	@Test
+	/*@Test
 	public void testSaveRoom() throws Exception {
 		Room room = new Room(DB_ID, DB_NUMBER_OF_BEDS, DB_VERSION);
 
@@ -82,5 +82,5 @@ public class RoomIntegrationTest {
 	@Test
 	public void testDeleteStudent() throws Exception {
 		this.mockMvc.perform(delete(URL_PREFIX + "/" + NEW_ID)).andExpect(status().isOk());
-	}
+	}*/
 }
