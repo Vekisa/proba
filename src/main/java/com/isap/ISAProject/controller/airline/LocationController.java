@@ -23,7 +23,9 @@ import com.isap.ISAProject.model.airline.Coordinates;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.hotel.Hotel;
+import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.rentacar.BranchOffice;
+import com.isap.ISAProject.model.rentacar.VehicleReservation;
 import com.isap.ISAProject.service.airline.LocationService;
 
 import io.swagger.annotations.ApiOperation;
@@ -174,6 +176,28 @@ public class LocationController {
 	})
 	public ResponseEntity<List<Resource<Location>>> getDestinations() {
 		return new ResponseEntity<List<Resource<Location>>>(HATEOASImplementorAirline.createDestinationsList(service.findAll(null)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/room-quicks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća brze rezervacije soba.", notes = "Povratna vrednost servisa je lista brzih rezervacija soba na toj lokaciji", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request")
+	})
+	public ResponseEntity<List<Resource<RoomReservation>>> getQuickRoomReservations(@PathVariable("id") Long id) {
+		return new ResponseEntity<List<Resource<RoomReservation>>>(HATEOASImplementorHotel.createRoomReservationList(service.getQuickRoomReservations(id)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/vehicle-quicks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Vraća brze rezervacije vozila.", notes = "Povratna vrednost servisa je lista brzih rezervacija vozila na toj lokaciji", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = List.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request")
+	})
+	public ResponseEntity<List<Resource<VehicleReservation>>> getQuickVehicleReservations(@PathVariable("id") Long id) {
+		return new ResponseEntity<List<Resource<VehicleReservation>>>(HATEOASImplementorRentacar.vehicleReservationLinksList(service.getQuickVehicleReservations(id)), HttpStatus.OK);
 	}
 
 }

@@ -245,4 +245,9 @@ public class AirlineController {
 		return new ResponseEntity<List<Resource<FlightSeat>>>(HATEOASImplementorAirline.createFlightSeatsList(service.getQuicks(id)), HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/all-quicks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Resource<FlightSeat>>> getAllQuicks() {
+		return new ResponseEntity<List<Resource<FlightSeat>>>(HATEOASImplementorAirline.createFlightSeatsList(service.getAllQuicks()), HttpStatus.OK);
+	}
+	
 }

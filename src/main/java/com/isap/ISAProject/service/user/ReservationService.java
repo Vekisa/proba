@@ -1,5 +1,6 @@
 package com.isap.ISAProject.service.user;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,7 @@ import com.isap.ISAProject.model.user.ConfirmedReservation;
 import com.isap.ISAProject.model.user.PendingReservation;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
+import com.isap.ISAProject.repository.airline.FlightSeatsRepository;
 import com.isap.ISAProject.repository.airline.PassengerRepository;
 import com.isap.ISAProject.repository.user.ReservationRepository;
 import com.isap.ISAProject.service.EmailSenderService;
@@ -75,6 +77,9 @@ public class ReservationService {
 	@Autowired
 	private EmailSenderService emailService;
 	
+	@Autowired
+	private FlightSeatsRepository flightSeatsRepository;
+
 	@Value("${discount.factor}") 
 	private int factor;
 	
@@ -159,14 +164,22 @@ public class ReservationService {
 		Reservation reservation = this.findById(id);
 		RegisteredUser user = userService.findById(userId);
 		reservation.getConfirmedReservations().add(new ConfirmedReservation(user, reservation));
+		FlightSeat seat = getFreeSeat(reservation.getTicket());
+		if(user.getPassenger() == null) {
+			user.setPassenger(this.createNewPassenger(user));
+		}
+		passengersRepository.save(user.getPassenger());
+		seat.setPassenger(user.getPassenger());
+		flightSeatsRepository.save(seat);
+		
 		if(user.getBonusPoints() <= points) {
 			reservation.setPrice(reservation.getPrice() * (100 - points * this.getDiscountFactor()));
 			user.setBonusPoints(user.getBonusPoints() - points);
 		}
 		user.setBonusPoints(user.getBonusPoints() + (int) reservation.getTicket().getSeats().get(0).getFlight().getFlightLength() / 100);
 		if(user.getBonusPoints() > 15) user.setBonusPoints(15);
-		reservationRepository.save(reservation);
 		
+		reservationRepository.save(reservation);
 		emailService.sendReservationInfo(user, reservation);
 		logger.info("< user added");
 		return reservation;
@@ -176,7 +189,7 @@ public class ReservationService {
 	public Reservation inviteUsersToReservation(Long id, List<Long> users) {
 		logger.info("> inviting users to reservation with id {}", id);
 		Reservation reservation = this.findById(id);
-		if(users.size() > reservation.getTicket().getNumberOfSeats())
+		if(users.size() > reservation.getTicket().getNumberOfSeats() && this.getFreeSeat(reservation.getTicket()) != null)
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Too many friends invited.");
 		RegisteredUser owner = reservation.getConfirmedReservations().get(0).getUser();
 		if(owner == null) 
@@ -236,6 +249,7 @@ public class ReservationService {
 		userService.save(user);
 		reservationRepository.save(reservation);
 		emailService.sendReservationInfo(user, reservation);
+		flightSeatsRepository.save(seat);
 		logger.info("< accepted invitation");
 		return reservation;
 	}
@@ -288,6 +302,7 @@ public class ReservationService {
 		for(ConfirmedReservation confirmed : reservation.getConfirmedReservations())
 			if(confirmed.getUser().equals(user)) {
 				forRemoval = confirmed;
+				forRemoval.setReservation(null);
 				break;
 			}
 		return reservation.getConfirmedReservations().remove(forRemoval);
@@ -307,7 +322,7 @@ public class ReservationService {
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 	private void removeUserFromSeat(Ticket ticket, Passenger passenger) {
 		for(FlightSeat fs : ticket.getSeats())
-			if(fs.getPassenger().equals(passenger)) {
+			if(fs.getPassenger() != null && fs.getPassenger().equals(passenger)) {
 				fs.setPassenger(null);
 				return;
 			}
@@ -466,6 +481,87 @@ public class ReservationService {
 		return reservation;
 	}
 	
+	public List<Passenger> getPassengers(Long id){
+		logger.info("> getting passengers");
+		Optional<Reservation> reservation = reservationRepository.findById(id);
+		if(!reservation.isPresent())
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rezervacija ne postoji");
+		List<Passenger> passengers = new ArrayList<>();
+		Ticket ticket = reservation.get().getTicket();
+		for(FlightSeat fs : ticket.getSeats()) {
+			if(fs.getPassenger() != null)
+				passengers.add(fs.getPassenger());
+		}
+		logger.info("< getting passengers");
+		
+		return passengers;
+	}
+	
+	public List<Passenger> getUnregisteredPassengers(Long id){
+		logger.info("> getting unregistered passengers");
+		Optional<Reservation> reservation = reservationRepository.findById(id);
+		if(!reservation.isPresent())
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rezervacija ne postoji");
+		
+		List<Passenger> passengers = new ArrayList<>();
+		
+		Ticket ticket = reservation.get().getTicket();
+		for(FlightSeat fs : ticket.getSeats()) {
+			if(fs.getPassenger() != null && fs.getPassenger().getUser() == null)
+				passengers.add(fs.getPassenger());
+		}
+		
+		logger.info("< getting unregistered passengers");
+		
+		return passengers;
+	}
+	
+	public List<FlightSeat> getFreeSeats(Long id){
+		logger.info("> getting free seats");
+		Optional<Reservation> reservation = reservationRepository.findById(id);
+		if(!reservation.isPresent())
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rezervacija ne postoji");
+		
+		List<FlightSeat> seats = new ArrayList<>();
+		Ticket ticket = reservation.get().getTicket();
+		
+		for(FlightSeat fs : ticket.getSeats()) {
+			if(fs.getPassenger() == null)
+				seats.add(fs);
+		}
+		
+		logger.info("< getting free seats");
+		
+		return seats;
+	}
+	
+	@Transactional(readOnly = false)
+	public Passenger deletePassenger(Long id, Long passengerId) {
+		logger.info("> deleting passenger");
+		Optional<Reservation> reservation = reservationRepository.findById(id);
+		Optional<Passenger> passenger = passengersRepository.findById(passengerId);
+		if(!reservation.isPresent() || !reservation.isPresent())
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rezervacija ili putnik ne postoji");
+		
+		FlightSeat flightSeat = null;
+		for(FlightSeat fs : reservation.get().getTicket().getSeats()) {
+			if(fs.getPassenger().getId() == passenger.get().getId()) {
+				flightSeat = fs;
+				break;
+			}
+		}
+		
+		if(flightSeat == null)
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Putnik nije na zadatom letu");
+		flightSeat.setPassenger(null);
+		passenger.get().getFlightSeats().remove(flightSeat);
+		passengersRepository.save(passenger.get());
+		flightSeatsRepository.save(flightSeat);
+		logger.info("< deleting passenger");
+		
+		return passenger.get();
+	}
+		
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
 	public void setDiscountFactor(int factor) {
 		logger.info("> setting discount factor");

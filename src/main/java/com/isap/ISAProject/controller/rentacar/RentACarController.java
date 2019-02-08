@@ -9,6 +9,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -37,6 +40,7 @@ import io.swagger.annotations.ApiResponses;
 
 
 @RestController
+@EnableSpringDataWebSupport
 @RequestMapping("/rent-a-cars")
 public class RentACarController {
 	@Autowired
@@ -49,11 +53,11 @@ public class RentACarController {
 			@ApiResponse(code = 204, message = "No Content. Lista je prazna."),
 			@ApiResponse(code = 400, message = "Bad Request. Parametri paginacije nisu ispravni.")
 	})
-	public ResponseEntity<List<Resource<RentACar>>> getAllRentACars(Pageable pageable){
+	public ResponseEntity<List<Resource<RentACar>>> getAllRentACars(@PageableDefault(size = 10) Pageable pageable){
 		return new ResponseEntity<List<Resource<RentACar>>>(HATEOASImplementorRentacar.rentacarLinksList(service.getAllRentACars(pageable)), HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/search", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/search", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Pretraga rent-a-car servisa", responseContainer = "List", httpMethod = "GET", produces = "application/json")
 	@ApiResponses(value = { 
 			@ApiResponse(code = 200, message = "OK", response = List.class),
@@ -99,7 +103,7 @@ public class RentACarController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili rent-a-car kompanija nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Rent-a-car kompanija sa prosleđenim ID-em ne postoji.")
 	})
-	public ResponseEntity<Resource<RentACar>> updateRentACar(@PathVariable(value="id") Long racId, @Valid @RequestBody RentACar racDetails) {
+	public ResponseEntity<Resource<RentACar>> updateRentACar(@PathVariable(value="id") Long racId, @RequestBody RentACar racDetails) {
 		return new ResponseEntity<Resource<RentACar>>(HATEOASImplementorRentacar.rentacarLinks(service.updateRentACar(racId, racDetails)), HttpStatus.OK);
 	}
 	

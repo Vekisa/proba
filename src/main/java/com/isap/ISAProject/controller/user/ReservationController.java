@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.isap.ISAProject.model.airline.FlightSeat;
 import com.isap.ISAProject.model.airline.Location;
+import com.isap.ISAProject.model.airline.Passenger;
 import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.hotel.RoomReservation;
 import com.isap.ISAProject.model.rentacar.VehicleReservation;
@@ -161,6 +163,26 @@ public class ReservationController {
 	@RequestMapping(value = "/{id}/cancel", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Resource<Reservation>> cancelReservation(@PathVariable(value = "id") Long id, @RequestParam("user") Long userId) {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.cancelReservation(id, userId)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/passengers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Passenger>> getPassengers(@PathVariable(value = "id") Long id) {
+		return new ResponseEntity<List<Passenger>>(reservationService.getPassengers(id), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/free-seats", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<FlightSeat>> getFreeSeats(@PathVariable(value = "id") Long id) {
+		return new ResponseEntity<List<FlightSeat>>(reservationService.getFreeSeats(id), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/passengers_unregistered", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Passenger>> getUnregisteredPassengers(@PathVariable(value = "id") Long id) {
+		return new ResponseEntity<List<Passenger>>(reservationService.getUnregisteredPassengers(id), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/delete_passenger/{idpass}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Passenger> deletePassenger(@PathVariable(value = "id") Long id, @PathVariable(value = "idpass") Long passengerId) {
+		return new ResponseEntity<Passenger>(reservationService.deletePassenger(id,passengerId), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/factor", method = RequestMethod.POST)

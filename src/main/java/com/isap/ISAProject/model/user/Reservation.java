@@ -58,7 +58,7 @@ public class Reservation {
 	
 	@JsonIgnore
 	@Cascade(CascadeType.ALL)
-	@OneToMany(mappedBy = "reservation")
+	@OneToMany(mappedBy = "reservation", orphanRemoval = true)
 	private List<ConfirmedReservation> confirmedReservations;
 	
 	@JsonIgnore

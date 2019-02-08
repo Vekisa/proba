@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightSeat;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.SeatState;
 import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.user.Reservation;
@@ -186,6 +187,11 @@ public class TicketService implements TicketServiceInterface {
 			this.addSeatToTicket(seatId, ticketId);
 		logger.info("< seats added");
 		return this.findById(ticketId);
+	}
+	
+	public Location getDestinationOfTicket(Long ticketId) {
+		Ticket ticket = this.findById(ticketId);
+		return ticket.getSeats().get(0).getFlight().getFinishDestination();
 	}
 
 }
