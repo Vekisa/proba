@@ -38,10 +38,9 @@ public class FlightSeat {
 	@Column(nullable = false)
 	private int cNumber;
 
-	@Column(nullable = false)
+	@Column(nullable = false) 
 	private double price;
 
-	@JsonIgnore
 	@ManyToOne
 	private Flight flight;
 

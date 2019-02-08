@@ -66,7 +66,6 @@ public class Flight {
 	@Column(nullable = false)
 	private TripType tripType;
 	
-	@JsonIgnore
 	@ManyToOne
 	private Airline airline;
 

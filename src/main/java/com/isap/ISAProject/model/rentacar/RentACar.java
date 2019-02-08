@@ -17,6 +17,7 @@ import com.isap.ISAProject.model.user.CompanyAdmin;
 @Table(name = "rent_a_car")
 public class RentACar extends Company {
 	
+	@JsonIgnore
 	@OneToMany(mappedBy="rentACar")
 	private List<BranchOffice> branchOffices;
 	

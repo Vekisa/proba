@@ -57,7 +57,7 @@ public class RentACarController {
 		return new ResponseEntity<List<Resource<RentACar>>>(HATEOASImplementorRentacar.rentacarLinksList(service.getAllRentACars(pageable)), HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/search", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/search", method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Pretraga rent-a-car servisa", responseContainer = "List", httpMethod = "GET", produces = "application/json")
 	@ApiResponses(value = { 
 			@ApiResponse(code = 200, message = "OK", response = List.class),

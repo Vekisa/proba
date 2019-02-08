@@ -210,7 +210,7 @@ public class RentACarService implements RentACarServiceInterface {
 		for(BranchOffice bo : rents.getBranchOffices())
 			for(Vehicle v : bo.getVehicles())
 				for(VehicleReservation reservation : v.getVehicleReservations())
-					if(reservation.getBeginDate().after(beginDate) && reservation.getBeginDate().before(endDate))
+					if(reservation.getBeginDate().after(beginDate) && reservation.getBeginDate().before(endDate) && reservation.getReservation() != null)
 						if(incomeMap.containsKey(reservation.getBeginDate().getTime())) {
 							incomeMap.put(reservation.getBeginDate().getTime(), incomeMap.get(reservation.getBeginDate().getTime()) + reservation.getPrice());
 						} else {
@@ -239,7 +239,7 @@ public class RentACarService implements RentACarServiceInterface {
 		for(BranchOffice bo : rents.getBranchOffices())
 			for(Vehicle v : bo.getVehicles())
 				for(VehicleReservation reservation : v.getVehicleReservations())
-					if(reservation.getEndDate().after(beginDate) && reservation.getBeginDate().before(endDate)) {
+					if(reservation.getEndDate().after(beginDate) && reservation.getBeginDate().before(endDate) && reservation.getReservation() != null) {
 						if(statisticMap.containsKey(reservation.getBeginDate().getTime())) {
 							statisticMap.put(reservation.getBeginDate().getTime(), statisticMap.get(reservation.getBeginDate().getTime()) + 1);
 						} else {

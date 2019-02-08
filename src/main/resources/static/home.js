@@ -14,6 +14,12 @@
 */
 var currentData;
 var currentUser;
+var airlineRate;
+var flightRate;
+var rentACarRate;
+var vehicleRate;
+var hotelRate;
+var roomRate;
 
 function clearShoppingCart(){
     localStorage.setItem("vehicleC", null);
@@ -25,6 +31,10 @@ function clearShoppingCart(){
     localStorage.setItem("seatsC", null);
     localStorage.setItem("flightC", null);
     localStorage.setItem("extraOptionsC",null);
+    
+    $('#suggestedItems').hide();
+    $('#quickResVehicle').hide();
+    $('#quickResRoom').hide();
 }
 
 
@@ -48,6 +58,12 @@ function load(){
 	$('#profile').hide();
 	$("#myMap").hide();
 	$('#profdiv').hide();
+    
+    if(localStorage.getItem('flightC') == null || localStorage.getItem('flightC') == "null" || localStorage.getItem('flightC') == ""){
+        $('#suggestedItems').hide();
+        $('#quickResVehicle').hide();
+        $('#quickResRoom').hide();
+    }
 }
 
 function setMapLocation(long, lat){
@@ -85,7 +101,7 @@ $(document).on('click','#userName',function(e){
 	$('#friendsReqBtn').val(currentUser._links.friend_requests.href);
 	$('#reservationHisBtn').val(currentUser._links.reservations_history.href);
 	$('#activeResBtn').val(currentUser._links.active_reservations.href);
-	$('#pendingResBtn').val(currentUser._links.pending_reservations.href);
+	
 });
 
 $(document).ready(function(){
@@ -380,6 +396,7 @@ $(document).on('click','.bookvehicle',function(e){
 });
 
 $(document).on('click','.bookflight',function(e){
+    document.getElementById("seats").innerHTML = "";
     loadSeatsChartFor($(this).val());
     $("#cancelBookingSeats").val($(this).val());
 	$("#flightModal").modal();
@@ -417,6 +434,9 @@ $(document).on('click','.bookRoom',function(e){
 $(document).on('click','#clearCart',function(e){
     clearShoppingCart();
     document.getElementById("tablediv").innerHTML = "<button type=\"button\" class=\"btn btn-danger\" id=\"clearCart\">Clear</button>" + "<h1><strong>Shopping Cart</strong></h1>";
+    $('#suggestedItems').hide();
+    $('#quickResVehicle').hide();
+    $('#quickResRoom').hide();
 })
 
 function printSC(){
@@ -462,8 +482,8 @@ function printSC(){
                     + "<td scope=\"col\">" + data.type + "</td>"
                     + "<td scope=\"col\">" + data.seatsNumber + "</td>"
                     + "<td scope=\"col\">" + data.pricePerDay + "</td>"
-                    + "<td scope=\"col\">" + vehicleStartDate + "</td>"
-                    + "<td scope=\"col\">" + vehicleEndDate + "</td>"
+                    + "<td scope=\"col\">" + vehicleStartDate.substring(0, 19).replace('T', '<br>') + "</td>"
+                    + "<td scope=\"col\">" + vehicleEndDate.substring(0, 19).replace('T', '<br>') + "</td>"
                     + "<td scope=\"col\">" + "<button type=\"button\" class=\"btn btn-danger\" id=\"removeVehicleFromSC\">Remove</button>" + "</td>"
                     + "</tr>"     
                 + "</tbody></table>";
@@ -518,8 +538,8 @@ function printSC(){
                     + "<td scope=\"col\">" + data.floor.number + "</td>"
                     + "<td scope=\"col\">" + data.numberOfBeds + "</td>"
                     + "<td scope=\"col\">" + data.roomType.pricePerNight + "</td>"
-                    + "<td scope=\"col\">" + roomStartDate + "</td>"
-                    + "<td scope=\"col\">" + roomEndDate + "</td>"
+                    + "<td scope=\"col\">" + roomStartDate.substring(0, 19).replace('T', '<br>') + "</td>"
+                    + "<td scope=\"col\">" + roomEndDate.substring(0, 19).replace('T', '<br>') + "</td>"
                     + "<td scope=\"col\">" + "<button type=\"button\" class=\"btn btn-danger\" id=\"removeRoomFromSC\">Remove</button>" + "</td>"
                     + "</tr>"     
                 + "</tbody></table>";
@@ -557,8 +577,8 @@ function printSC(){
                      "<tr>" + "<td scope=\"col\">"+ data.startDestination.name + "</td>" 
                     + "<td scope=\"col\">" + data.finishDestination.name + "</td>"
                     + "<td scope=\"col\">" + data.transfers + "</td>"
-                    + "<td scope=\"col\">" + data.departureTime + "</td>"
-                    + "<td scope=\"col\">" + data.arrivalTime + "</td>"
+                    + "<td scope=\"col\">" + data.departureTime.substring(0, 19).replace('T', '<br>') + "</td>"
+                    + "<td scope=\"col\">" + data.arrivalTime.substring(0, 19).replace('T', '<br>') + "</td>"
                     + "<td scope=\"col\">" + data.flightLength + "</td>"
                     + "<td scope=\"col\">" + data.basePrice + "</td>"
                     + "<td scope=\"col\">" + seatsStr + "</td>"
@@ -614,6 +634,9 @@ $(document).on('click','#removeFlightFromSC', function(e) {
     e.preventDefault();
     localStorage.setItem("seatsC", null);
     localStorage.setItem("flightC", null);
+    $('#suggestedItems').hide();
+    $('#quickResVehicle').hide();
+    $('#quickResRoom').hide();
     printSC();
 });
 
@@ -644,7 +667,7 @@ $(document).on('click','#bookNow', function() {
   		},
 		success: function(data){
             reservation = data;
-            //alert("dobio nazad rezervaciju " + reservation.id)
+            alert("dobio nazad rezervaciju " + reservation.id)
         }
     });
     
@@ -659,7 +682,7 @@ $(document).on('click','#bookNow', function() {
         dataType: "json",
         async: false,
 		success: function(data){
-            //alert("dodao sedista");
+            alert("dodao sedista");
         }
     });
     
@@ -674,14 +697,14 @@ $(document).on('click','#bookNow', function() {
             async: false,
             success: function(data){
                 vehicleReservation = data;
-                //alert("napravio vehicle reservation");
+                alert("napravio vehicle reservation");
                 $.ajax({
                     type: "POST",
                     url: "/reservations/" + reservation.id + "/set-vehicle-reservation/" + vehicleReservation.id,
                     contentType: "application/json",
                     async: false,
                     success: function(data){
-                        //alert("povezao vozilo");
+                        alert("povezao vozilo");
                     }
                 });
             }
@@ -727,7 +750,7 @@ $(document).on('click','#bookNow', function() {
                 data: JSON.stringify(extraOptions),
                 async: false,
                 success: function(data){
-                    //alert("ubacio extra optione"); 
+                    alert("ubacio extra optione"); 
                 }
             });
         }
@@ -745,14 +768,14 @@ $(document).on('click','#bookNow', function() {
         },
         success: function(data){
             if(data!=null){
-                //alert("vratio usera");
+                alert("vratio usera");
                 $.ajax({
                     type: "POST",
                     url: "/reservations/" + reservation.id + "/user?user=" + data.id, 
                     contentType: "application/json",
                     async: false,
                     success: function(data2){
-                        //alert("postavio usera"); 
+                        alert("postavio usera"); 
                     }
                 });
             }
@@ -1196,6 +1219,7 @@ function printActiveReservations(data){
 	var history = "";
 	var name = "";
     var vehicle = "";
+    var button = "";
     //alert("tu sam");
     
 	if(data!=null){
@@ -1210,11 +1234,18 @@ function printActiveReservations(data){
 						name = data.name;
 					}
 			 });
+            
+            if(reservation.ticket.numberOfSeats > 1){
+                button = "<button style=\"margin: 10px\" value =\"" + reservation.id +"\" type=\"button\" class=\"btn btn-primary inviteReservation\">Invite</button>";
+            }else{
+                button = "";
+            }
 			 
 			history += "<tr>" + "<td scope=\"col\">" + reservation.beginDate.substring(0, 19).replace('T', '<br>') + "</td>" + "<td scope=\"col\">"+ reservation.endDate.substring(0, 19).replace('T', '<br>') + "</td>" +
 			"<td scope=\"col\">" + name + "</td>"
             + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + reservation.id +"\" type=\"button\" class=\"btn btn-warning viewReservation\">View</button>" + "</td>"
-            + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + reservation.id +"\" type=\"button\" class=\"btn btn-primary inviteReservation\">Invite</button>" + "</td>"
+            + "<td scope=\"col\">" + button + "</td>"
+            + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + reservation.id +"\" type=\"button\" class=\"btn btn-info passengers\">Passengers</button>" + "</td>"
             + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + reservation.id +"\" type=\"button\" class=\"btn btn-danger cancelReservation\">Cancel</button>" + "</td>"
             + "</tr>";
             
@@ -1230,6 +1261,97 @@ function printActiveReservations(data){
 		"</tr>" +
 		"</thead><tbody>" + history + "</tbody></table>";
 }
+
+
+$(document).on('click','.passengers',function(e){
+    e.preventDefault();
+    var id = $(this).val();
+    
+    printPass(id);
+    
+    $('#smallAddBtn').val(id);
+    $('#modalPassengers').modal();
+});
+
+function printPass(id){
+    
+    $('#addPassFields').show();
+    
+    $.ajax({
+        type: "GET",
+        url:  "/reservations/" + id + "/free-seats",
+        dataType: "json",
+        async: false,
+        success: function(data){
+            if(data == ""){  
+                $('#addPassFields').hide();
+            }
+        }
+	 }); 
+    
+    $.ajax({
+        type: "GET",
+        url:  "/reservations/" + id + "/passengers",
+        dataType: "json",
+        async: false,
+        success: function(data){
+            $("#closePassengers").val(id);
+            printPassengers(data);
+        }
+	 }); 
+}
+
+function printPassengers(data){
+    var passengers = "";
+    
+    $.each(data,function(index, passenger){
+        if(passenger.user == null || passenger.user == "null"){
+            passengers += "<tr>" + "<td scope=\"col\">" + passenger.firstName + "</td>" + "<td scope=\"col\">" + passenger.lastName + "</td>" + "<td scope=\"col\">" + passenger.passportNumber + "</td>" 
+                + "<td scope=\"col\">" + "<button value=\"" + passenger.id  + "\" style=\"margin: 10px\" type=\"button\" class=\"btn btn-danger removePassenger\">Remove</button>" + "</td>"
+                + "</tr>";
+        }else{
+            passengers += "<tr>" + "<td scope=\"col\">" + passenger.firstName + "</td>" + "<td scope=\"col\">" + passenger.lastName + "</td>" + "<td scope=\"col\">" + passenger.passportNumber + "</td>" + "</tr>";  
+        }
+    });
+    
+    document.getElementById('passengers').innerHTML = "<table class=\"table table-hover\"><thead>" +
+		"<tr>" + 
+	    "<th scope=\"col\">First Name</th>" +
+	    "<th scope=\"col\">Last Name</th>" +
+	    "<th scope=\"col\">Passport Number</th>" +
+		"</tr>" +
+		"</thead><tbody>" + passengers + "</tbody></table>";
+}
+
+$(document).on('click','.removePassenger',function(e){
+    var reservationId = $("#closePassengers").val();
+    var passengerId = $(this).val();
+    alert("Brisem iz rezervacije: " + reservationId + " passengera: " + passengerId);
+     $.ajax({
+        type: "POST",
+        url:  "/reservations/" + reservationId + "/delete_passenger/" + passengerId,
+        dataType: "json",
+        async: false,
+        success: function(data){
+            printPass(reservationId);
+        }
+	 }); 
+});
+
+$(document).on('click','#smallAddBtn',function(e){
+    e.preventDefault();
+    var reservationId = $(this).val();
+    alert("/seats/" + reservationId + "/passenger_values?firstName=" + $('#smallFN').val() + "&lastName=" + $('#smallLN').val() +"&passport=" + $('#smallN').val());
+    $.ajax({
+        type: "PUT",
+        url:  "/seats/" + reservationId + "/passenger_values?firstName=" + $('#smallFN').val() + "&lastName=" + $('#smallLN').val() +"&passport=" + $('#smallN').val(),
+        dataType: "json",
+        async: false,
+        success: function(data){
+            printPass(reservationId);
+        }
+	 }); 
+});
 
 $(document).on('click','.viewReservationHis',function(e){
      var id = $(this).val();
@@ -1258,7 +1380,8 @@ $(document).on('click','.viewReservationHis',function(e){
                 flight = data;
             }
 	   }); 
-        
+        flightRate = flight.id;
+        airlineRate = flight.airline.id;
         htmlCode += "<hr>" + 
             "<strong>Flight</strong>" +
             "<hr>" + "<pre><strong>From:</strong> " + flight.startDestination.name + "</pre>" + 
@@ -1270,14 +1393,18 @@ $(document).on('click','.viewReservationHis',function(e){
                 "<pre><strong>Rate:</strong> " +
                     "<input type=\"radio\" name=\"flight\" value=\"1\">1&nbsp;" +
                     "<input type=\"radio\" name=\"flight\" value=\"2\">2&nbsp;" +
-                    "<input type=\"radio\" name=\"flight\" value=\"3\">3&nbsp;" +
+                    "<input type=\"radio\" name=\"flight\" value=\"3\" checked>3&nbsp;" +
                     "<input type=\"radio\" name=\"flight\" value=\"4\">4&nbsp;" +
                     "<input type=\"radio\" name=\"flight\" value=\"5\">5&nbsp;" +
-                    "<button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id=\"rateFlightBtn\">Rate!</button>"
+                    "<button value =\"" + flight.airline.id + "\" style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id=\"rateFlightBtn\">Rate!</button><br>" +
+                    "<input type=\"checkbox\" name=\"cbRateAirline\" value=\"Bike\" id =\"cbRateAirline\"> Airline<br>" + 
+                    "<input type=\"checkbox\" name=\"cbRateFlight\" value=\"Bike\" id =\"cbRateFlight\"> Flight<br>"
                 + "</pre>" ;
     }
     
     if(reservation.vehicleReservation != null && reservation.vehicleReservation != "null"){
+        rentACarRate = reservation.vehicleReservation.vehicle.branchOffice.rentACar.id;
+        vehicleRate = reservation.vehicleReservation.vehicle.id;
         htmlCode += "<hr>" + 
             "<strong>Vehicle</strong>" +
             "<hr>" + "<pre><strong>Brand:</strong> " + reservation.vehicleReservation.vehicle.brand + "</pre>" +
@@ -1289,14 +1416,18 @@ $(document).on('click','.viewReservationHis',function(e){
                 "<pre><strong>Rate:</strong> " +
                     "<input type=\"radio\" name=\"vehicle\" value=\"1\">1&nbsp;" +
                     "<input type=\"radio\" name=\"vehicle\" value=\"2\">2&nbsp;" +
-                    "<input type=\"radio\" name=\"vehicle\" value=\"3\">3&nbsp;" +
+                    "<input type=\"radio\" name=\"vehicle\" value=\"3\" checked>3&nbsp;" +
                     "<input type=\"radio\" name=\"vehicle\" value=\"4\">4&nbsp;" +
                     "<input type=\"radio\" name=\"vehicle\" value=\"5\">5&nbsp;" +
-                    "<button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id=\"rateVehicleBtn\">Rate!</button>"
+                    "<button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id=\"rateVehicleBtn\">Rate!</button><br>" +
+                    "<input type=\"checkbox\" name=\"cbRateRent\" value=\"Bike\" id=\"cbRateRent\"> Rent A Car<br>" + 
+                    "<input type=\"checkbox\" name=\"cbRateCar\" value=\"Bike\" id=\"cbRateCar\"> Vehicle<br>"
                 + "</pre>";
     }
     
     if(reservation.roomReservation != null && reservation.roomReservation != "null"){
+        hotelRate = reservation.roomReservation.room.floor.hotel.id;
+        roomRate = reservation.roomReservation.room.id;
         htmlCode += "<hr>" + 
             "<strong>Room</strong>" +
             "<hr>" + "<pre><strong>Hotel:</strong> " + reservation.roomReservation.room.floor.hotel.name + "</pre>" +
@@ -1307,10 +1438,12 @@ $(document).on('click','.viewReservationHis',function(e){
                     "<pre><strong>Rate:</strong> " +
                     "<input type=\"radio\" name=\"room\" value=\"1\">1&nbsp;" +
                     "<input type=\"radio\" name=\"room\" value=\"2\">2&nbsp;" +
-                    "<input type=\"radio\" name=\"room\" value=\"3\">3&nbsp;" +
+                    "<input type=\"radio\" name=\"room\" value=\"3\" checked>3&nbsp;" +
                     "<input type=\"radio\" name=\"room\" value=\"4\">4&nbsp;" +
                     "<input type=\"radio\" name=\"room\" value=\"5\">5&nbsp;" +
-                    "<button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id=\"rateRoomBtn\">Rate!</button>"
+                    "<button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id=\"rateRoomBtn\">Rate!</button><br>" +
+                    "<input type=\"checkbox\" name=\"cbRateHotel\" value=\"Bike\" id=\"cbRateHotel\"> Hotel<br>" + 
+                    "<input type=\"checkbox\" name=\"cbRateRoom\" value=\"Bike\" id=\"cbRateRoom\"> Room<br>"
                 + "</pre>";
 ;
     }
@@ -1320,6 +1453,92 @@ $(document).on('click','.viewReservationHis',function(e){
     $('#reservationModal').modal();
     
 })
+
+$(document).on('click','#rateRoomBtn',function(e){
+    var rating = $('[name=room]:checked').val();
+    
+    alert("/users/registered/" + currentUser.id + "/rate-room?room=" + roomRate + "&rating=" + rating);
+    
+    if($('#cbRateHotel').is(':checked')){
+        $.ajax({
+            type: "POST",
+            url:  "/users/registered/" + currentUser.id + "/rate-hotel?hotel=" + hotelRate + "&rating=" + rating,
+            async: false,
+            success: function(data){
+                alert("hotel ocenjen");
+            }
+	   }); 
+    }
+    
+    if($('#cbRateRoom').is(':checked')){
+        $.ajax({
+            type: "POST",
+            url:  "/users/registered/" + currentUser.id + "/rate-room?room=" + roomRate + "&rating=" + rating,
+            async: false,
+            success: function(data){
+                alert("room ocenjen");
+            }
+	   }); 
+    }
+    
+});
+
+$(document).on('click','#rateVehicleBtn',function(e){
+    var rating = $('[name=vehicle]:checked').val();
+    
+    alert("/users/registered/" + currentUser.id + "/rate-vehicle?vehicle=" + vehicleRate + "&rating=" + rating);
+    
+    if($('#cbRateRent').is(':checked')){
+        alert("ocenjujem vehicle")
+        $.ajax({
+            type: "POST",
+            url:  "/users/registered/" + currentUser.id + "/rate-rent-a-car?rentACar=" + rentACarRate + "&rating=" + rating,
+            async: false,
+            success: function(data){
+                alert("rent ocenjen");
+            }
+	   }); 
+    }
+    
+    if($('#cbRateCar').is(':checked')){
+        $.ajax({
+            type: "POST",
+            url:  "/users/registered/" + currentUser.id + "/rate-vehicle?hotel=" + vehicleRate + "&rating=" + rating,
+            async: false,
+            success: function(data){
+                alert("vehicle ocenjen");
+            }
+	   }); 
+    }
+    
+});
+
+$(document).on('click','#rateFlightBtn',function(e){
+    var rating = $('[name=flight]:checked').val();
+    alert("/users/registered/" + currentUser.id + "/rate-airline?airline=" + $(this).val() + "&rating=" + rating);
+    
+    if($('#cbRateAirline').is(':checked')){
+        $.ajax({
+            type: "POST",
+            url:  "/users/registered/" + currentUser.id + "/rate-airline?airline=" + airlineRate + "&rating=" + rating,
+            async: false,
+            success: function(data){
+                alert("airline ocenjen");
+            }
+	   }); 
+    }
+    
+    if($('#cbRateFlight').is(':checked')){
+        $.ajax({
+            type: "POST",
+            url:  "/users/registered/" + currentUser.id + "/rate-flight?flight=" + flightRate + "&rating=" + rating,
+            async: false,
+            success: function(data){
+                alert("flight ocenjen");
+            }
+	   }); 
+    }
+});
 
 $(document).on('click','.viewReservation',function(e){
     var id = $(this).val();
@@ -1536,7 +1755,7 @@ function printDestinations(data){
 	 var destinations = "";
     
 	 if(pomDataDestinations != null){
-		 $.each(pomDataDestinations, function(index, destiantion) {
+		 $.each(pomDataDestinations, function(index, destination) {
 				destinations += "<tr><td scope=\"col\">" + destination.name + "</td></tr>";
 		});
 	 }
@@ -1857,7 +2076,7 @@ function printFlights1(data){
 		});
 	}
 	
-	flights ="<div class=\"row\"><div class=\"col-sm\"><button style=\"margin: 10px\" type=\"button\" class=\"btn btn-primary\" id =\"destbtn\">Destinations</button></div></div>" + "<div>" + 
+	flights = "<div>" + 
 	"<hr>" + 
 	"<strong>Flights</strong>" +
 	"<hr>" +  "<table class=\"table table-hover\"><thead>" +
@@ -1987,6 +2206,8 @@ function search(company){
 			url += '&' + parameters[i].key + '=' + parameters[i].value;
 		}
 	}
+    
+    alert(url);
 	if(company == "rentacar"){
 		$.ajax({
 			method: 'GET',
@@ -2029,7 +2250,413 @@ $(document).on('click','#addTicket',function(e){
     localStorage.setItem("seatsC",JSON.stringify(seats));
     $('#flightModal').modal('toggle');
     
+    $('#suggestedItems').show();
+    $('#quickResVehicle').show();
+    $('#quickResRoom').show();
+    
 });
+
+$(document).on('click','#suggestedRent',function(e){
+    e.preventDefault();
+    $("#myMap").hide();
+	$("#tablediv").show();
+	$("#profile").hide();
+	$('#profdiv').hide();
+    printSuggestedRents();
+});
+
+$(document).on('click','#suggestedHotel',function(e){
+    e.preventDefault();
+    $("#myMap").hide();
+	$("#tablediv").show();
+	$("#profile").hide();
+	$('#profdiv').hide();
+    printSuggestedHotels();
+});
+
+$(document).on('click','#quickResRoom',function(e){
+    e.preventDefault();
+    $("#myMap").hide();
+	$("#tablediv").show();
+	$("#profile").hide();
+	$('#profdiv').hide();
+    
+    printQuickRoomReservations();
+});
+
+$(document).on('click','#quickResFlight',function(e){
+    e.preventDefault();
+    $("#myMap").hide();
+	$("#tablediv").show();
+	$("#profile").hide();
+	$('#profdiv').hide();
+    
+    printQuickFlightReservations();
+});
+
+$(document).on('click','#quickResVehicle',function(e){
+    e.preventDefault();
+    $("#myMap").hide();
+	$("#tablediv").show();
+	$("#profile").hide();
+	$('#profdiv').hide();
+    
+    printQuickVehicleReservations();
+});
+
+function printQuickVehicleReservations(){
+    var flightId = localStorage.getItem("flightC");
+    var vehicleQuicks = new Array(); 
+    $.ajax({
+        method: 'GET',
+        url: '/flights/' + flightId,
+        async: false,
+        success: function(data){
+            //alert("dobio let");
+             $.ajax({
+                method: 'GET',
+                url: '/destinations/' + data.finishDestination.id + '/vehicle-quicks',
+                async: false, 
+                success: function(data2){    
+                    //alert("dobio quickove vozila");
+                    printQVR(data2);
+                }   
+            });
+        }   
+    });
+}
+
+function printQVR(data){
+    var vehicleReservations = "";
+    
+    if(data!=null && data!= "null" && data!=undefined && data!="undefined"){
+        $.each(data,function(index, vehicleReservation){
+            vehicleReservations += "<tr>" + "<td scope=\"col\">" + vehicleReservation.vehicle.branchOffice.rentACar.name + "</td>"
+                    + "<td scope=\"col\">" + vehicleReservation.vehicle.brand + "</td>"
+                    + "<td scope=\"col\">" + vehicleReservation.vehicle.model + "</td>"
+                    + "<td scope=\"col\">" + vehicleReservation.vehicle.type + "</td>"
+                    + "<td scope=\"col\">" + vehicleReservation.vehicle.seatsNumber + "</td>"
+                    + "<td scope=\"col\">" + vehicleReservation.beginDate.substring(0, 19).replace('T', '<br>') + "</td>"
+                    + "<td scope=\"col\">" + vehicleReservation.endDate.substring(0, 19).replace('T', '<br>') + "</td>"
+                    + "<td scope=\"col\">" + vehicleReservation.price + "</td>"
+                    + "<td scope=\"col\">" + vehicleReservation.vehicle.pricePerDay + "</td>"
+                    + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + vehicleReservation.id + "\" type=\"button\" class=\"btn btn-primary bookQuickReservationVehicleBtn\">Book</button>" + "</td>"
+                    + "</tr>";
+        });
+    }
+    
+    document.getElementById("tablediv").innerHTML =
+            "<table class=\"table table-hover\"><thead>" +
+            "<tr>" + 
+                "<th scope=\"col\">Rent A Car</th>" +
+                "<th scope=\"col\">Brand</th>" +
+                "<th scope=\"col\">Model</th>" +
+                "<th scope=\"col\">Type</th>" +
+                "<th scope=\"col\">Seats Number</th>" +
+                "<th scope=\"col\">Begin Date</th>" +
+                "<th scope=\"col\">End Date</th>" +
+                "<th scope=\"col\">Old Price(&euro;)</th>" +
+                "<th scope=\"col\">Discounted Price(&euro;)</th>" +
+            "</tr>" +
+            "</thead><tbody>" + vehicleReservations + "</tbody></table>";
+    
+}
+$(document).on('click','.bookQuickReservationRoomBtn',function(e){
+    var roomReservationId = $(this).val();
+    var seats = JSON.parse(localStorage.getItem("seatsC"));
+    var reservation;
+    
+     $.ajax({
+		type: "POST",
+		url: "/tickets",
+		contentType: "application/json",
+        dataType: "json",
+        async: false,
+        beforeSend: function(request) {
+    		request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
+  		},
+		success: function(data){
+            reservation = data;
+            alert("dobio nazad rezervaciju " + reservation.id)
+        }
+    });
+    
+    $.ajax({
+		type: "POST",
+		url: "tickets/" + reservation.ticket.id + "/seats",
+        data: JSON.stringify(seats),
+		contentType: "application/json",
+        dataType: "json",
+        async: false,
+		success: function(data){
+            alert("dodao sedista");
+        }
+    });
+    
+    $.ajax({
+        type: "POST",
+        url: "/reservations/" + reservation.id + "/set-room-reservation/" + roomReservationId, 
+        dataType: "json", 
+        async: false,
+        success: function(data){
+            alert("povezao sobu"); 
+        }
+    });
+    
+     $.ajax({
+        type: "POST",
+        url: "/reservations/" + reservation.id + "/user?user=" + currentUser.id, 
+        contentType: "application/json",
+        async: false,
+        success: function(data2){
+            alert("postavio usera"); 
+        }
+    });
+    
+    printQuickRoomReservations();
+    clearShoppingCart(); 
+    
+});
+
+$(document).on('click','.bookQuickReservationVehicleBtn',function(e){
+   e.preventDefault();
+   var vehicleReservationId = $(this).val();
+    //alert(vehicleReservationId);
+   var seats = JSON.parse(localStorage.getItem("seatsC"));
+    var reservation;
+    
+    $.ajax({
+		type: "POST",
+		url: "/tickets",
+		contentType: "application/json",
+        dataType: "json",
+        async: false,
+        beforeSend: function(request) {
+    		request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
+  		},
+		success: function(data){
+            reservation = data;
+            //alert("dobio nazad rezervaciju " + reservation.id)
+        }
+    });
+    
+    $.ajax({
+		type: "POST",
+		url: "tickets/" + reservation.ticket.id + "/seats",
+        data: JSON.stringify(seats),
+		contentType: "application/json",
+        dataType: "json",
+        async: false,
+		success: function(data){
+            //alert("dodao sedista");
+        }
+    });
+    
+     $.ajax({
+        type: "POST",
+        url: "/reservations/" + reservation.id + "/set-vehicle-reservation/" + vehicleReservationId,
+        contentType: "application/json",
+        async: false,
+        success: function(data){
+            //alert("povezao vozilo");
+        }
+     });
+    
+    $.ajax({
+        type: "POST",
+        url: "/reservations/" + reservation.id + "/user?user=" + currentUser.id, 
+        contentType: "application/json",
+        async: false,
+        success: function(data2){
+            //alert("postavio usera"); 
+        }
+    });
+    
+    printQuickVehicleReservations();
+    clearShoppingCart();
+});
+
+function printQuickRoomReservations(){  
+    var flightId = localStorage.getItem("flightC");
+    var roomQuicks = new Array(); 
+    $.ajax({
+        method: 'GET',
+        url: '/flights/' + flightId,
+        async: false,
+        success: function(data){
+            //alert("dobio let");
+             $.ajax({
+                method: 'GET',
+                url: '/destinations/' + data.finishDestination.id + '/room-quicks',
+                async: false, 
+                success: function(data2){    
+                    //alert("dobio quickove soba");
+                    printQRR(data2);
+                }   
+            });
+        }   
+    });
+}
+
+function printQRR(data){
+    var roomReservations = "";
+    $.each(data,function(index, roomReservation){
+        roomReservations += "<tr>" + "<td scope=\"col\">" + roomReservation.room.floor.hotel.name + "</td>" 
+                + "<td scope=\"col\">" + roomReservation.beginDate.substring(0, 19).replace('T', '<br>') + "</td>"
+                + "<td scope=\"col\">" + roomReservation.endDate.substring(0, 19).replace('T', '<br>') + "</td>"
+                + "<td scope=\"col\">" + roomReservation.price + "</td>"
+                + "<td scope=\"col\">" + roomReservation.room.roomType.pricePerNight + "</td>"
+                + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + roomReservation.id + "\" type=\"button\" class=\"btn btn-primary bookQuickReservationRoomBtn\">Book</button>" + "</td>"
+                + "</tr>";
+    });
+    
+    document.getElementById("tablediv").innerHTML =
+            "<table class=\"table table-hover\"><thead>" +
+            "<tr>" + 
+                "<th scope=\"col\">Hotel</th>" +
+                "<th scope=\"col\">Begin Date</th>" +
+                "<th scope=\"col\">End Date</th>" +
+                "<th scope=\"col\">Old Price(&euro;)</th>" +
+                "<th scope=\"col\">Discounted Price(&euro;)</th>" +
+            "</tr>" +
+            "</thead><tbody>" + roomReservations + "</tbody></table>";
+}
+
+function printQuickFlightReservations(){
+    
+    $.ajax({
+        method: 'GET',
+        url: '/airlines/all-quicks',
+        async: false, 
+        success: function(data){    
+            printQFR(data);
+        }   
+    });
+}
+
+function printQFR(data){
+    var flightSeats = "";
+    
+    if(data!=null && data!= "null" && data!=undefined && data!="undefined"){
+        $.each(data,function(index,flightSeat){
+            flightSeats += "<tr>" + "<td scope=\"col\">" + flightSeat.flight.startDestination.name + "</td>" 
+                + "<td scope=\"col\">" + flightSeat.flight.finishDestination.name + "</td>"
+                + "<td scope=\"col\">" + flightSeat.flight.departureTime.substring(0, 19).replace('T', '<br>') + "</td>"
+                + "<td scope=\"col\">" + flightSeat.flight.arrivalTime.substring(0, 19).replace('T', '<br>') + "</td>"
+                + "<td scope=\"col\">" + flightSeat.flight.flightLength + "</td>"
+                + "<td scope=\"col\">" + flightSeat.flight.basePrice + "</td>"
+                + "<td scope=\"col\">" + flightSeat.price + "</td>"
+                + "<td scope=\"col\">" + "<button style=\"margin: 10px\" value =\"" + flightSeat.id +"\" type=\"button\" class=\"btn btn-primary bookQuickReservationFlightBtn\">Book</button>" + "</td>"
+                + "</tr>";
+        });
+    }
+        
+        document.getElementById("tablediv").innerHTML =
+            "<table class=\"table table-hover\"><thead>" +
+            "<tr>" + 
+            "<th scope=\"col\">Start Destination</th>" +
+            "<th scope=\"col\">Finish Destination</th>" +
+            "<th scope=\"col\">Departure Time</th>" +
+            "<th scope=\"col\">Arrival Time</th>" +
+            "<th scope=\"col\">Flight Length(km)</th>" +
+            "<th scope=\"col\">Old Price(&euro;)</th>" +
+            "<th scope=\"col\">Discounted Price(&euro;)</th>" +
+            "</tr>" +
+            "</thead><tbody>" + flightSeats + "</tbody></table>";
+}
+
+
+$(document).on('click','.bookQuickReservationFlightBtn',function(e) {
+    var flightSeatId = $(this).val();
+    var reservation;
+    var seat = new Array();
+    seat.push(flightSeatId);
+    
+    $.ajax({
+		type: "POST",
+		url: "/tickets",
+		contentType: "application/json",
+        dataType: "json",
+        async: false,
+        beforeSend: function(request) {
+    		request.setRequestHeader("X-Auth-Token", localStorage.getItem("token"));
+  		},
+		success: function(data){
+            //alert("napravio rezervaciju");
+            reservation = data;
+        }
+    });
+
+    $.ajax({
+		type: "POST",
+		url: "tickets/" + reservation.ticket.id + "/seats",
+        data: JSON.stringify(seat),
+		contentType: "application/json",
+        dataType: "json",
+        async: false,
+		success: function(data){
+            //alert("dodao sediste sa akcijom");
+        }
+    });
+    
+     $.ajax({
+        type: "POST",
+        url: "/reservations/" + reservation.id + "/user?user=" + currentUser.id, 
+        contentType: "application/json",
+        async: false,
+        success: function(data2){
+                //alert("postavio usera"); 
+        }
+    });
+    
+    $(this).prop( "disabled", true );
+    printQuickFlightReservations();
+    
+});
+
+function printSuggestedRents(){
+     var flightId = localStorage.getItem("flightC"); 
+     var rents; 
+     $.ajax({
+			method: 'GET',
+			url: '/flights/'+ flightId + "/finish",
+			contentType: 'application/json',
+            dataType: "json",
+			success: function(data){
+                $.ajax({
+                    method: 'GET',
+                    url: '/rent-a-cars/search?locationName=' + data.name,
+                    contentType: 'application/json',
+                    dataType: "json",
+                    success: function(data2){    
+                        printListOfCompanies(data2);
+                    }   
+                });
+            }           
+    });  
+}
+
+function printSuggestedHotels(){
+    var flightId = localStorage.getItem("flightC"); 
+     var rents; 
+     $.ajax({
+			method: 'GET',
+			url: '/flights/'+ flightId + "/finish",
+			contentType: 'application/json',
+            dataType: "json",
+			success: function(data){
+                $.ajax({
+                    method: 'GET',
+                    url: '/hotels/search?locationName=' + data.name,
+                    contentType: 'application/json',
+                    dataType: "json",
+                    success: function(data2){    
+                        printListOfCompanies(data2);
+                    }   
+                });
+            }           
+    }); 
+}
 
 function loadSeatsChartFor(id) {
 	flightId = id;

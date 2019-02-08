@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.isap.ISAProject.controller.user.HATEOASImplementorUsers;
 import com.isap.ISAProject.model.airline.Flight;
 import com.isap.ISAProject.model.airline.FlightSeat;
+import com.isap.ISAProject.model.airline.Location;
 import com.isap.ISAProject.model.airline.Ticket;
 import com.isap.ISAProject.model.user.Reservation;
 import com.isap.ISAProject.service.airline.TicketService;
@@ -114,5 +115,17 @@ public class TicketController {
 	})
 	public ResponseEntity<Resource<Flight>> getFlightForTicketWithId(@PathVariable("id") Long ticketId) {
 		return new ResponseEntity<Resource<Flight>>(HATEOASImplementorAirline.createFlight(service.getFlightOfTicket(ticketId)), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/{id}/destination", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Destinacija leta.", notes = "Povratna vrednost servisa loakacija.", httpMethod = "GET", produces = "application/json")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "OK", response = Location.class),
+			@ApiResponse(code = 204, message = "No Content"),
+			@ApiResponse(code = 400, message = "Bad Request"),
+			@ApiResponse(code = 404, message = "Not Found")
+	})
+	public ResponseEntity<Resource<Location>> getDestinationForTicketWithId(@PathVariable("id") Long ticketId) {
+		return new ResponseEntity<Resource<Location>>(new Resource<Location>(service.getDestinationOfTicket(ticketId)), HttpStatus.OK);
 	}
 }
