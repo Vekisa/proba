@@ -10,6 +10,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,6 +63,7 @@ public class FlightSeatCategoryController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili kategorija leta nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Kategorija leta sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToCategory(#categoryId)")
 	public ResponseEntity<Resource<FlightSeatCategory>> updateFlightSeatCategoryWithId(@PathVariable("id") Long categoryId, @Valid @RequestBody FlightSeatCategory newCategory) {
 		return new ResponseEntity<Resource<FlightSeatCategory>>(HATEOASImplementorAirline.createFlightSeatCategory(service.updateFlightSeatCategory(categoryId, newCategory)), HttpStatus.OK);
 	}
@@ -73,6 +75,7 @@ public class FlightSeatCategoryController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Kategorija sedišta sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToCategory(#categoryId)")
 	public ResponseEntity<?> deleteFlightSeatCategoryWithId(@PathVariable("id") Long categoryId) {
 		service.deleteFlightSeatCategory(categoryId);
 		return ResponseEntity.ok().build();

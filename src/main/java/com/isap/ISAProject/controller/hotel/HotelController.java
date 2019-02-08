@@ -13,6 +13,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -82,6 +83,7 @@ public class HotelController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Resource<Hotel>> createHotel(@Valid @RequestBody Hotel hotel, @RequestParam("location") Long id) {
 		return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(hotelService.saveWithLocation(hotel, id)), HttpStatus.CREATED);
 	}
@@ -106,6 +108,7 @@ public class HotelController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<?> deleteHotelWithId(@PathVariable(value="id") Long hotelId){
 		hotelService.deleteById(hotelId);
 		return ResponseEntity.ok().build();
@@ -120,6 +123,7 @@ public class HotelController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToHotel(#hotelId)")
 	public ResponseEntity<Resource<Hotel>> updateHotelWithId(@PathVariable(value = "id") Long hotelId,
 			@Valid @RequestBody Hotel newHotel) {
 				return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(hotelService.updateHotelById(hotelId, newHotel)), HttpStatus.OK);
@@ -160,6 +164,7 @@ public class HotelController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToHotel(#hotelId)")
 	public ResponseEntity<Resource<Floor>> createFloorForHotelWithId(@PathVariable(value = "id") Long hotelId,
 			@Valid @RequestBody Floor floor) {
 			return new ResponseEntity<Resource<Floor>>(HATEOASImplementorHotel.createFloor(hotelService.createFloor(hotelId, floor)), HttpStatus.CREATED);
@@ -187,6 +192,7 @@ public class HotelController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToHotel(#hotelId)")
 	public ResponseEntity<Resource<ExtraOption>> createExtraOptionForHotelWithId(@PathVariable(value = "id") Long hotelId,
 			@Valid @RequestBody ExtraOption extraOption) {
 			return new ResponseEntity<Resource<ExtraOption>>(HATEOASImplementorHotel.createExtraOption(hotelService.createExtraOption(hotelId, extraOption)), HttpStatus.CREATED);
@@ -214,6 +220,7 @@ public class HotelController {
 			@ApiResponse(code = 204, message = "No Content"),
 			@ApiResponse(code = 400, message = "Bad Request")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToHotel(#hotelId)")
 	public ResponseEntity<Resource<Catalogue>> setCatalogueForHotelWithId(@PathVariable(value = "id") Long hotelId, @RequestParam("catalogue") Long catalogueId) {
 			return new ResponseEntity<Resource<Catalogue>>(HATEOASImplementorHotel.createCatalogue(hotelService.createCatalogue(hotelId, catalogueId)), HttpStatus.CREATED);
 	}
@@ -225,6 +232,7 @@ public class HotelController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Hotel ili destinacija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('HOTEL_ADMIN') AND @securityServiceImpl.hasAccessToHotel(#hotelId)")
 	public ResponseEntity<Resource<Hotel>> changeLocationOfHotel(@PathVariable("id") Long hotelId, @RequestParam("destination") Long id) {
 		return new ResponseEntity<Resource<Hotel>>(HATEOASImplementorHotel.createHotel(hotelService.changeLocationOfHotel(hotelId, id)), HttpStatus.OK);
 	}

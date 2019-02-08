@@ -13,6 +13,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,6 +65,7 @@ public class VehicleReservationController {
 			@ApiResponse(code = 201, message = "Created", response = VehicleReservation.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđena rezervacija nije validna.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Object> saveVehicleReservation(@Valid @RequestBody VehicleReservation vehRes) {
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(service.saveVehicleReservation(vehRes).getId()).toUri();
 		return ResponseEntity.created(location).build();
@@ -75,6 +77,7 @@ public class VehicleReservationController {
 			@ApiResponse(code = 201, message = "Created", response = VehicleReservation.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđena rezervacija nije validna.")
 	})
+	@PreAuthorize("hasAuthority('RENT_A_CAR_ADMIN') AND @securityServiceImpl.hasAccessToVehicle(#id)")
 	public ResponseEntity<Resource<VehicleReservation>> createVehicleReservation(@PathParam("vehicleId") Long vehicleId, @PathParam("beginDate") Long beginDate, @PathParam("endDate") Long endDate) {
 		return new ResponseEntity<Resource<VehicleReservation>>(HATEOASImplementorRentacar.vehicleReservationLinks(service.createVehicleReservationWithVehicleAndDates(vehicleId, new Date(beginDate), new Date(endDate))),HttpStatus.CREATED);
 	}
@@ -86,6 +89,7 @@ public class VehicleReservationController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili rezervacija nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Vozilo sa prosleđenim ID-em ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('RENT_A_CAR_ADMIN') AND @securityServiceImpl.hasAccessToVehicle(#id)")
 	public ResponseEntity<Resource<VehicleReservation>> updateVehicleReservation(@PathVariable(value="id") Long vehId, @Valid @RequestBody VehicleReservation vehDetails) {
 		return new ResponseEntity<Resource<VehicleReservation>>(HATEOASImplementorRentacar.vehicleReservationLinks(service.updateVehicleReservation(vehId, vehDetails)), HttpStatus.OK);
 	}
@@ -97,12 +101,14 @@ public class VehicleReservationController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Rezervacija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('RENT_A_CAR_ADMIN') AND @securityServiceImpl.hasAccessToVehicleReservation(#id)")
 	public ResponseEntity<?> deleteVehicleReservationWithID(@PathVariable(value = "id") Long id){
 		service.deleteVehicleReservation(id);
 		return ResponseEntity.ok().build();
 	}
 	
 	@RequestMapping(value = "/quicks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAuthority('RENT_A_CAR_ADMIN') AND @securityServiceImpl.hasAccessToVehicle(#id)")
 	public ResponseEntity<Resource<VehicleReservation>> createQuickRoomReservation(@RequestParam("vehicle") Long vehicleId, @RequestBody @Valid VehicleReservation reservation) {
 		return new ResponseEntity<Resource<VehicleReservation>>(HATEOASImplementorRentacar.vehicleReservationLinks(service.saveQuickVehicleReservation(reservation, vehicleId)), HttpStatus.CREATED);
 	}

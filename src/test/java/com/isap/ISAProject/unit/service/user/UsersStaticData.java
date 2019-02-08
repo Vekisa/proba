@@ -47,6 +47,9 @@ public class UsersStaticData {
 	public static final String REGISTERED_2_PHONE_NUMBER = "222-222";
 	public static final UserState REGISTERED_2_STATE = UserState.INACTIVE;
 	public static final AuthorizationLevel REGISTERED_2_AUTHORIZATION = AuthorizationLevel.REGULAR_USER;
-	public static final Long REGISTERED_2_ID = 2L;	
+	public static final Long REGISTERED_2_ID = 2L;
+	
+	public static final String UNIQUE_EMAIL = "jedinstveni@mail.com";
+	public static final String UNIQUE_USERNAME = "jedinstvevnoime";	
 	
 }

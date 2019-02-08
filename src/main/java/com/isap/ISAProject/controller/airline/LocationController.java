@@ -10,6 +10,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,6 +68,7 @@ public class LocationController {
 		@ApiResponse(code = 201, message = "Created", response = Location.class),
 		@ApiResponse(code = 400, message = "Bad Request. Prosleđena lokacija nije validna.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Resource<Location>> createDestination(@RequestBody Location destination) {
 		return new ResponseEntity<Resource<Location>>(HATEOASImplementorAirline.createDestination(service.saveDestination(destination)), HttpStatus.CREATED);
 	}
@@ -78,6 +80,7 @@ public class LocationController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili lokacija nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. lokacija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Resource<Location>> updateDestinationWithId(@PathVariable(value = "id") Long destinationId,
 			@Valid @RequestBody Location newDestination) {
 		return new ResponseEntity<Resource<Location>>(HATEOASImplementorAirline.createDestination(service.updateDestination(destinationId, newDestination)), HttpStatus.OK);
@@ -90,6 +93,7 @@ public class LocationController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. lokacija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<?> deleteDestinationWithId(@PathVariable(value = "id") Long destinationId) {
 		service.deleteDestination(destinationId);
 		return ResponseEntity.ok().build();

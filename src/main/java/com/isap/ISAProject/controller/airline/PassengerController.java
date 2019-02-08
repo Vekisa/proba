@@ -10,6 +10,7 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,6 +63,7 @@ public class PassengerController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Putnik sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN') OR hasAuthority('AIRLINE_ADMIN')")
 	public ResponseEntity<?> deletePassengerWithId(@PathVariable("id") Long id) {
 		service.deletePassenger(id);
 		return ResponseEntity.ok().build();
@@ -74,6 +76,7 @@ public class PassengerController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili avio kompaniju nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Avio kompanija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN') OR hasAuthority('AIRLINE_ADMIN') OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<Passenger>> updatePassengerWithId(@PathVariable("id") Long id, @RequestBody @Valid Passenger newPassenger) {
 		return new ResponseEntity<Resource<Passenger>>(HATEOASImplementorAirline.createPassenger(service.updatePassenger(id, newPassenger)), HttpStatus.OK);
 	}

@@ -1,6 +1,7 @@
 package com.isap.ISAProject.security;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -30,9 +31,8 @@ public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFil
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-
     HttpServletRequest httpRequest = (HttpServletRequest) request;
-    String authToken = httpRequest.getHeader(this.tokenHeader);
+    String authToken = httpRequest.getHeader(tokenHeader);
     String username = this.tokenUtils.getUsernameFromToken(authToken);
     if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
       UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);

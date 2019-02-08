@@ -16,12 +16,12 @@ import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -90,6 +90,7 @@ public class RentACarController {
 			@ApiResponse(code = 201, message = "Created", response = RentACar.class),
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđena rent-a-car kompanija nije validna.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<Object> saveRentACar(@Valid @RequestBody RentACar rac) {
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(service.saveRentACar(rac).getId()).toUri();
 		return ResponseEntity.created(location).build();
@@ -103,6 +104,7 @@ public class RentACarController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili rent-a-car kompanija nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Rent-a-car kompanija sa prosleđenim ID-em ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('RENT_A_CAR_ADMIN') AND @securityServiceImpl.hasAccessToRentACar(#racId)")
 	public ResponseEntity<Resource<RentACar>> updateRentACar(@PathVariable(value="id") Long racId, @RequestBody RentACar racDetails) {
 		return new ResponseEntity<Resource<RentACar>>(HATEOASImplementorRentacar.rentacarLinks(service.updateRentACar(racId, racDetails)), HttpStatus.OK);
 	}
@@ -114,6 +116,7 @@ public class RentACarController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Rent-a-car kompanija sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('USERS_ADMIN')")
 	public ResponseEntity<?> deleteRentACarWithID(@PathVariable(value = "id") Long id){
 		service.deleteRentACar(id);
 		return ResponseEntity.ok().build();
@@ -139,6 +142,7 @@ public class RentACarController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID ili informacija o filijali nisu validni."),
 			@ApiResponse(code = 404, message = "Not Found. Rent-a-car kompanija sa prosleđenim ID-em ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('RENT_A_CAR_ADMIN') AND @securityServiceImpl.hasAccessToRentACar(#racId)")
 	public ResponseEntity<Resource<BranchOffice>> addBranchOfficeForRentACarWithId(@PathVariable(value = "id") Long racId,
 			@Valid @RequestBody BranchOffice branch, @RequestParam("location") Long locationId) {
 		return new ResponseEntity<Resource<BranchOffice>>(HATEOASImplementorRentacar.branchOfficeLinks(service.addBranchOffice(racId, branch, locationId)), HttpStatus.CREATED);
@@ -151,6 +155,7 @@ public class RentACarController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Rent-a-car kompanija ili filijala sa prosleđenim ID ne postoji.")
 	})
+	@PreAuthorize("hasAuthority('RENT_A_CAR_ADMIN') AND @securityServiceImpl.hasAccessToRentACar(#racId)")
 	public ResponseEntity<?> deleteBranchOfficeForRentACarWithId(@PathVariable(value = "racId") Long racId, @Valid @RequestBody BranchOffice branch){
 		service.deleteBranchOffice(racId, branch);
 		return ResponseEntity.ok().build();
