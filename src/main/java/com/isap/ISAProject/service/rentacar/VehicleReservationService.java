@@ -58,7 +58,7 @@ public class VehicleReservationService implements VehicleReservationServiceInter
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
 	public VehicleReservation saveVehicleReservation(VehicleReservation vr) {
 		logger.info("> saving vehicle reservation");
 		repository.save(vr);
@@ -66,7 +66,7 @@ public class VehicleReservationService implements VehicleReservationServiceInter
 		return vr;
 	}
 	
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 	public VehicleReservation createVehicleReservationWithVehicleAndDates(Long vehicleId, Date beginDate, Date endDate) {
 		logger.info("> creating vehicle reservation");
 		Vehicle vehicle = vRepo.findById(vehicleId).get();
@@ -82,7 +82,7 @@ public class VehicleReservationService implements VehicleReservationServiceInter
 	}
 
 	@Override
-	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRES_NEW)
 	public VehicleReservation updateVehicleReservation(Long id, VehicleReservation vr) {
 		logger.info("> updating vehicle reservation with id {}", id);
 		VehicleReservation oldVr = this.getVehicleReservationById(id);
@@ -95,14 +95,14 @@ public class VehicleReservationService implements VehicleReservationServiceInter
 	}
 
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
 	public void deleteVehicleReservation(Long id) {
 		logger.info("> deleting vehicle reservation with id {}", id);
 		repository.delete(this.getVehicleReservationById(id));
 		logger.info("< vehicle reservation deleted");
 	}
 	
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
 	public VehicleReservation saveQuickVehicleReservation(VehicleReservation vehicleReservation, Long id) {
 		Vehicle vehicle = vService.getVehicleById(id);
 		if(!vService.checkIfVehicleIsFree(vehicleReservation.getBeginDate(), vehicleReservation.getEndDate(), vehicle.getId())) {

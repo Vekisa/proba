@@ -66,7 +66,7 @@ public class RoomReservationService implements RoomReservationServiceInterface {
 	}
 	
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
 	public RoomReservation save(RoomReservation roomReservation) {
 		logger.info("> Rezervacija sobe create");
 		RoomReservation savedRoomReservation = roomReservationRepository.save(roomReservation);
@@ -75,7 +75,7 @@ public class RoomReservationService implements RoomReservationServiceInterface {
 	}
 	
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
 	public void deleteById(long id) {
 		logger.info("> Rezervacija sobe delete");
 		this.findById(id);
@@ -84,7 +84,7 @@ public class RoomReservationService implements RoomReservationServiceInterface {
 	}
 	
 	@Override
-	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRES_NEW)
 	public RoomReservation updateRoomReservationById(Long roomReservationId, RoomReservation newRoomReservation) {
 		logger.info("> Rezervacija sobe update");
 		RoomReservation oldRoomReservation = this.findById(roomReservationId);
@@ -116,7 +116,7 @@ public class RoomReservationService implements RoomReservationServiceInterface {
 	}
 	
 	@Override
-	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE)
 	public ExtraOption createExtraOption(Long roomReservationId, ExtraOption extraOption){
 		logger.info("> create extra-option for room-resevration");
 		RoomReservation roomReservation = this.findById(roomReservationId);
@@ -143,6 +143,7 @@ public class RoomReservationService implements RoomReservationServiceInterface {
 	}
 	
 	@Override
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public void recalculateReservationPrice(RoomReservation roomReservation) {
 		roomReservation.setPrice(roomReservation.getRoom().getRoomType().getPricePerNight() * roomReservation.getNumberOfNights());
 		for(ExtraOption eo : roomReservation.getExtraOptions())
@@ -177,7 +178,7 @@ public class RoomReservationService implements RoomReservationServiceInterface {
 	}
 	
 	@Override
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 	public RoomReservation saveWithRoomId(Long roomId, Date begin, Date end) {	
 		logger.info("> create room reervation  with room", roomId);
 		Room room = roomService.findById(roomId);
@@ -212,7 +213,7 @@ public class RoomReservationService implements RoomReservationServiceInterface {
 		return true;
 	}
 	
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
 	public RoomReservation saveQuickRoomReservation(RoomReservation roomReservation, Long id) {
 		Room room = roomService.findById(id);
 		if(!checkIfRoomIsFree(roomReservation.getBeginDate(), roomReservation.getEndDate(), room)) {

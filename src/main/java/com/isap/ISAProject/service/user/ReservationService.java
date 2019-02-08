@@ -157,7 +157,7 @@ public class ReservationService {
 		logger.info("< ticket (reservation) can be cancelled");
 	}
 
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
 	public Reservation addUserToReservation(Long id, Long userId, int points) {
 		logger.info("> adding user to reservation with id {}", id);
 		Reservation reservation = this.findById(id);
@@ -184,7 +184,7 @@ public class ReservationService {
 		return reservation;
 	}
 
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
 	public Reservation inviteUsersToReservation(Long id, List<Long> users) {
 		logger.info("> inviting users to reservation with id {}", id);
 		Reservation reservation = this.findById(id);
@@ -204,7 +204,7 @@ public class ReservationService {
 		return reservation;
 	}
 
-	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	@Transactional(readOnly = true, propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
 	private void inviteUserToReservation(RegisteredUser user, List<RegisteredUser> friends, Reservation reservation) {
 		if(friends.contains(user)) {
 			for(PendingReservation pending : user.getPendingReservations())
@@ -228,7 +228,7 @@ public class ReservationService {
 		return reservation;
 	}
 
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
 	public Reservation acceptInvitation(Long id, Long userId) {
 		logger.info("> accepting invitation of reservation with id {}", id);
 		Reservation reservation = this.findById(id);
@@ -259,7 +259,6 @@ public class ReservationService {
 		Passenger passenger = new Passenger();
 		passenger.setFirstName(user.getFirstName());
 		passenger.setLastName(user.getLastName());
-		// TODO : Videti sta sa brojem pasosa
 		passenger.setPassportNumber(user.getId());
 		passenger.setUser(user);
 		logger.info("< created passenger");
@@ -357,7 +356,7 @@ public class ReservationService {
 		return reservation;
 	}
 	
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
 	public Reservation addRoomReservationToReservationWitdId(Long reservationid, Long roomReservationId) {
 		Reservation reservation = this.findById(reservationid);
 		RoomReservation roomReservation = roomReservationService.findById(roomReservationId);
@@ -393,6 +392,7 @@ public class ReservationService {
 		logger.info("< room reservation can be cancelled");
 	}
 
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
 	public boolean checkIfRoomIsFree(Date start, Date end, Room room) {
 		Date reservedStart = null;
 		Date reservedEnd = null;
@@ -476,7 +476,7 @@ public class ReservationService {
 		return r;
 	}
 
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
 	public Reservation create(Reservation reservation) {
 		logger.info("> creating reservation");
 		reservationRepository.save(reservation);
@@ -484,6 +484,7 @@ public class ReservationService {
 		return reservation;
 	}
 	
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
 	public List<Passenger> getPassengers(Long id){
 		logger.info("> getting passengers");
 		Optional<Reservation> reservation = reservationRepository.findById(id);
@@ -500,6 +501,7 @@ public class ReservationService {
 		return passengers;
 	}
 	
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
 	public List<Passenger> getUnregisteredPassengers(Long id){
 		logger.info("> getting unregistered passengers");
 		Optional<Reservation> reservation = reservationRepository.findById(id);
@@ -519,6 +521,7 @@ public class ReservationService {
 		return passengers;
 	}
 	
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
 	public List<FlightSeat> getFreeSeats(Long id){
 		logger.info("> getting free seats");
 		Optional<Reservation> reservation = reservationRepository.findById(id);
@@ -538,7 +541,7 @@ public class ReservationService {
 		return seats;
 	}
 	
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED)
 	public Passenger deletePassenger(Long id, Long passengerId) {
 		logger.info("> deleting passenger");
 		Optional<Reservation> reservation = reservationRepository.findById(id);

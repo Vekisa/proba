@@ -65,7 +65,7 @@ public class TicketService implements TicketServiceInterface {
 	}
 
 	@Override
-	@Transactional(readOnly = false, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
 	public Reservation saveTicket(Ticket ticket) {
 		logger.info("> saving ticket");
 		Reservation reservation = new Reservation();
