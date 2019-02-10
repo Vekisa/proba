@@ -7,5 +7,5 @@ install:
 deploy:
   provider: heroku
   api_key: 
-    secure: "08fbd936-05e8-4c7e-a363-f5e8ad26abc4"
-  app: malipauk
+    secure: "abf38e1d-9a61-48b2-befc-166a7e6f1a83"
+  app: jasampauk
