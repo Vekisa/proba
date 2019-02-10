@@ -869,6 +869,7 @@ $(document).on('click','#bookNow', function() {
         type: "GET",
         url: "users/registered/currentUser",
         dataType: "json",
+        contentType: "application/json",
         beforeSend: function(xhr) {
             if (localStorage.token) {
               xhr.setRequestHeader('X-Auth-Token', localStorage.token);	            
@@ -881,6 +882,7 @@ $(document).on('click','#bookNow', function() {
                     type: "POST",
                     url: "/reservations/" + reservation.id + "/user?user=" + data.id + "&points=" + pointsUser, 
                     dataType: "json",
+                    contentType: "application/json",
                     async: false,
                     success: function(data2){
                         //alert("postavio usera"); 
