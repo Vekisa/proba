@@ -72,7 +72,7 @@ public class SeatController {
 		return ResponseEntity.ok().build();
 	}
 
-	@RequestMapping(value = "/{id}/luggageInfo", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/{id}/luggageInfo", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value = "Postavlja informaciju o prtljagu za sedište.", notes = "Dodeljuje informaciju o prtljagu za sedište sa prosleđenim ID.", httpMethod = "PUT", produces = "application/json")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "OK", response = FlightSeat.class),
