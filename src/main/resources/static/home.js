@@ -954,7 +954,7 @@ $(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
 });
 
 $.ajaxSetup({
-        cache:false,
+        cache:true,
         beforeSend: function (xhr){ 
             if (localStorage.token) {
 		            xhr.setRequestHeader('X-Auth-Token', localStorage.token);
