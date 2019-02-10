@@ -33,7 +33,7 @@ public class EmailSenderService {
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Complete Registration!");
         mailMessage.setFrom("bice10izise@gmail.com");
-        mailMessage.setText("https://malipauk.herokuapp.com/users/registered/"+user.getConfirmationToken().getConfirmationToken()+"/confirm-account");
+        mailMessage.setText("https://jasampauk.herokuapp.com/users/registered/"+user.getConfirmationToken().getConfirmationToken()+"/confirm-account");
         this.sendEmail(mailMessage);
     }
     
