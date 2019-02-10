@@ -752,7 +752,6 @@ $(document).on('click','#bookNow', function() {
     $.ajax({
 		type: "POST",
 		url: "/tickets",
-		contentType: "application/json",
         dataType: "json",
         async: false,
         beforeSend: function(request) {
@@ -786,7 +785,7 @@ $(document).on('click','#bookNow', function() {
          $.ajax({
             type: "POST",
             url: "vehicle-reservations/create?vehicleId=" + vehicle + "&beginDate=" + s.getTime() + "&endDate=" + e.getTime(),
-            contentType: "application/json",
+            dataType: "json",
             async: false,
             success: function(data){
                 vehicleReservation = data;
@@ -794,7 +793,7 @@ $(document).on('click','#bookNow', function() {
                 $.ajax({
                     type: "POST",
                     url: "/reservations/" + reservation.id + "/set-vehicle-reservation/" + vehicleReservation.id,
-                    contentType: "application/json",
+                    dataType: "json",
                     async: false,
                     success: function(data){
                         //alert("povezao vozilo");
@@ -814,7 +813,7 @@ $(document).on('click','#bookNow', function() {
         $.ajax({
             type: "POST",
             url: "room_reservations/create-with-room/" + room + "?begin=" + s.getTime() + "&end=" + e.getTime(),
-            contentType: "application/json",
+            dataType: "json",
             async: false,
             success: function(data){
                 roomReservation = data;
@@ -864,6 +863,7 @@ $(document).on('click','#bookNow', function() {
     $.ajax({
         type: "GET",
         url: "users/registered/currentUser",
+        dataType: "json",
         beforeSend: function(xhr) {
             if (localStorage.token) {
               xhr.setRequestHeader('X-Auth-Token', localStorage.token);	            
@@ -875,7 +875,7 @@ $(document).on('click','#bookNow', function() {
                 $.ajax({
                     type: "POST",
                     url: "/reservations/" + reservation.id + "/user?user=" + data.id + "&points=" + pointsUser, 
-                    contentType: "application/json",
+                    dataType: "json",
                     async: false,
                     success: function(data2){
                         //alert("postavio usera"); 
