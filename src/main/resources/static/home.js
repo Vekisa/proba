@@ -171,6 +171,7 @@ $(document).on('click','#addLuggageInfo',function(e){
     $.ajax({
 		  url: "/seats/" + $('#seatSelect').val() + "/luggageInfo?luggageId="+ $('#luggageSelect').val(),
 		  type:"PUT",
+		  dataType: "json",
 		  success: function(data){   
               //alert("postavio");
 		  }
