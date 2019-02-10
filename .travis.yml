@@ -7,5 +7,5 @@ install:
 deploy:
   provider: heroku
   api_key: 
-    secure: "102db708-4368-4f02-a147-5c9434d8e960"
-  app: isaprojectvam
+    secure: "08fbd936-05e8-4c7e-a363-f5e8ad26abc4"
+  app: malipauk
