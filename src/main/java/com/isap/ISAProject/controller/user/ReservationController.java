@@ -146,7 +146,7 @@ public class ReservationController {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.removeRoomReservation(id)), HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/{id}/user", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/{id}/user", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAuthority('USERS_ADMIN') OR hasAuthority('REGULAR_USER')")
 	public ResponseEntity<Resource<Reservation>> addUserToReservation(@PathVariable(value = "id") Long id, @RequestParam("user") Long userId, @RequestParam("points") int points) {
 		return new ResponseEntity<Resource<Reservation>>(HATEOASImplementorUsers.createReservation(reservationService.addUserToReservation(id, userId, points)), HttpStatus.CREATED);
