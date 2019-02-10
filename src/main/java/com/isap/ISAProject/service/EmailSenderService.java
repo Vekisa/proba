@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.isap.ISAProject.model.user.RegisteredUser;
 import com.isap.ISAProject.model.user.Reservation;
 
+import antlr.debug.Event;
+
 @Service("emailSenderService")
 public class EmailSenderService {
 	
@@ -31,7 +33,7 @@ public class EmailSenderService {
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Complete Registration!");
         mailMessage.setFrom("bice10izise@gmail.com");
-        mailMessage.setText("http://localhost:8080/users/registered/"+user.getConfirmationToken().getConfirmationToken()+"/confirm-account");
+        mailMessage.setText("https://malipauk.herokuapp.com/users/registered/"+user.getConfirmationToken().getConfirmationToken()+"/confirm-account");
         this.sendEmail(mailMessage);
     }
     

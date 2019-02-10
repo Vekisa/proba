@@ -156,7 +156,6 @@ public class FlightController {
 			@ApiResponse(code = 400, message = "Bad Request. Prosleđeni ID nije validan."),
 			@ApiResponse(code = 404, message = "Not Found. Let ili konfiguraciju sa prosleđenim ID ne postoji.")
 	})
-	@PreAuthorize("hasAuthority('AIRLINE_ADMIN') AND @securityServiceImpl.hasAccessToFlight(#flightId)")
 	public ResponseEntity<Resource<Flight>> addConfigurationToFlightWithId(@PathVariable("id") Long flightId, @RequestParam("configId") Long configurationId) {
 		return new ResponseEntity<Resource<Flight>>(HATEOASImplementorAirline.createFlight(service.setConfigurationToFlight(configurationId, flightId)), HttpStatus.OK);
 	}
