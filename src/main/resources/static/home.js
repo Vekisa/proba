@@ -752,6 +752,7 @@ $(document).on('click','#bookNow', function() {
     $.ajax({
 		type: "POST",
 		url: "/tickets",
+		contentType: "application/json",
         dataType: "json",
         async: false,
         beforeSend: function(request) {
@@ -785,6 +786,7 @@ $(document).on('click','#bookNow', function() {
          $.ajax({
             type: "POST",
             url: "vehicle-reservations/create?vehicleId=" + vehicle + "&beginDate=" + s.getTime() + "&endDate=" + e.getTime(),
+            contentType: "application/json",
             dataType: "json",
             async: false,
             success: function(data){
@@ -793,6 +795,7 @@ $(document).on('click','#bookNow', function() {
                 $.ajax({
                     type: "POST",
                     url: "/reservations/" + reservation.id + "/set-vehicle-reservation/" + vehicleReservation.id,
+                    contentType: "application/json",
                     dataType: "json",
                     async: false,
                     success: function(data){
@@ -813,6 +816,7 @@ $(document).on('click','#bookNow', function() {
         $.ajax({
             type: "POST",
             url: "room_reservations/create-with-room/" + room + "?begin=" + s.getTime() + "&end=" + e.getTime(),
+            contentType: "application/json",
             dataType: "json",
             async: false,
             success: function(data){
@@ -822,6 +826,7 @@ $(document).on('click','#bookNow', function() {
                  $.ajax({
                     type: "POST",
                     url: "/reservations/" + reservation.id + "/set-room-reservation/" + roomReservation.id, 
+                    contentType: "application/json",
                     dataType: "json", 
                     async: false,
                     success: function(data){
