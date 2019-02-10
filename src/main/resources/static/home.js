@@ -153,6 +153,8 @@ $(document).ready(function(){
         $.ajax({
 		  url: "/seats/" + $(this).val() + "/luggageInfo",
 		  type:"GET",
+		  dataType: "json",
+		  contentType: "application/json",
 		  success: function(data){
               if(data == null){
                   //alert("nemaaaaa");
@@ -172,6 +174,7 @@ $(document).on('click','#addLuggageInfo',function(e){
 		  url: "/seats/" + $('#seatSelect').val() + "/luggageInfo?luggageId="+ $('#luggageSelect').val(),
 		  type:"PUT",
 		  dataType: "json",
+		  contentType: "application/json",
 		  success: function(data){   
               //alert("postavio");
 		  }
@@ -634,6 +637,8 @@ function printSC(){
         $.ajax({
             type: "GET",
             url: "/airlines/" + airline + "/luggageInfos",
+            dataType : "json",
+            contentType: "application/json",
             async: false,
             success: function(data){
                 //alert("dobio luggage");
@@ -687,6 +692,8 @@ function printSC(){
     if(flight != null && flight != "null" && flight != undefined){
         $.ajax({
               url: "/seats/" + $('#seatSelect').val() + "/luggageInfo",
+              dataType: "json",
+              contentType: "application/json",
               type:"GET",
               success: function(data){
                   if(data == null){
